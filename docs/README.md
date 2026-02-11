@@ -140,10 +140,10 @@ Complete testing and deployment checklist:
 
 ### Project Files
 
-- [Main README](../README.md)
-- [Backend Services](../)
-- [Start Script](../start-all.sh)
-- [Test Script](../test-services.sh)
+- [Backend Services README](../backend-services/README.md)
+- [Backend Services](../backend-services/)
+- [Start Script](../backend-services/start-all.sh)
+- [Test Script](../backend-services/test-services.sh)
 
 ---
 

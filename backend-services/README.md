@@ -99,21 +99,21 @@ curl -X POST http://localhost:8080/api/orders \
 
 ## 📚 Documentation
 
-Comprehensive documentation is available in the [`docs/`](docs/) directory:
+Comprehensive documentation is available in the [`docs/`](../docs/) directory:
 
 ### Getting Started
 
-- **[Setup Guide](docs/SETUP_GUIDE.md)** - Complete implementation guide with all configuration details
-- **[Quick Reference](docs/QUICK_REFERENCE.md)** - Command cheat sheet and common operations
+- **[Setup Guide](../docs/SETUP_GUIDE.md)** - Complete implementation guide with all configuration details
+- **[Quick Reference](../docs/QUICK_REFERENCE.md)** - Command cheat sheet and common operations
 
 ### Architecture & Design
 
-- **[Architecture Diagram](docs/ARCHITECTURE_DIAGRAM.md)** - Visual system architecture and request flow
-- **[Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md)** - Overview of what was built and how to use it
+- **[Architecture Diagram](../docs/ARCHITECTURE_DIAGRAM.md)** - Visual system architecture and request flow
+- **[Implementation Summary](../docs/IMPLEMENTATION_SUMMARY.md)** - Overview of what was built and how to use it
 
 ### Testing & Deployment
 
-- **[Checklist](docs/CHECKLIST.md)** - Testing, deployment, and troubleshooting checklist
+- **[Checklist](../docs/CHECKLIST.md)** - Testing, deployment, and troubleshooting checklist
 
 ## ⚡ Key Features
 
@@ -206,9 +206,9 @@ routes:
 
 For detailed troubleshooting and advanced topics, see:
 
-- [Setup Guide](docs/SETUP_GUIDE.md) - Comprehensive implementation guide
-- [Quick Reference](docs/QUICK_REFERENCE.md) - Common commands and solutions
-- [Checklist](docs/CHECKLIST.md) - Testing and deployment checklist
+- [Setup Guide](../docs/SETUP_GUIDE.md) - Comprehensive implementation guide
+- [Quick Reference](../docs/QUICK_REFERENCE.md) - Common commands and solutions
+- [Checklist](../docs/CHECKLIST.md) - Testing and deployment checklist
 
 ---
 
