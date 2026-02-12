@@ -31,7 +31,7 @@ makabasla-v2/
 
 ## 🚀 Quick Start
 
-### Backend Services
+### Backend Services (Standard)
 
 ```bash
 cd backend-services
@@ -44,6 +44,13 @@ cd backend-services
 
 # 3. Test services
 ./test-services.sh
+```
+
+### Backend Services (Docker)
+
+```bash
+# Start all microservices and infrastructure with one command
+docker compose up --build
 ```
 
 **Access Points:**
@@ -172,11 +179,11 @@ docs(api-gateway): update route configuration README
 - ✅ **API Gateway** - Complete with JWT and CORS
 - ✅ **User Service** - Complete with full CRUD
 - ✅ **Order Service** - Complete with user queries
-- 🚧 **Billing Service** - In progress
-- 🚧 **IAM Service** - In progress
-- 🚧 **Appointment Service** - Planned
-- 🚧 **Task Management Service** - Planned
-- 🚧 **Webstore Service** - Planned
+- ✅ **Billing Service** - Project initialized with Docker
+- ✅ **IAM Service** - Project initialized with Security & Docker
+- ✅ **Appointment Service** - Project initialized with Docker
+- ✅ **Task Management Service** - Project initialized with Docker
+- ✅ **Webstore Service** - Project initialized with Docker
 
 ## 🆘 Support
 
