@@ -1,4 +1,0 @@
-/Users/virul/Dev/makabasla-v2/backend-services/api-gateway/src/main/java/com/makabas/gateway/ApiGatewayApplication.java
-/Users/virul/Dev/makabasla-v2/backend-services/api-gateway/src/main/java/com/makabas/gateway/config/LoadBalancerConfiguration.java
-/Users/virul/Dev/makabasla-v2/backend-services/api-gateway/src/main/java/com/makabas/gateway/filter/GlobalFiltersConfiguration.java
-/Users/virul/Dev/makabasla-v2/backend-services/api-gateway/src/main/java/com/makabas/gateway/filter/JwtAuthenticationFilter.java

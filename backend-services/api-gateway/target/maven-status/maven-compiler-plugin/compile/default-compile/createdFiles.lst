@@ -1,5 +1,0 @@
-com/makabas/gateway/filter/JwtAuthenticationFilter.class
-com/makabas/gateway/ApiGatewayApplication.class
-com/makabas/gateway/filter/JwtAuthenticationFilter$Config.class
-com/makabas/gateway/config/LoadBalancerConfiguration.class
-com/makabas/gateway/filter/GlobalFiltersConfiguration.class

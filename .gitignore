@@ -45,5 +45,7 @@ buildNumber.properties
 .env
 .env.local
 
+.vscode/
+
 # OS #
 .DS_Store
