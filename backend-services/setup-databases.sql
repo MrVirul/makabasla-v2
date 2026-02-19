@@ -2,8 +2,6 @@
 -- Run this script to create all required databases
 
 -- Create databases for microservices
-CREATE DATABASE userdb;
-CREATE DATABASE orderdb;
 CREATE DATABASE billingdb;
 CREATE DATABASE iamdb;
 CREATE DATABASE appointmentdb;
