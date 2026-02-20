@@ -28,6 +28,8 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<sonar.organization>mrvirul</sonar.organization>
+		<sonar.projectKey>mrvirul_billing-service</sonar.projectKey>
 	</properties>
 	<dependencies>
 		<dependency>
