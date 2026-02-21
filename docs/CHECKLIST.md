@@ -1,4 +1,4 @@
-# 🎯 Microservices Implementation Checklist
+# 🎯 Makabasla Microservices Implementation Checklist
 
 ## ✅ What's Been Implemented
 
@@ -12,55 +12,63 @@
 
 - [x] **API Gateway** - Spring Cloud Gateway (Port 8080)
   - [x] Complete pom.xml with Gateway + Eureka dependencies
-  - [x] Route configuration for all services
+  - [x] Route configuration for IAM and Billing services
   - [x] CORS configuration for React frontend
   - [x] Global logging filter
   - [x] JWT authentication filter
-  - [x] Custom load balancer configuration
   - [x] Actuator endpoints including gateway routes
 
 ### Microservices
 
-- [x] **User Service** (Port 8081)
-  - [x] Complete pom.xml with JPA + PostgreSQL
+- [x] **IAM Service** (Port 8084)
   - [x] Application configuration
-  - [x] User entity (JPA)
-  - [x] User repository
-  - [x] User controller with full CRUD
+  - [x] Basic auth (admin/password)
   - [x] Eureka client registration
   - [x] Actuator health endpoints
 
-- [x] **Order Service** (Port 8082)
-  - [x] Complete pom.xml
+- [x] **Appointment Service** (Port 8085)
   - [x] Application configuration
-  - [x] Order entity (JPA)
-  - [x] Order repository
-  - [x] Order controller with full CRUD
-  - [x] User-specific order queries
+  - [x] PostgreSQL (appointmentdb)
+  - [x] JPA/Hibernate
   - [x] Eureka client registration
   - [x] Actuator health endpoints
 
-### Automation & Tools
+- [x] **Task Management Service** (Port 8086)
+  - [x] Application configuration
+  - [x] PostgreSQL (taskdb)
+  - [x] JPA/Hibernate
+  - [x] Eureka client registration
+  - [x] Actuator health endpoints
 
-- [x] **Shell Scripts**
-  - [x] start-all.sh - Automated service startup
-  - [x] stop-all.sh - Graceful shutdown
-  - [x] test-services.sh - Comprehensive testing
-  - [x] setup-databases.sh - PostgreSQL setup
-  - [x] All scripts made executable
+- [x] **Webstore Service** (Port 8087)
+  - [x] Application configuration
+  - [x] PostgreSQL (webstoredb)
+  - [x] JPA/Hibernate
+  - [x] Eureka client registration
+  - [x] Actuator health endpoints
 
-- [x] **Database Setup**
-  - [x] setup-databases.sql - Database creation script
-  - [x] Database configuration for each service
+- [x] **Billing Service**
+  - [x] Spring Boot 4.0.2
+  - [ ] Eureka client (standalone - add if needed)
+  - [ ] Gateway route configuration
+
+### Database Setup
+
+- [x] **setup-databases.sql** - Database creation script
+  - [x] billingdb
+  - [x] iamdb
+  - [x] appointmentdb
+  - [x] taskdb
+  - [x] webstoredb
 
 ### Documentation
 
-- [x] **MICROSERVICES_SETUP_GUIDE.md** - Complete implementation guide
-- [x] **README.md** - Quick start and setup instructions
-- [x] **QUICK_REFERENCE.md** - Command reference card
-- [x] **IMPLEMENTATION_SUMMARY.md** - Implementation overview
-- [x] **ARCHITECTURE_DIAGRAM.md** - Visual architecture diagrams
-- [x] **.gitignore** - Proper Git ignore rules
+- [x] **docs/README.md** - Documentation index
+- [x] **docs/SETUP_GUIDE.md** - Complete implementation guide
+- [x] **docs/QUICK_REFERENCE.md** - Command reference
+- [x] **docs/IMPLEMENTATION_SUMMARY.md** - Implementation overview
+- [x] **docs/ARCHITECTURE_DIAGRAM.md** - Visual architecture
+- [x] **docs/CHECKLIST.md** - This file
 
 ## 📋 Pre-Deployment Checklist
 
@@ -69,22 +77,23 @@
 - [ ] Java 21 installed and configured
 - [ ] Maven 3.8+ installed
 - [ ] PostgreSQL running on localhost:5432
-- [ ] Ports 8761, 8080, 8081, 8082 are available
+- [ ] Ports 8761, 8080, 8084, 8085, 8086, 8087 are available
 
 ### Database Setup
 
 - [ ] PostgreSQL service is running
-- [ ] Run `./setup-databases.sh` to create databases
+- [ ] Run `psql -U postgres -f backend-services/setup-databases.sql`
 - [ ] Verify databases exist: `psql -U postgres -l`
 - [ ] Update database credentials if needed in application.yml files
 
 ### Build & Test
 
-- [ ] Navigate to backend-services directory
-- [ ] Run `./start-all.sh` to start all services
-- [ ] Wait for all services to register (check http://localhost:8761)
-- [ ] Run `./test-services.sh` to verify everything works
-- [ ] Check all services appear in Eureka Dashboard
+- [ ] Navigate to project root
+- [ ] Run `mvn clean install` to build all modules
+- [ ] Start Eureka: `cd backend-services/eureka-server && mvn spring-boot:run`
+- [ ] Start Gateway: `cd backend-services/api-gateway && mvn spring-boot:run`
+- [ ] Start services: IAM, Appointment, Task Mgt, Webstore
+- [ ] Check http://localhost:8761 for registered services
 
 ## 🧪 Testing Checklist
 
@@ -92,43 +101,26 @@
 
 - [ ] Eureka Dashboard accessible at http://localhost:8761
 - [ ] API-GATEWAY registered in Eureka
-- [ ] USER-SERVICE registered in Eureka
-- [ ] ORDER-SERVICE registered in Eureka
+- [ ] IAM-SERVICE registered in Eureka
+- [ ] APPOINTMENT-SERVICE registered in Eureka
+- [ ] TASK-MGT-SERVICE registered in Eureka
+- [ ] WEBSTORE-SERVICE registered in Eureka
 
 ### Health Checks
 
-- [ ] Eureka Server health: `curl http://localhost:8761/actuator/health`
-- [ ] API Gateway health: `curl http://localhost:8080/actuator/health`
-- [ ] User Service health: `curl http://localhost:8081/actuator/health`
-- [ ] Order Service health: `curl http://localhost:8082/actuator/health`
+- [ ] Eureka Server: `curl http://localhost:8761/actuator/health`
+- [ ] API Gateway: `curl http://localhost:8080/actuator/health`
+- [ ] IAM Service: `curl http://localhost:8084/actuator/health`
+- [ ] Appointment Service: `curl http://localhost:8085/actuator/health`
+- [ ] Task Mgt Service: `curl http://localhost:8086/actuator/health`
+- [ ] Webstore Service: `curl http://localhost:8087/actuator/health`
 
 ### API Gateway Routes
 
 - [ ] View routes: `curl http://localhost:8080/actuator/gateway/routes`
-- [ ] USER-SERVICE route exists
-- [ ] ORDER-SERVICE route exists
-
-### User Service API
-
-- [ ] Create user via Gateway: `curl -X POST http://localhost:8080/api/users ...`
-- [ ] Get all users: `curl http://localhost:8080/api/users`
-- [ ] Get user by ID: `curl http://localhost:8080/api/users/1`
-- [ ] Update user: `curl -X PUT http://localhost:8080/api/users/1 ...`
-- [ ] Delete user: `curl -X DELETE http://localhost:8080/api/users/1`
-
-### Order Service API
-
-- [ ] Create order via Gateway: `curl -X POST http://localhost:8080/api/orders ...`
-- [ ] Get all orders: `curl http://localhost:8080/api/orders`
-- [ ] Get order by ID: `curl http://localhost:8080/api/orders/1`
-- [ ] Get orders by user: `curl http://localhost:8080/api/orders/user/1`
-- [ ] Delete order: `curl -X DELETE http://localhost:8080/api/orders/1`
-
-### Load Balancing
-
-- [ ] Start second instance of User Service on different port
-- [ ] Verify both instances registered in Eureka
-- [ ] Test requests are distributed (check logs)
+- [ ] IAM-SERVICE route exists (/api/auth/**)
+- [ ] BILLING-SERVICE route exists (/api/billing/**)
+- [ ] Consider adding routes for appointment, task, webstore
 
 ### CORS
 
@@ -144,6 +136,7 @@
 - [ ] Update PostgreSQL passwords (production)
 - [ ] Configure HTTPS/TLS (production)
 - [ ] Enable JWT filter on protected routes (if needed)
+- [ ] Change IAM default admin/password (production)
 
 ### Performance
 
@@ -165,8 +158,7 @@
 
 - [x] All services run on localhost
 - [x] PostgreSQL accessible on localhost:5432
-- [x] Services can be started with ./start-all.sh
-- [x] Services can be stopped with ./stop-all.sh
+- [ ] Consider creating start-all.sh, stop-all.sh scripts
 
 ### Docker (Future)
 
@@ -184,41 +176,13 @@
 - [ ] Set up Horizontal Pod Autoscaling
 - [ ] Deploy to K8s cluster
 
-## 📚 Integration Checklist
-
-### React Frontend
-
-- [ ] Update API base URL to http://localhost:8080
-- [ ] Implement JWT token storage
-- [ ] Add Authorization header to requests
-- [ ] Handle CORS properly
-- [ ] Implement error handling
-- [ ] Add loading states
-
-### IAM Service
-
-- [ ] Implement user authentication
-- [ ] Generate JWT tokens
-- [ ] Store user credentials securely
-- [ ] Implement refresh token logic
-- [ ] Register with Eureka
-- [ ] Add routes to API Gateway
-
-### Billing Service
-
-- [ ] Implement billing logic
-- [ ] Integrate with Order Service
-- [ ] Register with Eureka
-- [ ] Add routes to API Gateway
-
 ## 🔍 Troubleshooting Checklist
 
 ### Services Won't Start
 
 - [ ] Check Java version: `java -version` (should be 21)
 - [ ] Check Maven version: `mvn -version` (should be 3.8+)
-- [ ] Check ports are available: `lsof -i :8761,8080,8081,8082`
-- [ ] Check logs in logs/ directory
+- [ ] Check ports: `lsof -i :8761,8080,8084,8085,8086,8087`
 - [ ] Run `mvn clean install` to rebuild
 
 ### Service Not Registering
@@ -267,6 +231,7 @@
 
 ### Immediate
 
+- [ ] Add gateway routes for appointment, task, webstore (if needed)
 - [ ] Test all endpoints thoroughly
 - [ ] Integrate with React frontend
 - [ ] Implement proper error handling
@@ -274,10 +239,11 @@
 
 ### Short Term
 
-- [ ] Implement JWT authentication in IAM service
+- [ ] Implement JWT token generation in IAM service
 - [ ] Add API documentation (SpringDoc OpenAPI)
 - [ ] Set up centralized logging
 - [ ] Implement Circuit Breaker pattern
+- [ ] Create start-all.sh, stop-all.sh, test-services.sh scripts
 
 ### Long Term
 
@@ -297,22 +263,21 @@ You'll know the implementation is successful when:
 2. ✅ All services register with Eureka within 30 seconds
 3. ✅ Eureka Dashboard shows all services as UP
 4. ✅ API Gateway routes requests to correct services
-5. ✅ CRUD operations work through Gateway
-6. ✅ Health checks return 200 OK for all services
-7. ✅ Load balancing distributes requests
-8. ✅ React frontend can communicate with backend
-9. ✅ Database operations complete successfully
-10. ✅ All tests in test-services.sh pass
+5. ✅ Health checks return 200 OK for all services
+6. ✅ Load balancing distributes requests (when multiple instances)
+7. ✅ React frontend can communicate with backend
+8. ✅ Database operations complete successfully
 
 ## 📝 Notes
 
-- All services are Spring Boot 3.2.2 compatible
-- Spring Cloud version is 2023.0.0 (latest stable)
-- Java 21 is required (not compatible with older versions)
-- PostgreSQL can be substituted with other databases by updating dependencies
-- Gateway uses WebFlux (reactive), services use traditional Spring MVC
+- Core services use Spring Boot 3.2.2
+- Billing service uses Spring Boot 4.0.2
+- Spring Cloud version is 2023.0.0
+- Java 21 is required
+- PostgreSQL databases: appointmentdb, taskdb, webstoredb, billingdb, iamdb
+- Gateway uses WebFlux (reactive), services use Spring MVC
 
 ---
 
-**Last Updated**: 2026-02-11  
+**Last Updated**: 2026-02-21  
 **Status**: ✅ Implementation Complete - Ready for Testing
