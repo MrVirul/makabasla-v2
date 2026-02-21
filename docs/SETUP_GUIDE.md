@@ -1082,66 +1082,28 @@ public class OrderController {
 
 ```
 makabasla-v2/
+├── pom.xml                    # Parent POM (makabasla-parent)
 ├── backend-services/
 │   ├── eureka-server/
-│   │   ├── src/
-│   │   │   └── main/
-│   │   │       ├── java/
-│   │   │       │   └── com/makabas/eureka/
-│   │   │       │       └── EurekaServerApplication.java
-│   │   │       └── resources/
-│   │   │           └── application.yml
+│   │   ├── src/main/java/com/makabas/eureka/
 │   │   └── pom.xml
 │   │
 │   ├── api-gateway/
-│   │   ├── src/
-│   │   │   └── main/
-│   │   │       ├── java/
-│   │   │       │   └── com/makabas/gateway/
-│   │   │       │       ├── ApiGatewayApplication.java
-│   │   │       │       ├── filter/
-│   │   │       │       │   ├── GlobalFiltersConfiguration.java
-│   │   │       │       │   └── JwtAuthenticationFilter.java
-│   │   │       │       └── config/
-│   │   │       │           └── LoadBalancerConfiguration.java
-│   │   │       └── resources/
-│   │   │           └── application.yml
+│   │   ├── src/main/java/com/makabas/gateway/
+│   │   │   ├── filter/ (GlobalFiltersConfiguration, JwtAuthenticationFilter)
+│   │   │   └── config/ (LoadBalancerConfiguration)
 │   │   └── pom.xml
 │   │
-│   ├── user-service/
-│   │   ├── src/
-│   │   │   └── main/
-│   │   │       ├── java/
-│   │   │       │   └── com/makabas/userservice/
-│   │   │       │       ├── UserServiceApplication.java
-│   │   │       │       ├── controller/
-│   │   │       │       │   └── UserController.java
-│   │   │       │       ├── entity/
-│   │   │       │       │   └── User.java
-│   │   │       │       └── repository/
-│   │   │       │           └── UserRepository.java
-│   │   │       └── resources/
-│   │   │           └── application.yml
-│   │   └── pom.xml
-│   │
-│   └── order-service/
-│       ├── src/
-│       │   └── main/
-│       │       ├── java/
-│       │       │   └── com/makabas/orderservice/
-│       │       │       ├── OrderServiceApplication.java
-│       │       │       ├── controller/
-│       │       │       │   └── OrderController.java
-│       │       │       ├── entity/
-│       │       │       │   └── Order.java
-│       │       │       └── repository/
-│       │       │           └── OrderRepository.java
-│       │       └── resources/
-│       │           └── application.yml
-│       └── pom.xml
+│   ├── iam-service/
+│   ├── appointment-service/
+│   ├── task-mgt-service/
+│   ├── webstore-service/
+│   ├── billing-service/
+│   ├── setup-databases.sql
+│   └── README.md
 │
-└── frontend/
-    └── (React app)
+└── docs/
+    └── (Documentation)
 ```
 
 ---
@@ -1159,41 +1121,43 @@ Queries Eureka Server (localhost:8761)
     ↓
 Routes to Microservice
     ↓
-USER-SERVICE (localhost:8081) or ORDER-SERVICE (localhost:8082)
+IAM-SERVICE (8084) | APPOINTMENT-SERVICE (8085) | TASK-MGT-SERVICE (8086) | WEBSTORE-SERVICE (8087)
 ```
 
 ### Startup Sequence
 
 ```bash
 # 1. Start Eureka Server
-cd eureka-server
+cd backend-services/eureka-server
 mvn spring-boot:run
 
 # 2. Wait 10 seconds, then start API Gateway
 cd ../api-gateway
 mvn spring-boot:run
 
-# 3. Start User Service
-cd ../user-service
+# 3. Start IAM Service
+cd ../iam-service
 mvn spring-boot:run
 
-# 4. Start Order Service
-cd ../order-service
-mvn spring-boot:run
+# 4. Start Appointment, Task Mgt, Webstore services
+cd ../appointment-service && mvn spring-boot:run
+cd ../task-mgt-service && mvn spring-boot:run
+cd ../webstore-service && mvn spring-boot:run
 ```
 
 ### Create PostgreSQL Databases
 
 ```bash
-# Connect to PostgreSQL
-psql -U postgres
+# Run setup script
+cd backend-services
+psql -U postgres -f setup-databases.sql
 
-# Create databases
-CREATE DATABASE userdb;
-CREATE DATABASE orderdb;
-
-# Exit
-\q
+# Or manually
+psql -U postgres -c "CREATE DATABASE billingdb;"
+psql -U postgres -c "CREATE DATABASE iamdb;"
+psql -U postgres -c "CREATE DATABASE appointmentdb;"
+psql -U postgres -c "CREATE DATABASE taskdb;"
+psql -U postgres -c "CREATE DATABASE webstoredb;"
 ```
 
 ### cURL Test Examples
@@ -1210,56 +1174,35 @@ curl http://localhost:8761
 curl http://localhost:8080/actuator/health
 ```
 
-#### Create User (via Gateway)
+#### IAM Service (via Gateway)
 
 ```bash
-curl -X POST http://localhost:8080/api/users \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
-    "phone": "1234567890"
-  }'
+curl -u admin:password http://localhost:8080/api/auth/actuator/info
 ```
 
-#### Get All Users (via Gateway)
+#### Health Checks (via Gateway)
 
 ```bash
-curl http://localhost:8080/api/users
+curl http://localhost:8080/api/auth/actuator/health
+curl http://localhost:8080/api/billing/actuator/health
 ```
 
-#### Get User by ID (via Gateway)
+#### Direct Service Access
 
 ```bash
-curl http://localhost:8080/api/users/1
-```
-
-#### Create Order (via Gateway)
-
-```bash
-curl -X POST http://localhost:8080/api/orders \
-  -H "Content-Type: application/json" \
-  -d '{
-    "userId": 1,
-    "productName": "Laptop",
-    "quantity": 2,
-    "totalPrice": 2000.00
-  }'
-```
-
-#### Get Orders by User ID (via Gateway)
-
-```bash
-curl http://localhost:8080/api/orders/user/1
+curl http://localhost:8084/actuator/health   # IAM
+curl http://localhost:8085/actuator/health   # Appointment
+curl http://localhost:8086/actuator/health   # Task Mgt
+curl http://localhost:8087/actuator/health   # Webstore
 ```
 
 #### Test with JWT (if JWT filter is enabled)
 
 ```bash
-# First, get a JWT token from your auth service
+# First, get a JWT token from IAM service
 TOKEN="your-jwt-token-here"
 
-curl -X GET http://localhost:8080/api/users \
+curl -X GET http://localhost:8080/api/auth/... \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -1287,41 +1230,40 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const userService = {
-  getAllUsers: () => api.get("/users"),
-  getUserById: (id) => api.get(`/users/${id}`),
-  createUser: (user) => api.post("/users", user),
-  updateUser: (id, user) => api.put(`/users/${id}`, user),
-  deleteUser: (id) => api.delete(`/users/${id}`),
+export const authService = {
+  login: (credentials) => api.post("/auth/login", credentials),
+  getProfile: () => api.get("/auth/profile"),
 };
 
-export const orderService = {
-  getAllOrders: () => api.get("/orders"),
-  getOrderById: (id) => api.get(`/orders/${id}`),
-  getOrdersByUserId: (userId) => api.get(`/orders/user/${userId}`),
-  createOrder: (order) => api.post("/orders", order),
-  deleteOrder: (id) => api.delete(`/orders/${id}`),
+export const appointmentService = {
+  getAppointments: () => api.get("/appointments"),
+  createAppointment: (data) => api.post("/appointments", data),
+};
+
+export const taskService = {
+  getTasks: () => api.get("/tasks"),
+  createTask: (data) => api.post("/tasks", data),
 };
 ```
 
 ```javascript
 // Example React Component
 import React, { useEffect, useState } from "react";
-import { userService } from "./services/api";
+import { appointmentService } from "./services/api";
 
-function UserList() {
-  const [users, setUsers] = useState([]);
+function AppointmentList() {
+  const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    userService
-      .getAllUsers()
+    appointmentService
+      .getAppointments()
       .then((response) => {
-        setUsers(response.data);
+        setAppointments(response.data);
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching appointments:", error);
         setLoading(false);
       });
   }, []);
@@ -1330,19 +1272,17 @@ function UserList() {
 
   return (
     <div>
-      <h1>Users</h1>
-      {users.map((user) => (
-        <div key={user.id}>
-          <p>
-            {user.name} - {user.email}
-          </p>
+      <h1>Appointments</h1>
+      {appointments.map((apt) => (
+        <div key={apt.id}>
+          <p>{apt.title || apt.id}</p>
         </div>
       ))}
     </div>
   );
 }
 
-export default UserList;
+export default AppointmentList;
 ```
 
 ---
@@ -1351,13 +1291,14 @@ export default UserList;
 
 ### Port Assignment Strategy
 
-| Service         | Port | Environment Variable      |
-| --------------- | ---- | ------------------------- |
-| Eureka Server   | 8761 | Fixed (industry standard) |
-| API Gateway     | 8080 | `SERVER_PORT=8080`        |
-| User Service    | 8081 | `SERVER_PORT=8081`        |
-| Order Service   | 8082 | `SERVER_PORT=8082`        |
-| Billing Service | 8083 | `SERVER_PORT=8083`        |
+| Service           | Port | Environment Variable      |
+| ----------------- | ---- | ------------------------- |
+| Eureka Server     | 8761 | Fixed (industry standard) |
+| API Gateway       | 8080 | `SERVER_PORT=8080`        |
+| IAM Service       | 8084 | `SERVER_PORT=8084`        |
+| Appointment Service | 8085 | `SERVER_PORT=8085`      |
+| Task Mgt Service  | 8086 | `SERVER_PORT=8086`        |
+| Webstore Service | 8087 | `SERVER_PORT=8087`        |
 
 **For Production:**
 
@@ -1525,17 +1466,19 @@ cd backend-services/eureka-server && mvn spring-boot:run
 # 2. Start Gateway (in new terminal)
 cd backend-services/api-gateway && mvn spring-boot:run
 
-# 3. Start User Service (in new terminal)
-cd backend-services/user-service && mvn spring-boot:run
+# 3. Start IAM Service (in new terminal)
+cd backend-services/iam-service && mvn spring-boot:run
 
-# 4. Start Order Service (in new terminal)
-cd backend-services/order-service && mvn spring-boot:run
+# 4. Start other services (in new terminals)
+cd backend-services/appointment-service && mvn spring-boot:run
+cd backend-services/task-mgt-service && mvn spring-boot:run
+cd backend-services/webstore-service && mvn spring-boot:run
 
 # 5. Verify all services registered
 open http://localhost:8761
 
 # 6. Test via Gateway
-curl http://localhost:8080/api/users
+curl http://localhost:8080/actuator/health
 ```
 
 ---
@@ -1544,11 +1487,13 @@ curl http://localhost:8080/api/users
 
 - **Eureka Dashboard**: http://localhost:8761
 - **Gateway Actuator**: http://localhost:8080/actuator
-- **User Service Health**: http://localhost:8081/actuator/health
-- **Order Service Health**: http://localhost:8082/actuator/health
+- **IAM Service Health**: http://localhost:8084/actuator/health
+- **Appointment Service Health**: http://localhost:8085/actuator/health
+- **Task Mgt Service Health**: http://localhost:8086/actuator/health
+- **Webstore Service Health**: http://localhost:8087/actuator/health
 - **Gateway Routes**: http://localhost:8080/actuator/gateway/routes
 
 ---
 
 **Version**: Spring Boot 3.2.2, Spring Cloud 2023.0.0, Java 21  
-**Last Updated**: 2026-02-11
+**Last Updated**: 2026-02-21

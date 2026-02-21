@@ -142,8 +142,6 @@ Complete testing and deployment checklist:
 
 - [Backend Services README](../backend-services/README.md)
 - [Backend Services](../backend-services/)
-- [Start Script](../backend-services/start-all.sh)
-- [Test Script](../backend-services/test-services.sh)
 
 ---
 
@@ -159,6 +157,6 @@ When updating documentation:
 
 ---
 
-**Documentation Version**: 1.0.0  
-**Last Updated**: 2026-02-11  
+**Documentation Version**: 1.1.0  
+**Last Updated**: 2026-02-21  
 **Maintained by**: Development Team

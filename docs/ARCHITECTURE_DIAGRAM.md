@@ -19,8 +19,9 @@
 │  │  • JWT Authentication Filter                            │    │
 │  │  • Global Logging Filter                                │    │
 │  │  • Load Balancing (Round Robin)                         │    │
-│  │  • Route: /api/users/**  → USER-SERVICE                │    │
-│  │  • Route: /api/orders/** → ORDER-SERVICE               │    │
+│  │  • Route: /api/auth/**     → IAM-SERVICE                │    │
+│  │  • Route: /api/billing/**  → BILLING-SERVICE            │    │
+│  │  • Service Discovery Locator (dynamic routes)          │    │
 │  └────────────────────────────────────────────────────────┘    │
 └─────────────────────────┬───────────────────────────────────────┘
                           │
@@ -32,39 +33,40 @@
 │  ┌────────────────────────────────────────────────────────┐    │
 │  │  Service Registry:                                      │    │
 │  │  ✓ API-GATEWAY         (1 instance)                    │    │
-│  │  ✓ USER-SERVICE        (1+ instances)                  │    │
-│  │  ✓ ORDER-SERVICE       (1+ instances)                  │    │
-│  │  ✓ BILLING-SERVICE     (1+ instances)                  │    │
 │  │  ✓ IAM-SERVICE         (1+ instances)                  │    │
+│  │  ✓ APPOINTMENT-SERVICE (1+ instances)                  │    │
+│  │  ✓ TASK-MGT-SERVICE    (1+ instances)                  │    │
+│  │  ✓ WEBSTORE-SERVICE    (1+ instances)                  │    │
+│  │  ✓ BILLING-SERVICE     (when Eureka-enabled)           │    │
 │  └────────────────────────────────────────────────────────┘    │
 └─────────────────────────┬───────────────────────────────────────┘
                           │
                           │ Load Balanced
                           │
-        ┌─────────────────┼─────────────────┐
-        │                 │                 │
-        ▼                 ▼                 ▼
-┌───────────────┐ ┌───────────────┐ ┌───────────────┐
-│ User Service  │ │ Order Service │ │Other Services │
-│ (Port 8081)   │ │ (Port 8082)   │ │ (Port 808X)   │
-├───────────────┤ ├───────────────┤ ├───────────────┤
-│ • CRUD Users  │ │ • CRUD Orders │ │ • Billing     │
-│ • JPA/Hibernate│ │• User Orders  │ │ • IAM/Auth    │
-│ • Actuator    │ │ • Actuator    │ │ • Etc...      │
-└───────┬───────┘ └───────┬───────┘ └───────┬───────┘
-        │                 │                 │
-        ▼                 ▼                 ▼
-┌───────────────┐ ┌───────────────┐ ┌───────────────┐
-│  PostgreSQL   │ │  PostgreSQL   │ │  PostgreSQL   │
-│    userdb     │ │   orderdb     │ │   otherdb     │
-│ (Port 5432)   │ │ (Port 5432)   │ │ (Port 5432)   │
-└───────────────┘ └───────────────┘ └───────────────┘
+        ┌─────────────────┼─────────────────┬─────────────────┐
+        │                 │                 │                 │
+        ▼                 ▼                 ▼                 ▼
+┌───────────────┐ ┌───────────────┐ ┌───────────────┐ ┌───────────────┐
+│ IAM Service   │ │ Appointment   │ │ Task Mgt      │ │ Webstore      │
+│ (Port 8084)   │ │ (Port 8085)   │ │ (Port 8086)   │ │ (Port 8087)   │
+├───────────────┤ ├───────────────┤ ├───────────────┤ ├───────────────┤
+│ • Auth        │ │ • Appointments│ │ • Tasks       │ │ • Products    │
+│ • Actuator    │ │ • JPA/Postgres│ │ • JPA/Postgres│ │ • JPA/Postgres│
+│               │ │ • Actuator    │ │ • Actuator    │ │ • Actuator    │
+└───────┬───────┘ └───────┬───────┘ └───────┬───────┘ └───────┬───────┘
+        │                 │                 │                 │
+        ▼                 ▼                 ▼                 ▼
+┌───────────────┐ ┌───────────────┐ ┌───────────────┐ ┌───────────────┐
+│  (No DB)      │ │  PostgreSQL   │ │  PostgreSQL   │ │  PostgreSQL   │
+│               │ │ appointmentdb │ │   taskdb      │ │ webstoredb    │
+│               │ │ (Port 5432)   │ │ (Port 5432)   │ │ (Port 5432)   │
+└───────────────┘ └───────────────┘ └───────────────┘ └───────────────┘
 ```
 
 ## Request Flow
 
 ```
-1. React sends: GET /api/users/1
+1. React sends: GET /api/auth/actuator/health
    ↓
 2. API Gateway receives request
    ↓
@@ -72,27 +74,25 @@
    ↓
 4. Global Logging Filter logs request
    ↓
-5. Route matching: /api/users/** matches user-service route
+5. Route matching: /api/auth/** matches iam-service route
    ↓
-6. Gateway queries Eureka: "Where is USER-SERVICE?"
+6. Gateway queries Eureka: "Where is IAM-SERVICE?"
    ↓
-7. Eureka returns: [instance1: localhost:8081, instance2: localhost:8091]
+7. Eureka returns: [instance: localhost:8084]
    ↓
 8. Load Balancer selects instance (Round Robin)
    ↓
-9. Gateway rewrites path: /api/users/1 → /users/1
+9. Gateway rewrites path: /api/auth/actuator/health → /actuator/health
    ↓
-10. Forward to: http://localhost:8081/users/1
+10. Forward to: http://localhost:8084/actuator/health
     ↓
-11. User Service processes request
+11. IAM Service processes request
     ↓
-12. Query PostgreSQL userdb
+12. Return response
     ↓
-13. Return user data
+13. API Gateway logs response
     ↓
-14. API Gateway logs response
-    ↓
-15. Return to React Frontend
+14. Return to React Frontend
 ```
 
 ## Service Communication
@@ -102,32 +102,35 @@
 │   Gateway    │
 └──────┬───────┘
        │
-       │ lb://USER-SERVICE/users/1
+       │ lb://IAM-SERVICE/...
        ▼
 ┌──────────────┐     ┌──────────────┐
-│    Eureka    │────▶│UserService:1 │ http://localhost:8081
-└──────────────┘     │UserService:2 │ http://localhost:8091
+│    Eureka    │────▶│ IAM-SERVICE   │ http://localhost:8084
+└──────────────┘     │ APPOINTMENT  │ http://localhost:8085
+                     │ TASK-MGT     │ http://localhost:8086
+                     │ WEBSTORE     │ http://localhost:8087
                      └──────────────┘
                      Load Balanced!
 ```
 
 ## Port Allocation
 
-| Service         | Port | Protocol | Purpose           |
-| --------------- | ---- | -------- | ----------------- |
-| Eureka Server   | 8761 | HTTP     | Service Discovery |
-| API Gateway     | 8080 | HTTP     | API Gateway       |
-| User Service    | 8081 | HTTP     | User Management   |
-| Order Service   | 8082 | HTTP     | Order Management  |
-| Billing Service | 8083 | HTTP     | Billing (Future)  |
-| IAM Service     | 8084 | HTTP     | Auth (Future)     |
-| PostgreSQL      | 5432 | TCP      | Database          |
+| Service           | Port | Protocol | Purpose              |
+| ----------------- | ---- | -------- | -------------------- |
+| Eureka Server     | 8761 | HTTP     | Service Discovery    |
+| API Gateway       | 8080 | HTTP     | API Gateway          |
+| IAM Service       | 8084 | HTTP     | Auth & Identity      |
+| Appointment Service | 8085 | HTTP   | Appointment Booking  |
+| Task Mgt Service  | 8086 | HTTP     | Task Management      |
+| Webstore Service  | 8087 | HTTP     | Web Store            |
+| Billing Service   | TBD  | HTTP     | Billing (standalone)  |
+| PostgreSQL        | 5432 | TCP      | Database             |
 
 ## Technology Stack
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                  Spring Boot 3.2.2                      │
+│                  Spring Boot 3.2.2 / 4.0.2              │
 │                  Spring Cloud 2023.0.0                  │
 │                  Java 21                                │
 └─────────────────────────────────────────────────────────┘
@@ -136,7 +139,7 @@
         │                 │                 │
         ▼                 ▼                 ▼
 ┌───────────────┐ ┌───────────────┐ ┌───────────────┐
-│   Discovery   │ │    Gateway    │ │   Services    │
+│   Discovery   │ │    Gateway     │ │   Services    │
 ├───────────────┤ ├───────────────┤ ├───────────────┤
 │ Netflix       │ │ Spring Cloud  │ │ Spring Web    │
 │ Eureka        │ │ Gateway       │ │ Spring Data   │
@@ -154,19 +157,15 @@
 │                    PostgreSQL                           │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐            │
-│  │  userdb  │  │ orderdb  │  │billingdb │  ...       │
-│  ├──────────┤  ├──────────┤  ├──────────┤            │
-│  │          │  │          │  │          │            │
-│  │  users   │  │  orders  │  │ invoices │            │
-│  │ ──────── │  │ ──────── │  │ ──────── │            │
-│  │ •id      │  │ •id      │  │ •id      │            │
-│  │ •name    │  │ •userId  │  │ •orderId │            │
-│  │ •email   │  │ •product │  │ •amount  │            │
-│  │ •phone   │  │ •quantity│  │ •status  │            │
-│  │          │  │ •price   │  │          │            │
-│  │          │  │ •date    │  │          │            │
-│  └──────────┘  └──────────┘  └──────────┘            │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+│  │appointmentdb│ │  taskdb  │  │webstoredb│  │ billingdb │
+│  ├──────────┤  ├──────────┤  ├──────────┤  ├──────────┤
+│  │          │  │          │  │          │  │          │
+│  │appointments│ │  tasks   │  │ products │  │ invoices │
+│  │ ──────── │  │ ──────── │  │ ──────── │  │ ──────── │
+│  │ •id      │  │ •id      │  │ •id      │  │ •id      │
+│  │ •...     │  │ •...     │  │ •...     │  │ •...     │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘
 │                                                         │
 │  Database Per Service Pattern                          │
 └─────────────────────────────────────────────────────────┘
@@ -177,11 +176,14 @@
 ### Local Development (Current)
 
 ```
-MacBook
+Development Machine
 ├── Eureka Server   (Java Process)
 ├── API Gateway     (Java Process)
-├── User Service    (Java Process)
-├── Order Service   (Java Process)
+├── IAM Service     (Java Process)
+├── Appointment Service (Java Process)
+├── Task Mgt Service (Java Process)
+├── Webstore Service (Java Process)
+├── Billing Service  (Java Process)
 └── PostgreSQL      (Background Service)
 ```
 
@@ -191,8 +193,11 @@ MacBook
 Docker Compose
 ├── eureka-server:latest
 ├── api-gateway:latest
-├── user-service:latest
-├── order-service:latest
+├── iam-service:latest
+├── appointment-service:latest
+├── task-mgt-service:latest
+├── webstore-service:latest
+├── billing-service:latest
 └── postgres:14
 ```
 
@@ -202,8 +207,11 @@ Docker Compose
 K8s Cluster
 ├── eureka-server    (Deployment + Service)
 ├── api-gateway      (Deployment + Service + Ingress)
-├── user-service     (Deployment + Service + HPA)
-├── order-service    (Deployment + Service + HPA)
+├── iam-service      (Deployment + Service + HPA)
+├── appointment-service (Deployment + Service + HPA)
+├── task-mgt-service (Deployment + Service + HPA)
+├── webstore-service (Deployment + Service + HPA)
+├── billing-service  (Deployment + Service + HPA)
 └── postgres         (StatefulSet + PVC)
 ```
 
@@ -224,14 +232,6 @@ K8s Cluster
 │  • /actuator/metrics   - Application metrics           │
 │  • /actuator/info      - Application info              │
 │  • /actuator/gateway/routes - Gateway routes (8080)    │
-└─────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────┐
-│                 Service Logs                            │
-│  • logs/eureka.log     - Eureka Server                 │
-│  • logs/gateway.log    - API Gateway                   │
-│  • logs/user-service.log - User Service                │
-│  • logs/order-service.log - Order Service              │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -272,29 +272,29 @@ K8s Cluster
 ## File Structure Summary
 
 ```
-backend-services/
-├── eureka-server/           (15+ files)
-├── api-gateway/             (20+ files)
-├── user-service/            (18+ files)
-├── order-service/           (18+ files)
-├── billing-service/         (existing)
-├── iam-service/             (existing)
-├── logs/                    (generated)
-├── start-all.sh            ✓
-├── stop-all.sh             ✓
-├── test-services.sh        ✓
-├── setup-databases.sh      ✓
-├── setup-databases.sql     ✓
-├── README.md               ✓
-├── QUICK_REFERENCE.md      ✓
-├── IMPLEMENTATION_SUMMARY.md ✓
-└── .gitignore              ✓
-
-Total: 4 services + 3 automation scripts + 4 docs = Ready to run!
+makabasla-v2/
+├── pom.xml                    # Parent POM
+├── backend-services/
+│   ├── eureka-server/         (Service Discovery)
+│   ├── api-gateway/           (Gateway + Filters)
+│   ├── iam-service/           (Auth)
+│   ├── appointment-service/   (Appointments)
+│   ├── task-mgt-service/      (Tasks)
+│   ├── webstore-service/     (Web Store)
+│   ├── billing-service/      (Billing)
+│   ├── setup-databases.sql   ✓
+│   └── README.md             ✓
+└── docs/                      # Documentation
+    ├── README.md             ✓
+    ├── SETUP_GUIDE.md       ✓
+    ├── QUICK_REFERENCE.md    ✓
+    ├── ARCHITECTURE_DIAGRAM.md ✓
+    ├── IMPLEMENTATION_SUMMARY.md ✓
+    └── CHECKLIST.md          ✓
 ```
 
 ---
 
-**Architecture Version**: 1.0  
-**Created**: 2026-02-11  
+**Architecture Version**: 1.1  
+**Last Updated**: 2026-02-21  
 **Technology**: Spring Boot 3.2.2, Spring Cloud 2023.0.0, Java 21
