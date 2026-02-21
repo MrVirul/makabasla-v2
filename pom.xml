@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.makabas</groupId>
+    <artifactId>makabasla-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <sonar.organization>mrvirul</sonar.organization>
+        <sonar.projectKey>MrVirul_makabasla-v2</sonar.projectKey>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    </properties>
+
+    <modules>
+        <module>backend-services/api-gateway</module>
+        <module>backend-services/iam-service</module>
+        <module>backend-services/appointment-service</module>
+        <module>backend-services/billing-service</module>
+        <module>backend-services/eureka-server</module>
+        <module>backend-services/task-mgt-service</module>
+        <module>backend-services/webstore-service</module>
+    </modules>
+</project>
