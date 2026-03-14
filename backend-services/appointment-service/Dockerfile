@@ -1,20 +1,25 @@
 # syntax=docker/dockerfile:1
-FROM eclipse-temurin:21-jdk-alpine AS build
-WORKDIR /workspace/app
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-RUN ./mvnw dependency:go-offline -B
-COPY src src
-RUN ./mvnw package -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+FROM golang:1.26-alpine AS build
 
-FROM eclipse-temurin:21-jre-alpine
-VOLUME /tmp
+WORKDIR /app
+
+COPY . .
+
+RUN go env -w GOPROXY=https://proxy.golang.org,direct
+RUN apk add --no-cache git
+RUN go mod tidy
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o appointment-service ./cmd/main.go
+
+FROM alpine:latest
+
+WORKDIR /app
+
+COPY --from=build /app/appointment-service .
+
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
-ARG DEPENDENCY=/workspace/app/target/dependency
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.makabas.appointment.AppointmentServiceApplication"]
+
+EXPOSE 8085
+
+ENTRYPOINT ["./appointment-service"]
