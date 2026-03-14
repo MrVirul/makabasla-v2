@@ -20,48 +20,39 @@ services:
       timeout: 5s
       retries: 5
 
-  # Eureka Server - Service Discovery
-  eureka-server:
-    build:
-      context: ./backend-services/eureka-server
-      dockerfile: Dockerfile
-    container_name: makabasla-eureka
+  # Consul - Service Discovery
+  consul:
+    image: hashicorp/consul:1.15
+    container_name: makabasla-consul
     ports:
-      - "8761:8761"
+      - "8500:8500"
+      - "8600:8600/udp"
     networks:
       - makabasla-network
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
     healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--quiet",
-          "--tries=1",
-          "--spider",
-          "http://localhost:8761/actuator/health",
-        ]
+      test: ["CMD", "wget", "-qO-", "http://localhost:8500/v1/status/leader"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 40s
+      start_period: 10s
 
   # API Gateway
   api-gateway:
     build:
       context: ./backend-services/api-gateway
       dockerfile: Dockerfile
+      args:
+        - GO_VERSION=1.26-alpine
     container_name: makabasla-gateway
     ports:
       - "8080:8080"
     networks:
       - makabasla-network
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - CONSUL_HOST=consul
+      - PORT=8080
     depends_on:
-      eureka-server:
+      consul:
         condition: service_healthy
 
   # Billing Service
@@ -69,21 +60,20 @@ services:
     build:
       context: ./backend-services/billing-service
       dockerfile: Dockerfile
+      args:
+        - GO_VERSION=1.26-alpine
     container_name: makabasla-billing-service
     ports:
       - "8083:8083"
     networks:
       - makabasla-network
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/billingdb
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - DB_URL=postgres://postgres:postgres@postgres:5432/billingdb?sslmode=disable
+      - CONSUL_HOST=consul
     depends_on:
       postgres:
         condition: service_healthy
-      eureka-server:
+      consul:
         condition: service_healthy
 
   # IAM Service
@@ -91,16 +81,17 @@ services:
     build:
       context: ./backend-services/iam-service
       dockerfile: Dockerfile
+      args:
+        - GO_VERSION=1.26-alpine
     container_name: makabasla-iam-service
     ports:
       - "8084:8084"
     networks:
       - makabasla-network
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - CONSUL_HOST=consul
     depends_on:
-      eureka-server:
+      consul:
         condition: service_healthy
 
   # Appointment Service
@@ -108,21 +99,20 @@ services:
     build:
       context: ./backend-services/appointment-service
       dockerfile: Dockerfile
+      args:
+        - GO_VERSION=1.26-alpine
     container_name: makabasla-appointment-service
     ports:
       - "8085:8085"
     networks:
       - makabasla-network
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/appointmentdb
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - DB_URL=postgres://postgres:postgres@postgres:5432/appointmentdb?sslmode=disable
+      - CONSUL_HOST=consul
     depends_on:
       postgres:
         condition: service_healthy
-      eureka-server:
+      consul:
         condition: service_healthy
 
   # Task Management Service
@@ -130,21 +120,20 @@ services:
     build:
       context: ./backend-services/task-mgt-service
       dockerfile: Dockerfile
+      args:
+        - GO_VERSION=1.26-alpine
     container_name: makabasla-task-mgt-service
     ports:
       - "8086:8086"
     networks:
       - makabasla-network
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/taskdb
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - DB_URL=postgres://postgres:postgres@postgres:5432/taskdb?sslmode=disable
+      - CONSUL_HOST=consul
     depends_on:
       postgres:
         condition: service_healthy
-      eureka-server:
+      consul:
         condition: service_healthy
 
   # Webstore Service
@@ -152,21 +141,20 @@ services:
     build:
       context: ./backend-services/webstore-service
       dockerfile: Dockerfile
+      args:
+        - GO_VERSION=1.26-alpine
     container_name: makabasla-webstore-service
     ports:
       - "8087:8087"
     networks:
       - makabasla-network
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/webstoredb
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - DB_URL=postgres://postgres:postgres@postgres:5432/webstoredb?sslmode=disable
+      - CONSUL_HOST=consul
     depends_on:
       postgres:
         condition: service_healthy
-      eureka-server:
+      consul:
         condition: service_healthy
 
 networks:
