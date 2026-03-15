@@ -31,9 +31,7 @@ func NewProxy(targetHost, prefixToRemove string) echo.HandlerFunc {
 		res := c.Response()
 
 		// Rewrite the path by removing the given prefix
-		if strings.HasPrefix(req.URL.Path, prefixToRemove) {
-			req.URL.Path = strings.TrimPrefix(req.URL.Path, prefixToRemove)
-		}
+		req.URL.Path = strings.TrimPrefix(req.URL.Path, prefixToRemove)
 		if req.URL.Path == "" {
 			req.URL.Path = "/"
 		}
@@ -75,6 +73,7 @@ func main() {
 	e.Any("/api/orders/*", NewProxy("http://order-service:8082", "/api/orders"))
 	e.Any("/api/billing/*", NewProxy("http://billing-service:8083", "/api/billing"))
 	e.Any("/api/auth/*", NewProxy("http://iam-service:8084", "/api/auth"))            // IAM maps to auth here
+	e.Any("/keycloak/*", NewProxy("http://keycloak:8180", "/keycloak"))
 	e.Any("/api/appointment/*", NewProxy("http://appointment-service:8085", "/api/appointment"))
 	e.Any("/api/task/*", NewProxy("http://task-mgt-service:8086", "/api/task"))
 	e.Any("/api/webstore/*", NewProxy("http://webstore-service:8087", "/api/webstore"))
