@@ -23,6 +23,10 @@ Once running, the following services are available:
 
 The microservices will automatically register themselves with Consul. The API Gateway routes incoming requests to the respective upstream service automatically based on path prefixes or configurations.
 
+### Monitoring Health
+You can monitor the status of all registered services via the [Consul UI](http://localhost:8500). If a service is marked as "critical," it may be due to a failing health check. Detailed documentation on health check endpoints can be found in [Consul Health Checks](CONSUL_HEALTH_CHECKS.md).
+
+
 ## 2. Local Development (Running Go services manually)
 
 If you need to make changes to a specific Go service, you can run the dependencies (Postgres + Consul) via Docker and run the specific Go service locally.
