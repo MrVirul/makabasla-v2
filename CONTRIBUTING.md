@@ -67,7 +67,7 @@ We follow the **[Conventional Commits](https://www.conventionalcommits.org/)** s
 
 Use the **service or module name** to indicate what area of the codebase is affected:
 
-`api-gateway` · `iam-service` · `appointment-service` · `billing-service` · `task-mgt-service` · `webstore-service` · `frontend`
+`api-gateway` · `iam-service` · `appointment-service` · `billing-service` · `task-mgt-service` · `webstore-service` · `frontend` · `keycloak`
 
 ### Subject Rules
 

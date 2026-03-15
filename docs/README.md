@@ -17,11 +17,15 @@ Common commands for starting, stopping, and developing the microservices.
 #### [Architecture Diagram](ARCHITECTURE_DIAGRAM.md)
 Visual system architecture detailing the API Gateway, Consul service discovery, and the individual microservices.
 
+#### [Consul Health Checks](CONSUL_HEALTH_CHECKS.md)
+Detailed documentation on service discovery health check endpoints and configuration.
+
 #### [Implementation Summary](IMPLEMENTATION_SUMMARY.md)
 Details about the migration from Java to Go and the current implementation status.
 
 #### [Checklist](CHECKLIST.md)
 Pre-deployment checklist and troubleshooting.
+
 
 ## 🔗 Stack Requirements
 - Go 1.26

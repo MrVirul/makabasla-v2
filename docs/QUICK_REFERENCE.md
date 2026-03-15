@@ -47,6 +47,9 @@ go run cmd/main.go
 ### API Gateway Port Mapping
 Requests flow through `http://localhost:8080`
 
+### Keycloak Port Configuration
+Accessible via `http://localhost:8180` (Configured to avoid conflict with API Gateway)
+
 ### PostgreSQL Port Configuration
 Connected via TCP string on standard `5432` mappings or locally managed `DB_URL` configurations.
 `DB_URL=postgres://postgres:postgres@localhost:5432/<db_name>?sslmode=disable`
