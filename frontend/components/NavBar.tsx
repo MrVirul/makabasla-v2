@@ -2,15 +2,18 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useSession, signOut } from "next-auth/react";
 import {
   CalendarDays,
   CreditCard,
-  ShieldCheck,
-  ListTodo,
   ShoppingBag,
+  LogOut,
+  User,
+  ShieldCheck,
 } from "lucide-react";
 
 export default function NavBar() {
+  const { data: session } = useSession();
   const services = [
     {
       name: "Appointments",
@@ -59,11 +62,53 @@ export default function NavBar() {
             </Link>
           ))}
 
+          {(session as any)?.isInternal && (
+            <Link
+              href="/admin"
+              className="px-4 py-2 rounded-full text-[#F5A623] text-sm font-bold hover:bg-[#F5A623]/10 transition-all flex items-center gap-2 border border-[#F5A623]/20"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              Admin Panel
+            </Link>
+          )}
+
           <div className="h-4 w-[1px] bg-[#CFCFCF]/20 mx-2" />
 
-          <button className="h-10 px-6 rounded-full bg-[#F5A623] text-black text-sm font-bold hover:bg-[#C97A00] transition-all active:scale-95 glow shadow-[#F5A623]/10">
-            Log In
-          </button>
+          {session ? (
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+                {session.user?.image ? (
+                  <Image
+                    src={session.user.image}
+                    alt={session.user.name || "User"}
+                    width={24}
+                    height={24}
+                    className="rounded-full border border-[#F5A623]/20"
+                  />
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-[#F5A623]/20 flex items-center justify-center">
+                    <User className="w-3.5 h-3.5 text-[#F5A623]" />
+                  </div>
+                )}
+                <span className="text-sm font-medium text-white max-w-[120px] truncate">
+                  {session.user?.name}
+                </span>
+              </div>
+              <button
+                onClick={() => signOut()}
+                className="p-2.5 rounded-full text-[#CFCFCF] hover:text-white hover:bg-white/10 transition-all active:scale-95"
+                title="Log Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <Link href="/login">
+              <button className="h-10 px-6 rounded-full bg-[#F5A623] text-black text-sm font-bold hover:bg-[#C97A00] transition-all active:scale-95 glow shadow-[#F5A623]/10">
+                Log In
+              </button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Placeholder */}
