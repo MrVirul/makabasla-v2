@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Nerzal/gocloak/v13"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/makabas/api-gateway/config"
@@ -36,7 +37,21 @@ func NewProxy(targetHost, prefixToRemove string) echo.HandlerFunc {
 			req.URL.Path = "/"
 		}
 
+		// Set the Host header to the target host
 		req.Host = url.Host
+
+		// Fix for Keycloak "HTTPS Required" error on localhost:
+		// We set these headers so Keycloak knows the original request context.
+		if req.Header.Get("X-Forwarded-Proto") == "" {
+			req.Header.Set("X-Forwarded-Proto", "http")
+		}
+		if req.Header.Get("X-Forwarded-Host") == "" {
+			req.Header.Set("X-Forwarded-Host", c.Request().Host)
+		}
+		if req.Header.Get("X-Forwarded-For") == "" {
+			req.Header.Set("X-Forwarded-For", c.RealIP())
+		}
+
 		proxy.ServeHTTP(res, req)
 		return nil
 	}
@@ -59,9 +74,10 @@ func main() {
 		MaxAge:           3600,
 	}))
 
-	// Apply JWT authentication
-	// The frontend routes under /api will be intercepted by the JWT middleware, except for some ignored paths.
-	e.Use(mw.JwtAuthMiddleware(cfg.JwtSecret))
+	// Apply Keycloak authentication
+	// The frontend routes under /api will be intercepted by the Keycloak middleware, except for some ignored paths.
+	keycloakClient := gocloak.NewClient(cfg.KeycloakURL)
+	e.Use(mw.KeycloakAuthMiddleware(keycloakClient, cfg.KeycloakRealm, cfg.KeycloakClient, cfg.KeycloakSecret))
 
 	e.GET("/actuator/health", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"status": "UP", "service": "api-gateway"})

@@ -8,15 +8,23 @@ import (
 )
 
 type Config struct {
-	ServerPort string `mapstructure:"SERVER_PORT"`
-	AppName    string `mapstructure:"APP_NAME"`
-	JwtSecret  string `mapstructure:"JWT_SECRET"`
+	ServerPort     string `mapstructure:"SERVER_PORT"`
+	AppName        string `mapstructure:"APP_NAME"`
+	JwtSecret      string `mapstructure:"JWT_SECRET"`
+	KeycloakURL    string `mapstructure:"KEYCLOAK_URL"`
+	KeycloakRealm  string `mapstructure:"KEYCLOAK_REALM"`
+	KeycloakClient string `mapstructure:"KEYCLOAK_CLIENT_ID"`
+	KeycloakSecret string `mapstructure:"KEYCLOAK_CLIENT_SECRET"`
 }
 
 func LoadConfig() *Config {
 	viper.SetDefault("SERVER_PORT", "8080")
 	viper.SetDefault("APP_NAME", "api-gateway")
 	viper.SetDefault("JWT_SECRET", "your-256-bit-secret-key-here-change-in-production-make-it-at-least-32-characters-long")
+	viper.SetDefault("KEYCLOAK_URL", "http://localhost:8080")
+	viper.SetDefault("KEYCLOAK_REALM", "makabasla")
+	viper.SetDefault("KEYCLOAK_CLIENT_ID", "iam-service")
+	viper.SetDefault("KEYCLOAK_CLIENT_SECRET", "YOUR_CLIENT_SECRET")
 
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
