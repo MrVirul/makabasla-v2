@@ -12,9 +12,9 @@ type Config struct {
 	AppName    string `mapstructure:"APP_NAME"`
 	ConsulHost string `mapstructure:"CONSUL_HOST"`
 	ConsulPort string `mapstructure:"CONSUL_PORT"`
-	DBUrl      string `mapstructure:"SPRING_DATASOURCE_URL"`
-	DBUser     string `mapstructure:"SPRING_DATASOURCE_USERNAME"`
-	DBPassword string `mapstructure:"SPRING_DATASOURCE_PASSWORD"`
+	DBUrl      string `mapstructure:"DB_URL"`
+	DBUser     string `mapstructure:"DB_USER"`
+	DBPassword string `mapstructure:"DB_PASSWORD"`
 }
 
 func LoadConfig() *Config {
@@ -22,6 +22,9 @@ func LoadConfig() *Config {
 	viper.SetDefault("APP_NAME", "TASK-MGT-SERVICE")
 	viper.SetDefault("CONSUL_HOST", "consul")
 	viper.SetDefault("CONSUL_PORT", "8500")
+	viper.SetDefault("DB_URL", "")
+	viper.SetDefault("DB_USER", "")
+	viper.SetDefault("DB_PASSWORD", "")
 
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))

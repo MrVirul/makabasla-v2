@@ -29,6 +29,7 @@ Always review this checklist before deploying updates to the Makabasla Go Micros
 ### 5. Environment Variables
 - Ensure runtime environments defined in `compose.yaml` explicitly outline:
   - `DB_URL` (using valid `postgres://` formats with proper hosts)
+  - `DB_USER` and `DB_PASSWORD` (used by Go services for connection/auth)
   - `CONSUL_HOST` (set to `consul` for DNS resolution inside Compose)
 
 ## 🩺 Production Diagnostics

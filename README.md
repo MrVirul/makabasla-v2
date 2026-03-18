@@ -6,11 +6,8 @@ Modern healthcare management system built with Spring Boot microservices and Rea
 
 ```
 makabasla-v2/
-├── backend-services/           # Spring Boot microservices
-│   ├── eureka-server/         # Service discovery
+├── backend-services/           # Go microservices
 │   ├── api-gateway/           # API gateway with JWT & CORS
-│   ├── user-service/          # User management
-│   ├── order-service/         # Order management
 │   ├── billing-service/       # Billing operations
 │   ├── iam-service/           # Authentication & authorization
 │   ├── appointment-service/   # Appointment scheduling
@@ -55,10 +52,9 @@ docker compose up --build
 
 **Access Points:**
 
-- Eureka Dashboard: http://localhost:8761
 - API Gateway: http://localhost:8080
-- User Service: http://localhost:8081
-- Order Service: http://localhost:8082
+- Consul UI: http://localhost:8500
+- Keycloak: http://localhost:8180
 
 ### Frontend
 
@@ -82,13 +78,12 @@ Complete documentation is available in the [`docs/`](docs/) directory:
 
 ### Backend
 
-- **Spring Boot**: 3.2.2
-- **Spring Cloud**: 2023.0.0
-- **Java**: 21
+- **Go**: 1.26
+- **Echo**: HTTP server/router
 - **PostgreSQL**: Database
-- **Netflix Eureka**: Service Discovery
-- **Spring Cloud Gateway**: API Gateway
-- **JWT**: Authentication
+- **Consul**: Service discovery
+- **Keycloak**: Identity provider
+- **JWT**: Authentication (gateway)
 
 ### Frontend
 
@@ -111,8 +106,7 @@ Complete documentation is available in the [`docs/`](docs/) directory:
 
 ### Prerequisites
 
-- **Java 21** - For backend services
-- **Maven 3.8+** - Build tool
+- **Go 1.26** - For backend services
 - **Node.js 18+** - For frontend
 - **PostgreSQL** - Database
 
@@ -142,7 +136,7 @@ Complete documentation is available in the [`docs/`](docs/) directory:
    ```
 
 4. **Verify installation**
-   - Eureka Dashboard: http://localhost:8761
+   - API Gateway: http://localhost:8080
    - Frontend: http://localhost:3000
 
 ## 🧪 Testing
@@ -175,10 +169,7 @@ docs(api-gateway): update route configuration README
 
 ## 📝 Project Status
 
-- ✅ **Eureka Server** - Complete
-- ✅ **API Gateway** - Complete with JWT and CORS
-- ✅ **User Service** - Complete with full CRUD
-- ✅ **Order Service** - Complete with user queries
+- ✅ **API Gateway** - Complete with auth + CORS + routing
 - ✅ **Billing Service** - Project initialized with Docker
 - ✅ **IAM Service** - Project initialized with Security & Docker
 - ✅ **Appointment Service** - Project initialized with Docker
