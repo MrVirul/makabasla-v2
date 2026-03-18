@@ -6,6 +6,7 @@
 - **Service Discovery**: HashiCorp Consul
 - **Identity Provider**: Keycloak 26.0
 - **Database**: PostgreSQL 16 (running in containers)
+- **ORM/DB access**: Gorm (with postgres driver)
 - **Containerization**: Docker & Docker Compose
 - **Configuration**: Viper
 

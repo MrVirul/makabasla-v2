@@ -53,3 +53,15 @@ Accessible via `http://localhost:8180` (Configured to avoid conflict with API Ga
 ### PostgreSQL Port Configuration
 Connected via TCP string on standard `5432` mappings or locally managed `DB_URL` configurations.
 `DB_URL=postgres://postgres:postgres@localhost:5432/<db_name>?sslmode=disable`
+
+### Compose DB override examples
+```bash
+# Override default postgres credentials for the whole stack
+export POSTGRES_USER=myuser
+export POSTGRES_PASSWORD=mypassword
+
+# Override a single service DB DSN (example: billing-service)
+export BILLING_DB_URL="postgres://myuser:mypassword@localhost:5432/billingdb?sslmode=disable"
+
+docker-compose --file compose.yaml up -d --build
+```

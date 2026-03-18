@@ -62,3 +62,12 @@ If you need to completely reset the databases, remove the docker volume and rest
 docker-compose down -v
 docker-compose up -d postgres
 ```
+
+### Database environment variables
+Each Go microservice uses the following environment variables:
+- `DB_URL`: full Postgres DSN (e.g. `postgres://postgres:postgres@localhost:5432/appointmentdb?sslmode=disable`)
+- `DB_USER`: Postgres username (defaults to `postgres` in `compose.yaml`)
+- `DB_PASSWORD`: Postgres password (defaults to `postgres` in `compose.yaml`)
+
+When running via Docker Compose, you can override per-service DSNs using:
+- `BILLING_DB_URL`, `APPOINTMENT_DB_URL`, `TSKMGT_DB_URL`, `WEBSTORE_DB_URL`
