@@ -23,8 +23,8 @@ WORKDIR /app
 COPY --from=build /app/iam-service .
 
 # Create a non-root user
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
+RUN addgroup -S makabas && adduser -S makabas -G makabas
+USER makabas:makabas
 
 # Expose the port
 EXPOSE 8084
