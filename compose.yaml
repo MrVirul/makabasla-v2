@@ -1,25 +1,4 @@
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:16-alpine
-    container_name: makabasla-postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-postgres}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - ./backend-services/setup-databases.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - makabasla-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   # Keycloak - Identity & Access Management
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
@@ -29,9 +8,9 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME:-admin}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD:-admin}
       KC_DB: postgres
-      KC_DB_URL: ${KC_DB_URL:-jdbc:postgresql://postgres:5432/iamdb}
-      KC_DB_USERNAME: ${KC_DB_USERNAME:-postgres}
-      KC_DB_PASSWORD: ${KC_DB_PASSWORD:-postgres}
+      KC_DB_URL: ${KC_DB_URL}
+      KC_DB_USERNAME: ${KC_DB_USERNAME}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
       KC_HEALTH_ENABLED: "true"
       KC_HTTP_ENABLED: "true"
       KC_HOSTNAME_STRICT_HTTPS: "false"
@@ -40,14 +19,12 @@ services:
       - "8180:8180"
     networks:
       - makabasla-network
-    depends_on:
-      postgres:
-        condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "echo > /dev/tcp/127.0.0.1/9000"]
+      test: ["CMD-SHELL", "echo > /dev/tcp/127.0.0.1/8180"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   # Consul - Service Discovery
   consul:
@@ -97,13 +74,12 @@ services:
     networks:
       - makabasla-network
     environment:
-      - DB_URL=${BILLING_DB_URL:-postgres://postgres:postgres@postgres:5432/billingdb?sslmode=disable}
-      - DB_USER=${POSTGRES_USER:-postgres}
-      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_URL=${BILLING_DB_URL}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
       - CONSUL_HOST=${CONSUL_HOST:-consul}
+      - APP_NAME=billing-service
     depends_on:
-      postgres:
-        condition: service_healthy
       consul:
         condition: service_healthy
 
@@ -121,6 +97,7 @@ services:
       - makabasla-network
     environment:
       - CONSUL_HOST=${CONSUL_HOST:-consul}
+      - APP_NAME=iam-service
     depends_on:
       consul:
         condition: service_healthy
@@ -140,13 +117,12 @@ services:
     networks:
       - makabasla-network
     environment:
-      - DB_URL=${APPOINTMENT_DB_URL:-postgres://postgres:postgres@postgres:5432/appointmentdb?sslmode=disable}
-      - DB_USER=${POSTGRES_USER:-postgres}
-      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_URL=${APPOINTMENT_DB_URL}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
       - CONSUL_HOST=${CONSUL_HOST:-consul}
+      - APP_NAME=appointment-service
     depends_on:
-      postgres:
-        condition: service_healthy
       consul:
         condition: service_healthy
 
@@ -163,13 +139,12 @@ services:
     networks:
       - makabasla-network
     environment:
-      - DB_URL=${TSKMGT_DB_URL:-postgres://postgres:postgres@postgres:5432/taskdb?sslmode=disable}
-      - DB_USER=${POSTGRES_USER:-postgres}
-      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_URL=${TSKMGT_DB_URL}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
       - CONSUL_HOST=${CONSUL_HOST:-consul}
+      - APP_NAME=task-mgt-service
     depends_on:
-      postgres:
-        condition: service_healthy
       consul:
         condition: service_healthy
 
@@ -186,13 +161,12 @@ services:
     networks:
       - makabasla-network
     environment:
-      - DB_URL=${WEBSTORE_DB_URL:-postgres://postgres:postgres@postgres:5432/webstoredb?sslmode=disable}
-      - DB_USER=${POSTGRES_USER:-postgres}
-      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_URL=${WEBSTORE_DB_URL}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
       - CONSUL_HOST=${CONSUL_HOST:-consul}
+      - APP_NAME=webstore-service
     depends_on:
-      postgres:
-        condition: service_healthy
       consul:
         condition: service_healthy
 
@@ -200,7 +174,3 @@ networks:
   makabasla-network:
     driver: bridge
     name: makabasla-network
-
-volumes:
-  postgres-data:
-    name: makabasla-postgres-data
