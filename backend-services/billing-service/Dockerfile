@@ -17,8 +17,8 @@ WORKDIR /app
 
 COPY --from=build /app/billing-service .
 
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
+RUN addgroup -S makabas && adduser -S makabas -G makabas
+USER makabas:makabas
 
 EXPOSE 8083
 
