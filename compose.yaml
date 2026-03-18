@@ -4,9 +4,9 @@ services:
     image: postgres:16-alpine
     container_name: makabasla-postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
     ports:
       - "5432:5432"
     volumes:
@@ -26,12 +26,12 @@ services:
     container_name: makabasla-keycloak
     command: start-dev --http-port 8180 --proxy-headers xforwarded
     environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD:-admin}
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/iamdb
-      KC_DB_USERNAME: postgres
-      KC_DB_PASSWORD: postgres
+      KC_DB_URL: ${KC_DB_URL:-jdbc:postgresql://postgres:5432/iamdb}
+      KC_DB_USERNAME: ${KC_DB_USERNAME:-postgres}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD:-postgres}
       KC_HEALTH_ENABLED: "true"
       KC_HTTP_ENABLED: "true"
       KC_HOSTNAME_STRICT_HTTPS: "false"
@@ -78,7 +78,7 @@ services:
     networks:
       - makabasla-network
     environment:
-      - CONSUL_HOST=consul
+      - CONSUL_HOST=${CONSUL_HOST:-consul}
       - PORT=8080
     depends_on:
       consul:
@@ -97,8 +97,10 @@ services:
     networks:
       - makabasla-network
     environment:
-      - DB_URL=postgres://postgres:postgres@postgres:5432/billingdb?sslmode=disable
-      - CONSUL_HOST=consul
+      - DB_URL=${BILLING_DB_URL:-postgres://postgres:postgres@postgres:5432/billingdb?sslmode=disable}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - CONSUL_HOST=${CONSUL_HOST:-consul}
     depends_on:
       postgres:
         condition: service_healthy
@@ -118,7 +120,7 @@ services:
     networks:
       - makabasla-network
     environment:
-      - CONSUL_HOST=consul
+      - CONSUL_HOST=${CONSUL_HOST:-consul}
     depends_on:
       consul:
         condition: service_healthy
@@ -138,8 +140,10 @@ services:
     networks:
       - makabasla-network
     environment:
-      - DB_URL=postgres://postgres:postgres@postgres:5432/appointmentdb?sslmode=disable
-      - CONSUL_HOST=consul
+      - DB_URL=${APPOINTMENT_DB_URL:-postgres://postgres:postgres@postgres:5432/appointmentdb?sslmode=disable}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - CONSUL_HOST=${CONSUL_HOST:-consul}
     depends_on:
       postgres:
         condition: service_healthy
@@ -159,8 +163,10 @@ services:
     networks:
       - makabasla-network
     environment:
-      - DB_URL=postgres://postgres:postgres@postgres:5432/taskdb?sslmode=disable
-      - CONSUL_HOST=consul
+      - DB_URL=${TSKMGT_DB_URL:-postgres://postgres:postgres@postgres:5432/taskdb?sslmode=disable}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - CONSUL_HOST=${CONSUL_HOST:-consul}
     depends_on:
       postgres:
         condition: service_healthy
@@ -180,8 +186,10 @@ services:
     networks:
       - makabasla-network
     environment:
-      - DB_URL=postgres://postgres:postgres@postgres:5432/webstoredb?sslmode=disable
-      - CONSUL_HOST=consul
+      - DB_URL=${WEBSTORE_DB_URL:-postgres://postgres:postgres@postgres:5432/webstoredb?sslmode=disable}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - CONSUL_HOST=${CONSUL_HOST:-consul}
     depends_on:
       postgres:
         condition: service_healthy
