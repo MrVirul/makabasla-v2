@@ -1,0 +1,11 @@
+go 1.26.1
+
+use (
+	./backend-services/api-gateway
+	./backend-services/appointment-service
+	./backend-services/billing-service
+	./backend-services/iam-service
+	./backend-services/shared
+	./backend-services/task-mgt-service
+	./backend-services/webstore-service
+)
