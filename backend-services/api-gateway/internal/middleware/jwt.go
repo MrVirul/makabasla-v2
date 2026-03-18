@@ -13,7 +13,7 @@ func JwtAuthMiddleware(secret string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Skip JWT auth for health endpoint
-			if c.Path() == "/actuator/health" || strings.HasPrefix(c.Path(), "/api/auth/login") {
+			if c.Path() == "/health" || strings.HasPrefix(c.Path(), "/api/auth/login") {
 				return next(c)
 			}
 
