@@ -9,4 +9,4 @@
 - [ ] Frontend integration with Keycloak/API Gateway
 
 ## Status
-The project is currently in the backend implementation phase, migrating from an initial Spring Boot design to a specialized Go-based microservices architecture. Infractructure is stable; application logic is being ported.
+The project has successfully migrated from Spring Boot to a Go-based microservices architecture using the Echo framework. All Spring-specific artifacts and configurations have been cleaned up, and the services are now correctly integrated with Neon DB and Consul.
