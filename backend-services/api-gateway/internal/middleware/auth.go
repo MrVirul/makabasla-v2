@@ -12,7 +12,7 @@ func KeycloakAuthMiddleware(client *gocloak.GoCloak, realm, clientID, clientSecr
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Skip JWT auth for health and auth endpoints
-			if c.Path() == "/actuator/health" || strings.HasPrefix(c.Path(), "/api/auth/") || strings.HasPrefix(c.Path(), "/keycloak") {
+			if c.Path() == "/health" || strings.HasPrefix(c.Path(), "/api/auth/") || strings.HasPrefix(c.Path(), "/keycloak") {
 				return next(c)
 			}
 
