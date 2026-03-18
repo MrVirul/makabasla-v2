@@ -12,11 +12,13 @@ React Frontend → API Gateway → (Consul) → Microservices → PostgreSQL
 
 **Technology Stack:**
 
-- Go (see each service’s `go.mod`, currently `go 1.26`)
+- Go 1.24+ (Monorepo via `go.work`)
 - Echo (HTTP server/router)
-- Consul (service discovery + health checks)
-- Keycloak (identity provider)
-- PostgreSQL
+- gRPC (Inter-service communication)
+- Consul (Service discovery + health checks)
+- Keycloak (Identity provider)
+- PostgreSQL (Database)
+- Resty (Internal HTTP client with retries)
 - Docker / Docker Compose
 
 ## 🚀 Quick Start
@@ -24,11 +26,16 @@ React Frontend → API Gateway → (Consul) → Microservices → PostgreSQL
 ### Prerequisites
 
 - Docker + Docker Compose
+- Go 1.24+ (if running locally)
 
 ### Setup & Run
 
 ```bash
-# From repo root
+# Initialize workspace (if first time)
+go work init
+go work use ./backend-services/*
+
+# Run via Docker
 docker compose -f compose.yaml up --build
 ```
 
@@ -40,26 +47,31 @@ docker compose -f compose.yaml up --build
 | Keycloak | http://localhost:8180 | Identity provider |
 | API Gateway | http://localhost:8080 | Gateway (routes/auth) |
 | Billing Service | http://localhost:8083 | Billing APIs |
-| IAM Service | http://localhost:8084 | IAM integration APIs |
+| IAM Service | http://localhost:8084 | IAM integration APIs (Authz) |
 | Appointment Service | http://localhost:8085 | Appointment APIs |
 | Task Mgt Service | http://localhost:8086 | Task APIs |
 | Webstore Service | http://localhost:8087 | Webstore APIs |
 
 ## 📦 Services
 
-### Infrastructure
+### Infrastructure & Shared
 
-- **Consul** (via `compose.yaml`) - service discovery and health status
-- **Keycloak** (via `compose.yaml`) - identity provider used by the gateway/services
-- **[api-gateway/](api-gateway/)** - centralized routing, CORS, auth middleware
+- **Consul**: Service discovery and health monitoring.
+- **Keycloak**: Centralized IAM.
+- **[shared/](shared/)**: Common library for:
+  - Internal HTTP Client (Retry, Token propagation)
+  - gRPC Server/Client wrappers
+  - Common Protobuf definitions
+  - Unified Config & Logging (Zap)
+- **[api-gateway/](api-gateway/)**: Centralized routing, CORS, and JWT Auth middleware.
 
 ### Microservices
 
-- **[billing-service/](billing-service/)** - Billing operations (PostgreSQL)
-- **[iam-service/](iam-service/)** - IAM integration endpoints (Keycloak)
-- **[appointment-service/](appointment-service/)** - Appointment scheduling (PostgreSQL)
-- **[task-mgt-service/](task-mgt-service/)** - Task management (PostgreSQL)
-- **[webstore-service/](webstore-service/)** - Web store operations (PostgreSQL)
+- **[billing-service/](billing-service/)**: Billing operations (PostgreSQL)
+- **[iam-service/](iam-service/)**: IAM integration endpoints (Keycloak)
+- **[appointment-service/](appointment-service/)**: Appointment scheduling (PostgreSQL)
+- **[task-mgt-service/](task-mgt-service/)**: Task management (PostgreSQL)
+- **[webstore-service/](webstore-service/)**: Web store operations (PostgreSQL)
 
 ## 🧪 Testing
 
