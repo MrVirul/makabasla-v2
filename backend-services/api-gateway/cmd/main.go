@@ -79,14 +79,12 @@ func main() {
 	keycloakClient := gocloak.NewClient(cfg.KeycloakURL)
 	e.Use(mw.KeycloakAuthMiddleware(keycloakClient, cfg.KeycloakRealm, cfg.KeycloakClient, cfg.KeycloakSecret))
 
-	e.GET("/actuator/health", func(c echo.Context) error {
+	e.GET("/health", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"status": "UP", "service": "api-gateway"})
 	})
 
 	// Service Routes mapping the Docker hostnames and proxying requests.
 	// We map the incoming path prefix, remove it, and forward to the root of the targeted service.
-	e.Any("/api/users/*", NewProxy("http://user-service:8081", "/api/users"))
-	e.Any("/api/orders/*", NewProxy("http://order-service:8082", "/api/orders"))
 	e.Any("/api/billing/*", NewProxy("http://billing-service:8083", "/api/billing"))
 	e.Any("/api/auth/*", NewProxy("http://iam-service:8084", "/api/auth"))            // IAM maps to auth here
 	e.Any("/keycloak/*", NewProxy("http://keycloak:8180", "/keycloak"))

@@ -35,6 +35,6 @@ func (h *WebstoreHandler) GetData(c echo.Context) error {
 }
 
 func (h *WebstoreHandler) RegisterRoutes(e *echo.Echo) {
-	e.GET("/actuator/health", h.HealthCheck)
+	e.GET("/health", h.HealthCheck)
 	e.GET("/api/v1/webstore", h.GetData)
 }
