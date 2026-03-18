@@ -12,6 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/makabas/billing-service/config"
+	"github.com/makabas/billing-service/internal/database"
 	"github.com/makabas/billing-service/internal/discovery"
 	"github.com/makabas/billing-service/internal/handler"
 	"github.com/makabas/billing-service/internal/repository"
@@ -20,6 +21,12 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
+
+	// Initialize Database
+	db, err := database.NewDatabase(cfg)
+	if err != nil {
+		log.Fatalf("Warning: failed to initialize database: %v", err)
+	}
 
 	consulClient, err := discovery.NewConsulClient(cfg)
 	if err != nil {
@@ -30,7 +37,7 @@ func main() {
 		log.Printf("Warning: failed to register with consul: %v", err)
 	}
 
-	repo := repository.NewBillingRepository()
+	repo := repository.NewBillingRepository(db)
 	svc := service.NewBillingService(repo)
 	h := handler.NewBillingHandler(svc)
 

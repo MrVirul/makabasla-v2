@@ -40,6 +40,6 @@ func (h *IamHandler) GetUser(c echo.Context) error {
 }
 
 func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
-	e.GET("/actuator/health", h.HealthCheck)
+	e.GET("/health", h.HealthCheck)
 	e.GET("/api/v1/user", h.GetUser)
 }

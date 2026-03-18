@@ -38,16 +38,17 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// Basic Auth Middleware based on config
-	e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
-		// Only secure /api routes
-		if username == cfg.Username && password == cfg.Password {
-			return true, nil
-		}
-		if c.Path() == "/actuator/health" {
-			return true, nil // Health check should not require auth based on standard practices
-		}
-		return false, nil
+	// Basic Auth Middleware with Skipper for health checks
+	e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
+		Skipper: func(c echo.Context) bool {
+			return c.Path() == "/health"
+		},
+		Validator: func(username, password string, c echo.Context) (bool, error) {
+			if username == cfg.Username && password == cfg.Password {
+				return true, nil
+			}
+			return false, nil
+		},
 	}))
 
 	h.RegisterRoutes(e)
