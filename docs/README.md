@@ -30,7 +30,8 @@ Pre-deployment checklist and troubleshooting.
 ## 🔗 Stack Requirements
 - Go 1.26
 - Docker & Docker Compose
-- PostgreSQL
+- Neon DB (Cloud PostgreSQL)
+- GORM (ORM)
 
 ---
 
