@@ -35,6 +35,6 @@ func (h *BillingHandler) GetData(c echo.Context) error {
 }
 
 func (h *BillingHandler) RegisterRoutes(e *echo.Echo) {
-	e.GET("/actuator/health", h.HealthCheck)
+	e.GET("/health", h.HealthCheck)
 	e.GET("/api/v1/billing", h.GetData)
 }

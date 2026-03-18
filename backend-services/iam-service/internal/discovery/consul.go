@@ -43,7 +43,7 @@ func (c *ConsulClient) Register(cfg *config.Config) error {
 		Port:    port,
 		Address: cfg.AppName, // the container name in Docker Compose
 		Check: &api.AgentServiceCheck{
-			HTTP:     fmt.Sprintf("http://%s:%d/actuator/health", cfg.AppName, port),
+			HTTP:     fmt.Sprintf("http://%s:%d/health", cfg.AppName, port),
 			Interval: "10s",
 			Timeout:  "5s",
 		},
