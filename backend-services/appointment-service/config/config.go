@@ -22,6 +22,9 @@ func LoadConfig() *Config {
 	viper.SetDefault("APP_NAME", "APPOINTMENT-SERVICE")
 	viper.SetDefault("CONSUL_HOST", "consul")
 	viper.SetDefault("CONSUL_PORT", "8500")
+	viper.SetDefault("DB_URL", "")
+	viper.SetDefault("DB_USER", "")
+	viper.SetDefault("DB_PASSWORD", "")
 
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
