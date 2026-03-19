@@ -37,14 +37,16 @@ const handler = NextAuth({
         const tokens = await res.json();
 
         if (res.ok && tokens.access_token) {
-          // You might want to decode the token to get user info or call the userinfo endpoint
-          // For now, we return a basic user object
+          // Decode the token to get actual user info from Keycloak if possible
+          // For now, continue with basic user object but mark as internal
           return {
             id: credentials.username,
             name: credentials.username,
             email: credentials.username + "@internal.makabasla.com",
             accessToken: tokens.access_token,
           };
+        } else {
+          console.error("Keycloak Login Error:", tokens);
         }
         return null;
       }
