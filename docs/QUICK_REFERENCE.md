@@ -23,19 +23,33 @@ docker-compose --file compose.yaml down -v
 docker-compose --file compose.yaml logs -f
 ```
 
+## Shared Library & Protos
+
+### Generate Go code from Protos
+```bash
+cd backend-services/shared
+make protos
+```
+
+### Initialize Go Workspace (Monorepo)
+```bash
+# From the project root
+go work init
+go work use ./backend-services/*
+```
+
 ## Go Development commands
 
 ### Install latest packages
 ```bash
-# Required whenever pulling new code containing modified module dependencies
-cd backend-services/<service-name>
+# In any service or shared folder
 go mod tidy
 ```
 
 ### Run specific service locally
 ```bash
 # Make sure Consul/Postgres are available on localhost
-cd backend-services/<service-name>
+# Run from the service directory
 go run cmd/main.go
 ```
 

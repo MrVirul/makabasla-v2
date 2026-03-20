@@ -7,6 +7,7 @@ Modern healthcare management system built with Spring Boot microservices and Rea
 ```
 makabasla-v2/
 ├── backend-services/           # Go microservices
+│   ├── shared/                # Shared logic & protos
 │   ├── api-gateway/           # API gateway with JWT & CORS
 │   ├── billing-service/       # Billing operations
 │   ├── iam-service/           # Authentication & authorization
@@ -78,12 +79,14 @@ Complete documentation is available in the [`docs/`](docs/) directory:
 
 ### Backend
 
-- **Go**: 1.26
+- **Go**: 1.26 (Monorepo with `go.work`)
 - **Echo**: HTTP server/router
+- **gRPC**: Inter-service communication
 - **PostgreSQL**: Database
 - **Consul**: Service discovery
 - **Keycloak**: Identity provider
 - **JWT**: Authentication (gateway)
+- **Resty**: Internal HTTP client with retries
 
 ### Frontend
 
