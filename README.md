@@ -90,44 +90,43 @@ Complete documentation is available in the [`docs/`](docs/) directory:
 
 ### Frontend
 
-- **React**: UI framework
-- **Vite**: Build tool
-- **TailwindCSS**: Styling
+- **Next.js 15+**: React framework (App Router)
+- **NextAuth.js**: Authentication handling
+- **TailwindCSS 4**: Modern styling
+- **Shadcn UI**: Premium component library
+- **Lucide React**: Icon system
 
 ## ⚡ Features
 
 - ✅ **Microservices Architecture** - Independent, scalable services
-- ✅ **Service Discovery** - Automatic service registration with Eureka
-- ✅ **API Gateway** - Centralized routing and security
-- ✅ **JWT Authentication** - Secure token-based auth
-- ✅ **Load Balancing** - Automatic request distribution
-- ✅ **CORS Support** - Configured for frontend integration
-- ✅ **Health Monitoring** - Actuator endpoints on all services
-- ✅ **Database Per Service** - Proper data isolation
+- ✅ **Service Discovery** - Automatic service registration via Consul
+- ✅ **API Gateway** - Centralized routing, JWT validation & CORS
+- ✅ **User Profile Sync** - Just-in-Time provisioning for customer data
+- ✅ **Vehicle Management** - Customer vehicle registration system
+- ✅ **Modern Dashboard** - Premium glassmorphic UI with Shadcn components
+- ✅ **Keycloak/Google Auth** - Full OIDC integration with session management
 
 ## 📖 Getting Started
 
 ### Prerequisites
 
-- **Go 1.26** - For backend services
+- **Go 1.23+** - For backend services
 - **Node.js 18+** - For frontend
-- **PostgreSQL** - Database
+- **Docker & Docker Compose** - Infrastructure
 
 ### Installation
 
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/makabasla-v2.git
+   git clone https://github.com/MrVirul/makabasla-v2.git
    cd makabasla-v2
    ```
 
-2. **Start backend services**
+2. **Start backend services (Docker recommended)**
 
    ```bash
-   cd backend-services
-   ./setup-databases.sh
-   ./start-all.sh
+   docker compose up -d
    ```
 
 3. **Start frontend**
@@ -139,62 +138,19 @@ Complete documentation is available in the [`docs/`](docs/) directory:
    ```
 
 4. **Verify installation**
-   - API Gateway: http://localhost:8080
    - Frontend: http://localhost:3000
-
-## 🧪 Testing
-
-```bash
-# Backend tests
-cd backend-services
-./test-services.sh
-
-# Frontend tests
-cd frontend
-npm test
-```
-
-## 🤝 Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-### Commit Conventions
-
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-<type>(<scope>): <subject>
-
-feat(iam-service): add JWT refresh token rotation
-fix(billing-service): handle null invoice on payment retry
-docs(api-gateway): update route configuration README
-```
+   - API Gateway: http://localhost:8080
+   - Profile Sync: http://localhost:3000/profile
 
 ## 📝 Project Status
 
 - ✅ **API Gateway** - Complete with auth + CORS + routing
-- ✅ **Billing Service** - Project initialized with Docker
-- ✅ **IAM Service** - Project initialized with Security & Docker
-- ✅ **Appointment Service** - Project initialized with Docker
-- ✅ **Task Management Service** - Project initialized with Docker
-- ✅ **Webstore Service** - Project initialized with Docker
-
-## 🆘 Support
-
-- **Backend Issues**: See [Backend README](backend-services/README.md)
-- **Documentation**: Check [docs/](docs/) folder
-- **Quick Commands**: [Quick Reference](docs/QUICK_REFERENCE.md)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👥 Team
-
-- **Development Team** - [Your Team Name]
+- ✅ **IAM Service** - User Profile & Vehicle Management functional
+- ✅ **Frontend** - Next.js + Tailwind 4 + Shadcn UI integration complete
+- ✅ **Infrastructure** - Consul, Keycloak, and PostgreSQL integrated
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-02-11  
+**Version**: 1.1.0  
+**Last Updated**: 2026-03-21  
 **Status**: ✅ Active Development

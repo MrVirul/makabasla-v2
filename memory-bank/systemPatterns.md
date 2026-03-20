@@ -12,5 +12,7 @@
 - **DB initialization**: Each service initializes a shared `*gorm.DB` via `internal/database.NewDatabase(cfg)` and passes it to repositories.
 
 ## Authentication
-- **External Auth**: Keycloak providing OIDC/JWT.
-- **Service Level**: Gateway and IAM service validate JWT tokens before forwarding requests.
+### User Management
+- **User Shadow Table**: Each service requiring customer domain logic (like `iam-service`) maintains a local "shadow" copy of user profile data (email, name, phone).
+- **Just-in-Time (JIT) Provisioning**: Local customer records are created or updated automatically when a user visits the profile or makes a request, ensuring the service has all necessary domain data.
+- **Frontend Sync**: NextAuth extracts unique Keycloak IDs (`sub`) and maps them to service logic for consistent user tracking across microservices.
