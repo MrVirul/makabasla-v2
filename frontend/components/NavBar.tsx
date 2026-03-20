@@ -109,6 +109,11 @@ export default function NavBar() {
               </button>
             </Link>
           )}
+          <Link href="/profile">
+            <button className="h-10 px-6 rounded-full bg-[#F5A623] text-black text-sm font-bold hover:bg-[#C97A00] transition-all active:scale-95 glow shadow-[#F5A623]/10">
+              My Profile
+            </button>
+          </Link>
         </div>
 
         {/* Mobile Menu Placeholder */}

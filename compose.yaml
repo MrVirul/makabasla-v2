@@ -96,6 +96,9 @@ services:
     networks:
       - makabasla-network
     environment:
+      - DB_URL=${IAM_DB_URL}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
       - CONSUL_HOST=${CONSUL_HOST:-consul}
       - APP_NAME=iam-service
     depends_on:

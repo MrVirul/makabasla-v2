@@ -14,6 +14,9 @@ type Config struct {
 	ConsulPort string `mapstructure:"CONSUL_PORT"`
 	Username   string `mapstructure:"SECURITY_USER_NAME"`
 	Password   string `mapstructure:"SECURITY_USER_PASSWORD"`
+	DBUrl      string `mapstructure:"DB_URL"`
+	DBUser     string `mapstructure:"DB_USER"`
+	DBPassword string `mapstructure:"DB_PASSWORD"`
 }
 
 func LoadConfig() *Config {
@@ -23,6 +26,9 @@ func LoadConfig() *Config {
 	viper.SetDefault("CONSUL_PORT", "8500")
 	viper.SetDefault("SECURITY_USER_NAME", "admin")
 	viper.SetDefault("SECURITY_USER_PASSWORD", "password")
+	viper.SetDefault("DB_URL", "")
+	viper.SetDefault("DB_USER", "")
+	viper.SetDefault("DB_PASSWORD", "")
 
 	viper.AutomaticEnv()
 	// Allow mapping env vars like CONSUL_HOST

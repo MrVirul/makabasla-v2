@@ -1,10 +1,12 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
+import Image from "next/image";
+import Link from "next/link";
 import { 
   Users, 
   Activity, 
@@ -14,28 +16,156 @@ import {
   ArrowUpRight,
   Monitor,
   Search,
-  Plus
+  Plus,
+  Lock,
+  User as UserIcon,
+  Eye,
+  EyeOff,
+  Loader2,
+  ArrowLeft
 } from "lucide-react";
 
-export default function AdminDashboard() {
+export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  
+  // Login states
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+  });
 
   useEffect(() => {
-    // Redirect non-internal users or unauthenticated users
-    if (status === "unauthenticated" || (status === "authenticated" && !(session as any)?.isInternal)) {
+    // Redirect authenticated non-internal users
+    if (status === "authenticated" && !(session as any)?.isInternal) {
       router.push("/");
     }
   }, [status, session, router]);
 
-  if (status === "loading" || !session) {
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const result = await signIn("credentials", {
+        username: formData.username,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Invalid internal credentials.");
+      }
+      // If success, next-auth will update the status automatically
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("An unexpected error occurred.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (status === "loading") {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[#F5A623] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
+  // If not authenticated, show the login form
+  if (status === "unauthenticated") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#050505] relative overflow-hidden font-sans">
+        <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(245,166,35,0.1)_0%,transparent_50%)]" />
+        
+        <Link
+          href="/"
+          className="absolute top-8 left-8 flex items-center gap-2 text-[#CFCFCF]/60 hover:text-white transition-all group z-50 px-4 py-2 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-medium tracking-tight">Return to Site</span>
+        </Link>
+
+        <div className="w-full max-w-[440px] p-6 animate-reveal z-10">
+          <div className="flex justify-center mb-10">
+            <Image
+              src="/home/navBar%20Logo.png"
+              alt="Makabasla Logo"
+              width={180}
+              height={45}
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          </div>
+
+          <div className="glass rounded-[2.5rem] p-8 lg:p-10 border border-white/10 shadow-2xl backdrop-blur-xl">
+            <div className="text-center mb-10">
+              <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">Staff Portal</h1>
+              <p className="text-[#CFCFCF]/50 text-sm font-medium">Enter your internal credentials</p>
+            </div>
+
+            <form onSubmit={handleAdminLogin} className="space-y-5">
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs py-3 px-4 rounded-xl text-center mb-4 font-medium italic">
+                  {error}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <div className="relative group">
+                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#CFCFCF]/40 group-focus-within:text-[#F5A623] transition-colors" />
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    required
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 text-white text-sm placeholder:text-[#CFCFCF]/30 focus:outline-none focus:ring-2 focus:ring-[#F5A623]/20 focus:border-[#F5A623]/40 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#CFCFCF]/40 group-focus-within:text-[#F5A623] transition-colors" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    required
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl pl-11 pr-12 text-white text-sm placeholder:text-[#CFCFCF]/30 focus:outline-none focus:ring-2 focus:ring-[#F5A623]/20 focus:border-[#F5A623]/40 transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#CFCFCF]/40 hover:text-white transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-12 rounded-xl bg-[#F5A623] text-black font-bold flex items-center justify-center gap-2 hover:bg-[#C97A00] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-lg shadow-[#F5A623]/10"
+              >
+                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Authorize Access"}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If authenticated as internal user, show the dashboard
   const stats = [
     { label: "Active Sessions", value: "1,284", icon: <Activity className="w-5 h-5 text-[#F5A623]" />, change: "+12%" },
     { label: "Internal Users", value: "48", icon: <Users className="w-5 h-5 text-[#F5A623]" />, change: "Stable" },
@@ -81,8 +211,8 @@ export default function AdminDashboard() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          {stats.map((stat, i) => (
-            <div key={i} className="glass rounded-3xl p-6 border border-white/5 relative overflow-hidden group">
+          {stats.map((stat) => (
+            <div key={stat.label} className="glass rounded-3xl p-6 border border-white/5 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-24 h-24 bg-[#F5A623]/5 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-[#F5A623]/10 transition-colors" />
               <div className="flex justify-between items-start mb-4">
                 <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
