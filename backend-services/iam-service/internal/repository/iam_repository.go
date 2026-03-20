@@ -2,6 +2,8 @@ package repository
 
 import (
 	"errors"
+
+	"gorm.io/gorm"
 )
 
 type IamRepository interface {
@@ -9,11 +11,11 @@ type IamRepository interface {
 }
 
 type iamRepository struct {
-	// Add DB connection here
+	db *gorm.DB
 }
 
-func NewIamRepository() IamRepository {
-	return &iamRepository{}
+func NewIamRepository(db *gorm.DB) IamRepository {
+	return &iamRepository{db: db}
 }
 
 func (r *iamRepository) GetUser(username string) (string, error) {
