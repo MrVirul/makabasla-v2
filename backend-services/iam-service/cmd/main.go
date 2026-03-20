@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings" // Added
 	"syscall"
 	"time"
 
@@ -45,10 +46,10 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// Basic Auth Middleware with Skipper for health checks
 	e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
 		Skipper: func(c echo.Context) bool {
-			return c.Path() == "/health"
+			// Allow health visits and all /api/v1 prefix routes (which are verified by Gateway) 
+			return c.Path() == "/health" || strings.HasPrefix(c.Path(), "/api/v1")
 		},
 		Validator: func(username, password string, c echo.Context) (bool, error) {
 			if username == cfg.Username && password == cfg.Password {

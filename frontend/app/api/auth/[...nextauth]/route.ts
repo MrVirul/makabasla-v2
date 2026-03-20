@@ -56,14 +56,18 @@ const handler = NextAuth({
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
-        // @ts-ignore
-        token.accessToken = user.accessToken;
         // @ts-ignore
         token.id = user.id;
         // @ts-ignore
+        token.accessToken = user.accessToken;
+        // @ts-ignore
         token.isInternal = user.email?.endsWith("@internal.makabasla.com") || false;
+      }
+      if (account) {
+        // This runs only on the first login from an OAuth provider (Google/Keycloak)
+        token.accessToken = account.access_token;
       }
       return token;
     },

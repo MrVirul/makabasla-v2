@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/makabas/iam-service/config"
+	"github.com/makabas/iam-service/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -16,6 +17,12 @@ func NewDatabase(cfg *config.Config) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(cfg.DBUrl), &gorm.Config{
 		Logger: gormLogger,
 	})
+	if err != nil {
+		return nil, err
+	}
+
+	// AutoMigrate models
+	err = db.AutoMigrate(&models.Customer{}, &models.Vehicle{})
 	if err != nil {
 		return nil, err
 	}
