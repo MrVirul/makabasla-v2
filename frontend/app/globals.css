@@ -113,6 +113,14 @@
   --chart-3: #CFCFCF;
   --chart-4: #F5F5F5;
   --chart-5: #1A1A1A;
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
 @layer base {
@@ -129,11 +137,6 @@
     font-feature-settings:
       "rlig" 1,
       "calt" 1;
-    background-image: radial-gradient(
-      circle at 50% -20%,
-      rgba(245, 166, 35, 0.08) 0%,
-      transparent 50%
-    );
     background-attachment: fixed;
   }
 
@@ -163,11 +166,11 @@
   .mask-radial {
     mask-image: radial-gradient(circle, black, transparent);
   }
-  
+
   .bg-gold-glow {
     background: linear-gradient(135deg, #F5A623, #C97A00);
   }
-  
+
   .bg-metallic {
     background: linear-gradient(180deg, #0B0B0B, #1A1A1A);
   }
@@ -188,4 +191,15 @@
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-zinc-700;
+}
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
