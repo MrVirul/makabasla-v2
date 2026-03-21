@@ -1,14 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { 
-  LayoutDashboard, 
-  Users, 
-  Car, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Users,
+  Car,
+  Settings,
   LogOut,
   ShieldCheck,
-  User as UserIcon
+  User as UserIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -67,24 +67,30 @@ export function AdminSidebar() {
             <ShieldCheck size={20} />
           </div>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="text-sm font-bold tracking-tight text-white line-clamp-1">Makabasla Admin</span>
-            <span className="text-[10px] uppercase tracking-widest text-[#F5A623] font-bold">Owner View</span>
+            <span className="text-sm font-bold tracking-tight text-white line-clamp-1">
+              Makabasla Admin
+            </span>
+            <span className="text-[10px] uppercase tracking-widest text-[#F5A623] font-bold">
+              Owner View
+            </span>
           </div>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[#CFCFCF]/40 group-data-[collapsible=icon]:hidden px-2">Management</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[#CFCFCF]/40 group-data-[collapsible=icon]:hidden px-2">
+            Management
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
+                  <SidebarMenuButton
+                    asChild
                     isActive={pathname === item.url}
                     tooltip={item.title}
-                    className={`hover:bg-white/5 data-[active=true]:bg-[#F5A623]/10 data-[active=true]:text-[#F5A623] transition-all py-5 ${pathname === item.url ? 'text-[#F5A623]' : 'text-gray-400'}`}
+                    className={`hover:bg-white/5 data-[active=true]:bg-[#F5A623]/10 data-[active=true]:text-[#F5A623] transition-all py-5 ${pathname === item.url ? "text-[#F5A623]" : "text-gray-400"}`}
                   >
                     <Link href={item.url} className="flex items-center gap-3">
                       <item.icon size={20} />
@@ -101,12 +107,14 @@ export function AdminSidebar() {
       <SidebarFooter className="border-t border-white/5 p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton 
+            <SidebarMenuButton
               className="text-gray-400 hover:text-white hover:bg-white/5 py-5"
               onClick={() => signOut({ callbackUrl: "/admin" })}
             >
               <LogOut size={20} />
-              <span className="font-medium group-data-[collapsible=icon]:hidden">Sign Out</span>
+              <span className="font-medium group-data-[collapsible=icon]:hidden">
+                Sign Out
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
