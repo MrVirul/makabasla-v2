@@ -84,22 +84,8 @@ export default function AdminLayout({
         </Link>
 
         <div className="w-full max-w-[440px] p-6 animate-reveal z-10">
-          {/* <div className="flex justify-center mb-10">
-            <Image
-              src="/home/navBar%20Logo.png"
-              alt="Makabasla Logo"
-              width={180}
-              height={45}
-              className="h-10 w-auto object-contain text-white invert"
-              priority
-            />
-          </div> */}
-
           <div className="glass rounded-[2.5rem] p-8 lg:p-10 border border-white/10 shadow-2xl backdrop-blur-xl">
             <div className="text-center mb-10">
-              {/* <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F5A623]/10 text-[#F5A623] mb-4">
-                <ShieldCheck size={24} />
-              </div> */}
               <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
                 Staff Portal
               </h1>
