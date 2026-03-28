@@ -3,13 +3,13 @@ module github.com/makabas/api-gateway
 go 1.26
 
 require (
+	github.com/Nerzal/gocloak/v13 v13.9.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/labstack/echo/v4 v4.15.1
 	github.com/spf13/viper v1.21.0
 )
 
 require (
-	github.com/Nerzal/gocloak/v13 v13.9.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect

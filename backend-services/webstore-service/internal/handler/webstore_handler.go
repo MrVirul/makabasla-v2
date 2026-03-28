@@ -17,11 +17,7 @@ func NewWebstoreHandler(srv service.WebstoreService) *WebstoreHandler {
 	}
 }
 
-func (h *WebstoreHandler) HealthCheck(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]string{
-		"status": "UP",
-	})
-}
+
 
 func (h *WebstoreHandler) GetData(c echo.Context) error {
 	info, err := h.srv.ProcessData()
@@ -35,6 +31,5 @@ func (h *WebstoreHandler) GetData(c echo.Context) error {
 }
 
 func (h *WebstoreHandler) RegisterRoutes(e *echo.Echo) {
-	e.GET("/health", h.HealthCheck)
 	e.GET("/api/v1/webstore", h.GetData)
 }
