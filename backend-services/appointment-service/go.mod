@@ -6,6 +6,8 @@ require (
 	github.com/hashicorp/consul/api v1.33.4
 	github.com/labstack/echo/v4 v4.15.1
 	github.com/spf13/viper v1.21.0
+	gorm.io/driver/postgres v1.6.0
+	gorm.io/gorm v1.31.1
 )
 
 require (
@@ -48,6 +50,4 @@ require (
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
-	gorm.io/driver/postgres v1.6.0 // indirect
-	gorm.io/gorm v1.31.1 // indirect
 )

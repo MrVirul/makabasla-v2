@@ -22,7 +22,7 @@ func NewDatabase(cfg *config.Config) (*gorm.DB, error) {
 	}
 
 	// AutoMigrate models
-	err = db.AutoMigrate(&models.Customer{}, &models.Vehicle{})
+	err = db.AutoMigrate(&models.Customer{}, &models.Vehicle{}, &models.Admin{}, &models.Technician{}, &models.Staff{})
 	if err != nil {
 		return nil, err
 	}

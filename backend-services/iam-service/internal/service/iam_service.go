@@ -8,8 +8,8 @@ import (
 
 type IamService interface {
 	GetUserInfo(username string) (string, error)
-	SyncProfile(id, email, name, phone string) (*models.Customer, error)
-	GetProfile(id string) (*models.Customer, error)
+	SyncProfile(id, email, name, phone, role string) (interface{}, error)
+	GetProfile(id string) (interface{}, error) // Updated for multi-role
 	AddVehicle(vehicle *models.Vehicle) error
 	GetVehicles(customerID string) ([]models.Vehicle, error)
 }
@@ -24,11 +24,23 @@ func NewIamService(repo repository.IamRepository) IamService {
 	}
 }
 
-func (s *iamService) SyncProfile(id, email, name, phone string) (*models.Customer, error) {
-	return s.repo.SyncCustomer(id, email, name, phone)
+func (s *iamService) SyncProfile(id, email, name, phone, role string) (interface{}, error) {
+	switch role {
+	case "ADMIN":
+		return s.repo.SyncAdmin(id, email, name)
+	case "TECHNICIAN":
+		return s.repo.SyncTechnician(id, email, name)
+	case "STAFF":
+		return s.repo.SyncStaff(id, email, name, "General Staff")
+	default:
+		// Default to CUSTOMER if no role or CUSTOMER role
+		return s.repo.SyncCustomer(id, email, name, phone)
+	}
 }
 
-func (s *iamService) GetProfile(id string) (*models.Customer, error) {
+func (s *iamService) GetProfile(id string) (interface{}, error) {
+	// For simplicity, we check in Customer first.
+	// In a real system, you might include Role in the token/request to know where to look.
 	return s.repo.GetCustomer(id)
 }
 

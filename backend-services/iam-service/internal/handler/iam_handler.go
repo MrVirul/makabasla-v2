@@ -18,11 +18,7 @@ func NewIamHandler(srv service.IamService) *IamHandler {
 	}
 }
 
-func (h *IamHandler) HealthCheck(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]string{
-		"status": "UP",
-	})
-}
+
 
 func (h *IamHandler) GetUser(c echo.Context) error {
 	username := c.QueryParam("username")
@@ -46,6 +42,7 @@ func (h *IamHandler) SyncProfile(c echo.Context) error {
 		Email string `json:"email"`
 		Name  string `json:"name"`
 		Phone string `json:"phone"`
+		Role  string `json:"role"`
 	}
 
 	var req Request
@@ -53,7 +50,7 @@ func (h *IamHandler) SyncProfile(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	profile, err := h.srv.SyncProfile(req.ID, req.Email, req.Name, req.Phone)
+	profile, err := h.srv.SyncProfile(req.ID, req.Email, req.Name, req.Phone, req.Role)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -89,7 +86,6 @@ func (h *IamHandler) CreateVehicle(c echo.Context) error {
 }
 
 func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
-	e.GET("/health", h.HealthCheck)
 	e.GET("/api/v1/user", h.GetUser)
 	e.POST("/api/v1/profile", h.SyncProfile)
 	e.GET("/api/v1/profile/:id", h.GetProfile)

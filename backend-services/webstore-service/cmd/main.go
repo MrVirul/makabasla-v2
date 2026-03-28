@@ -13,7 +13,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/makabas/webstore-service/config"
 	"github.com/makabas/webstore-service/internal/database"
-	"github.com/makabas/webstore-service/internal/discovery"
 	"github.com/makabas/webstore-service/internal/handler"
 	"github.com/makabas/webstore-service/internal/repository"
 	"github.com/makabas/webstore-service/internal/service"
@@ -28,21 +27,13 @@ func main() {
 		log.Fatalf("Warning: failed to initialize database: %v", err)
 	}
 
-	consulClient, err := discovery.NewConsulClient(cfg)
-	if err != nil {
-		log.Fatalf("Warning: failed to initialize consul client: %v", err)
-	}
 
-	if err := consulClient.Register(cfg); err != nil {
-		log.Printf("Warning: failed to register with consul: %v", err)
-	}
 
 	repo := repository.NewWebstoreRepository(db)
 	svc := service.NewWebstoreService(repo)
 	h := handler.NewWebstoreHandler(svc)
 
 	e := echo.New()
-	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
 	h.RegisterRoutes(e)
@@ -51,6 +42,9 @@ func main() {
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
+		e.HideBanner = true
+		e.HidePort = true
+		log.Printf("Webstore Service is starting on port %s", cfg.ServerPort)
 		if err := e.Start(":" + cfg.ServerPort); err != nil && err != http.ErrServerClosed {
 			e.Logger.Fatal("Shutting down the server")
 		}
@@ -59,9 +53,6 @@ func main() {
 	<-quit
 	log.Println("Received termination signal, shutting down gracefully...")
 
-	if err := consulClient.Deregister(); err != nil {
-		log.Printf("Failed to deregister from consul: %v", err)
-	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

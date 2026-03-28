@@ -12,6 +12,9 @@ type IamRepository interface {
 	GetUser(username string) (string, error)
 	SyncCustomer(id string, email string, name string, phone string) (*models.Customer, error)
 	GetCustomer(id string) (*models.Customer, error)
+	SyncAdmin(id string, email string, name string) (*models.Admin, error)
+	SyncTechnician(id string, email string, name string) (*models.Technician, error)
+	SyncStaff(id string, email string, name string, role string) (*models.Staff, error)
 	CreateVehicle(vehicle *models.Vehicle) error
 	GetVehicles(customerID string) ([]models.Vehicle, error)
 }
@@ -48,6 +51,33 @@ func (r *iamRepository) GetCustomer(id string) (*models.Customer, error) {
 		return nil, err
 	}
 	return &customer, nil
+}
+
+func (r *iamRepository) SyncAdmin(id string, email string, name string) (*models.Admin, error) {
+	admin := &models.Admin{ID: id, Email: email, Name: name}
+	err := r.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"email", "name"}),
+	}).Create(admin).Error
+	return admin, err
+}
+
+func (r *iamRepository) SyncTechnician(id string, email string, name string) (*models.Technician, error) {
+	tech := &models.Technician{ID: id, Email: email, Name: name}
+	err := r.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"email", "name"}),
+	}).Create(tech).Error
+	return tech, err
+}
+
+func (r *iamRepository) SyncStaff(id string, email string, name string, role string) (*models.Staff, error) {
+	staff := &models.Staff{ID: id, Email: email, Name: name, Role: role}
+	err := r.db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id"}},
+		DoUpdates: clause.AssignmentColumns([]string{"email", "name", "role"}),
+	}).Create(staff).Error
+	return staff, err
 }
 
 func (r *iamRepository) CreateVehicle(vehicle *models.Vehicle) error {
