@@ -107,71 +107,71 @@ services:
       keycloak:
         condition: service_healthy
 
-  # Appointment Service
-  appointment-service:
-    build:
-      context: ./backend-services/appointment-service
-      dockerfile: Dockerfile
-      args:
-        - GO_VERSION=1.26-alpine
-    container_name: makabasla-appointment-service
-    ports:
-      - "8085:8085"
-    networks:
-      - makabasla-network
-    environment:
-      - DB_URL=${APPOINTMENT_DB_URL}
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - CONSUL_HOST=${CONSUL_HOST:-consul}
-      - APP_NAME=appointment-service
-    depends_on:
-      consul:
-        condition: service_healthy
+#   # Appointment Service
+#   appointment-service:
+#     build:
+#       context: ./backend-services/appointment-service
+#       dockerfile: Dockerfile
+#       args:
+#         - GO_VERSION=1.26-alpine
+#     container_name: makabasla-appointment-service
+#     ports:
+#       - "8085:8085"
+#     networks:
+#       - makabasla-network
+#     environment:
+#       - DB_URL=${APPOINTMENT_DB_URL}
+#       - DB_USER=${POSTGRES_USER}
+#       - DB_PASSWORD=${POSTGRES_PASSWORD}
+#       - CONSUL_HOST=${CONSUL_HOST:-consul}
+#       - APP_NAME=appointment-service
+#     depends_on:
+#       consul:
+#         condition: service_healthy
 
-  # Task Management Service
-  task-mgt-service:
-    build:
-      context: ./backend-services/task-mgt-service
-      dockerfile: Dockerfile
-      args:
-        - GO_VERSION=1.26-alpine
-    container_name: makabasla-task-mgt-service
-    ports:
-      - "8086:8086"
-    networks:
-      - makabasla-network
-    environment:
-      - DB_URL=${TSKMGT_DB_URL}
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - CONSUL_HOST=${CONSUL_HOST:-consul}
-      - APP_NAME=task-mgt-service
-    depends_on:
-      consul:
-        condition: service_healthy
+#   # Task Management Service
+#   task-mgt-service:
+#     build:
+#       context: ./backend-services/task-mgt-service
+#       dockerfile: Dockerfile
+#       args:
+#         - GO_VERSION=1.26-alpine
+#     container_name: makabasla-task-mgt-service
+#     ports:
+#       - "8086:8086"
+#     networks:
+#       - makabasla-network
+#     environment:
+#       - DB_URL=${TSKMGT_DB_URL}
+#       - DB_USER=${POSTGRES_USER}
+#       - DB_PASSWORD=${POSTGRES_PASSWORD}
+#       - CONSUL_HOST=${CONSUL_HOST:-consul}
+#       - APP_NAME=task-mgt-service
+#     depends_on:
+#       consul:
+#         condition: service_healthy
 
-  # Webstore Service
-  webstore-service:
-    build:
-      context: ./backend-services/webstore-service
-      dockerfile: Dockerfile
-      args:
-        - GO_VERSION=1.26-alpine
-    container_name: makabasla-webstore-service
-    ports:
-      - "8087:8087"
-    networks:
-      - makabasla-network
-    environment:
-      - DB_URL=${WEBSTORE_DB_URL}
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - CONSUL_HOST=${CONSUL_HOST:-consul}
-      - APP_NAME=webstore-service
-    depends_on:
-      consul:
-        condition: service_healthy
+#   # Webstore Service
+#   webstore-service:
+#     build:
+#       context: ./backend-services/webstore-service
+#       dockerfile: Dockerfile
+#       args:
+#         - GO_VERSION=1.26-alpine
+#     container_name: makabasla-webstore-service
+#     ports:
+#       - "8087:8087"
+#     networks:
+#       - makabasla-network
+#     environment:
+#       - DB_URL=${WEBSTORE_DB_URL}
+#       - DB_USER=${POSTGRES_USER}
+#       - DB_PASSWORD=${POSTGRES_PASSWORD}
+#       - CONSUL_HOST=${CONSUL_HOST:-consul}
+#       - APP_NAME=webstore-service
+#     depends_on:
+#       consul:
+#         condition: service_healthy
 
 networks:
   makabasla-network:
