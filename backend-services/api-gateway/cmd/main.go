@@ -61,8 +61,6 @@ func main() {
 	cfg := config.LoadConfig()
 
 	e := echo.New()
-
-	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	
 	// Global CORS configuration matches previous Spring Cloud Gateway
@@ -77,11 +75,9 @@ func main() {
 	// Apply Keycloak authentication
 	// The frontend routes under /api will be intercepted by the Keycloak middleware, except for some ignored paths.
 	keycloakClient := gocloak.NewClient(cfg.KeycloakURL)
-	e.Use(mw.KeycloakAuthMiddleware(keycloakClient, cfg.KeycloakRealm, cfg.KeycloakClient, cfg.KeycloakSecret))
+	e.Use(mw.KeycloakAuthMiddleware(keycloakClient, cfg.KeycloakRealm, cfg.KeycloakClient, cfg.KeycloakSecret, cfg.IAMServiceURL))
 
-	e.GET("/health", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, map[string]string{"status": "UP", "service": "api-gateway"})
-	})
+
 
 	// Service Routes mapping the Docker hostnames and proxying requests.
 	// We map the incoming path prefix, remove it, and forward to the root of the targeted service.
@@ -96,6 +92,9 @@ func main() {
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
+		e.HideBanner = true
+		e.HidePort = true
+		log.Printf("API Gateway is starting on port %s", cfg.ServerPort)
 		if err := e.Start(":" + cfg.ServerPort); err != nil && err != http.ErrServerClosed {
 			e.Logger.Fatal("Shutting down the server")
 		}

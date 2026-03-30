@@ -17,11 +17,7 @@ func NewAppointmentHandler(srv service.AppointmentService) *AppointmentHandler {
 	}
 }
 
-func (h *AppointmentHandler) HealthCheck(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]string{
-		"status": "UP",
-	})
-}
+
 
 func (h *AppointmentHandler) GetData(c echo.Context) error {
 	info, err := h.srv.ProcessData()
@@ -35,6 +31,5 @@ func (h *AppointmentHandler) GetData(c echo.Context) error {
 }
 
 func (h *AppointmentHandler) RegisterRoutes(e *echo.Echo) {
-	e.GET("/health", h.HealthCheck)
 	e.GET("/api/v1/appointment", h.GetData)
 }
