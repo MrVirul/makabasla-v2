@@ -17,11 +17,7 @@ func NewTaskHandler(srv service.TaskService) *TaskHandler {
 	}
 }
 
-func (h *TaskHandler) HealthCheck(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]string{
-		"status": "UP",
-	})
-}
+
 
 func (h *TaskHandler) GetData(c echo.Context) error {
 	info, err := h.srv.ProcessData()
@@ -35,6 +31,5 @@ func (h *TaskHandler) GetData(c echo.Context) error {
 }
 
 func (h *TaskHandler) RegisterRoutes(e *echo.Echo) {
-	e.GET("/health", h.HealthCheck)
 	e.GET("/api/v1/task", h.GetData)
 }

@@ -15,6 +15,7 @@ type Config struct {
 	KeycloakRealm  string `mapstructure:"KEYCLOAK_REALM"`
 	KeycloakClient string `mapstructure:"KEYCLOAK_CLIENT_ID"`
 	KeycloakSecret string `mapstructure:"KEYCLOAK_CLIENT_SECRET"`
+	IAMServiceURL  string `mapstructure:"IAM_SERVICE_URL"`
 }
 
 func LoadConfig() *Config {
@@ -25,6 +26,7 @@ func LoadConfig() *Config {
 	viper.SetDefault("KEYCLOAK_REALM", "makabasla")
 	viper.SetDefault("KEYCLOAK_CLIENT_ID", "iam-service")
 	viper.SetDefault("KEYCLOAK_CLIENT_SECRET", "YOUR_CLIENT_SECRET")
+	viper.SetDefault("IAM_SERVICE_URL", "http://iam-service:8084")
 
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
