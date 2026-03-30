@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+
 	"github.com/makabas/iam-service/internal/models"
 	"github.com/makabas/iam-service/internal/repository"
 )
@@ -9,7 +10,7 @@ import (
 type IamService interface {
 	GetUserInfo(username string) (string, error)
 	SyncProfile(id, email, name, phone, role string) (interface{}, error)
-	GetProfile(id string) (interface{}, error) // Updated for multi-role
+	GetProfile(id string) (interface{}, error)
 	AddVehicle(vehicle *models.Vehicle) error
 	GetVehicles(customerID string) ([]models.Vehicle, error)
 }
@@ -27,20 +28,18 @@ func NewIamService(repo repository.IamRepository) IamService {
 func (s *iamService) SyncProfile(id, email, name, phone, role string) (interface{}, error) {
 	switch role {
 	case "ADMIN":
-		return s.repo.SyncAdmin(id, email, name)
+		return s.repo.SyncAdmin(id, email, name, phone)
 	case "TECHNICIAN":
-		return s.repo.SyncTechnician(id, email, name)
+		return s.repo.SyncTechnician(id, email, name, phone)
 	case "STAFF":
-		return s.repo.SyncStaff(id, email, name, "General Staff")
+		return s.repo.SyncStaff(id, email, name, "General Staff", phone)
 	default:
-		// Default to CUSTOMER if no role or CUSTOMER role
 		return s.repo.SyncCustomer(id, email, name, phone)
 	}
 }
 
 func (s *iamService) GetProfile(id string) (interface{}, error) {
-	// For simplicity, we check in Customer first.
-	// In a real system, you might include Role in the token/request to know where to look.
+
 	return s.repo.GetCustomer(id)
 }
 
