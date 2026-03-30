@@ -18,7 +18,7 @@ func NewDatabase(cfg *config.Config) (*gorm.DB, error) {
 		Logger: gormLogger,
 	})
 	if err != nil {
-		return nil, err
+		return nil, err 
 	}
 
 	// AutoMigrate models

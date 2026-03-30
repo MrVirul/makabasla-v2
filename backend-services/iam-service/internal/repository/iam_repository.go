@@ -12,9 +12,9 @@ type IamRepository interface {
 	GetUser(username string) (string, error)
 	SyncCustomer(id string, email string, name string, phone string) (*models.Customer, error)
 	GetCustomer(id string) (*models.Customer, error)
-	SyncAdmin(id string, email string, name string) (*models.Admin, error)
-	SyncTechnician(id string, email string, name string) (*models.Technician, error)
-	SyncStaff(id string, email string, name string, role string) (*models.Staff, error)
+	SyncAdmin(id string, email string, name string, phone string) (*models.Admin, error)
+	SyncTechnician(id string, email string, name string, phone string) (*models.Technician, error)
+	SyncStaff(id string, email string, name string, role string, phone string) (*models.Staff, error)
 	CreateVehicle(vehicle *models.Vehicle) error
 	GetVehicles(customerID string) ([]models.Vehicle, error)
 }
@@ -53,29 +53,29 @@ func (r *iamRepository) GetCustomer(id string) (*models.Customer, error) {
 	return &customer, nil
 }
 
-func (r *iamRepository) SyncAdmin(id string, email string, name string) (*models.Admin, error) {
-	admin := &models.Admin{ID: id, Email: email, Name: name}
+func (r *iamRepository) SyncAdmin(id string, email string, name string, phone string) (*models.Admin, error) {
+	admin := &models.Admin{ID: id, Email: email, Name: name, Phone: phone}
 	err := r.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"email", "name"}),
+		DoUpdates: clause.AssignmentColumns([]string{"email", "name", "phone"}),
 	}).Create(admin).Error
 	return admin, err
 }
 
-func (r *iamRepository) SyncTechnician(id string, email string, name string) (*models.Technician, error) {
-	tech := &models.Technician{ID: id, Email: email, Name: name}
+func (r *iamRepository) SyncTechnician(id string, email string, name string, phone string) (*models.Technician, error) {
+	tech := &models.Technician{ID: id, Email: email, Name: name, Phone: phone}
 	err := r.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"email", "name"}),
+		DoUpdates: clause.AssignmentColumns([]string{"email", "name", "phone"}),
 	}).Create(tech).Error
 	return tech, err
 }
 
-func (r *iamRepository) SyncStaff(id string, email string, name string, role string) (*models.Staff, error) {
-	staff := &models.Staff{ID: id, Email: email, Name: name, Role: role}
+func (r *iamRepository) SyncStaff(id string, email string, name string, role string, phone string) (*models.Staff, error) {
+	staff := &models.Staff{ID: id, Email: email, Name: name, Role: role, Phone: phone}
 	err := r.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"email", "name", "role"}),
+		DoUpdates: clause.AssignmentColumns([]string{"email", "name", "role", "phone"}),
 	}).Create(staff).Error
 	return staff, err
 }

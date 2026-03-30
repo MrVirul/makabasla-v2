@@ -18,24 +18,27 @@ type Admin struct {
 	ID        string    `gorm:"primaryKey" json:"id"`
 	Email     string    `gorm:"uniqueIndex" json:"email"`
 	Name      string    `json:"name"`
+	Phone     string    `gorm:"uniqueIndex" json:"phone"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Technician struct {
-	ID           string    `gorm:"primaryKey" json:"id"`
-	Email        string    `gorm:"uniqueIndex" json:"email"`
-	Name         string    `json:"name"`
-	Specialization string  `json:"specialization"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID             string    `gorm:"primaryKey" json:"id"`
+	Email          string    `gorm:"uniqueIndex" json:"email"`
+	Name           string    `json:"name"`
+	Phone          string    `gorm:"uniqueIndex" json:"phone"`
+	Specialization string    `json:"specialization"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 type Staff struct {
 	ID        string    `gorm:"primaryKey" json:"id"`
 	Email     string    `gorm:"uniqueIndex" json:"email"`
 	Name      string    `json:"name"`
-	Role      string    `json:"role"` // e.g., "Receptionist", "Accountant"
+	Phone     string    `gorm:"uniqueIndex" json:"phone"`
+	Role      string    `json:"role"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

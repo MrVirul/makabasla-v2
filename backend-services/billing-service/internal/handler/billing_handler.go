@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/makabas/billing-service/internal/service"
 )
@@ -19,17 +17,5 @@ func NewBillingHandler(srv service.BillingService) *BillingHandler {
 
 
 
-func (h *BillingHandler) GetData(c echo.Context) error {
-	info, err := h.srv.ProcessData()
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-
-	return c.JSON(http.StatusOK, map[string]string{
-		"info": info,
-	})
-}
-
 func (h *BillingHandler) RegisterRoutes(e *echo.Echo) {
-	e.GET("/api/v1/billing", h.GetData)
 }
