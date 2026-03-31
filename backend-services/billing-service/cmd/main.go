@@ -1,21 +1,20 @@
 package main
 
 import (
-	"context"
 	"log"
-	"net/http"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/makabas/billing-service/config"
 	"github.com/makabas/billing-service/internal/database"
 	"github.com/makabas/billing-service/internal/handler"
 	"github.com/makabas/billing-service/internal/repository"
 	"github.com/makabas/billing-service/internal/service"
+	billingpb "github.com/makabas/shared/pkg/pb/billing"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -26,38 +25,30 @@ func main() {
 	if err != nil {
 		log.Fatalf("Warning: failed to initialize database: %v", err)
 	}
-
-
-
 	repo := repository.NewBillingRepository(db)
 	svc := service.NewBillingService(repo)
 	h := handler.NewBillingHandler(svc)
 
-	e := echo.New()
-	e.Use(middleware.Recover())
+	lis, err := net.Listen("tcp", ":"+cfg.ServerPort)
+	if err != nil {
+		log.Fatalf("failed to listen on port %s: %v", cfg.ServerPort, err)
+	}
 
-	h.RegisterRoutes(e)
+	grpcServer := grpc.NewServer()
+	billingpb.RegisterBillingServiceServer(grpcServer, h)
+	reflection.Register(grpcServer)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		e.HideBanner = true
-		e.HidePort = true
-		log.Printf("Billing Service is starting on port %s", cfg.ServerPort)
-		if err := e.Start(":" + cfg.ServerPort); err != nil && err != http.ErrServerClosed {
-			e.Logger.Fatal("Shutting down the server")
+		log.Printf("Billing gRPC service is starting on port %s", cfg.ServerPort)
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalf("failed to serve gRPC server: %v", err)
 		}
 	}()
 
 	<-quit
-	log.Println("Received termination signal, shutting down gracefully...")
-
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	if err := e.Shutdown(ctx); err != nil {
-		e.Logger.Fatal(err)
-	}
+	log.Println("Received termination signal, stopping gRPC server gracefully...")
+	grpcServer.GracefulStop()
 }
