@@ -42,7 +42,7 @@ func (c *ConsulClient) Register(cfg *config.Config) error {
 		Port:    port,
 		Address: cfg.AppName,
 		Check: &api.AgentServiceCheck{
-			HTTP:     fmt.Sprintf("http://%s:%d/health", cfg.AppName, port),
+			GRPC:     fmt.Sprintf("%s:%d/%s", cfg.AppName, port, cfg.AppName),
 			Interval: "10s",
 			Timeout:  "5s",
 		},

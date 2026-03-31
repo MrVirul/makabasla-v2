@@ -19,7 +19,4 @@ request:
     type: apikey
     placement: header
 bundled: false
-extensions:
-  ignore:
-    - node_modules
-    - .git
+extensions: {}
