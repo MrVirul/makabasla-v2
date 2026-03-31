@@ -356,9 +356,15 @@ export default function ProfilePage() {
                     <div className="flex gap-2">
                       <Input
                         value={editedPhone}
-                        onChange={(e) => setEditedPhone(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, "");
+                          if (val.length <= 10) {
+                            setEditedPhone(val);
+                          }
+                        }}
+                        maxLength={10}
                         className="bg-black/50 border-white/10 h-9"
-                        placeholder="071-XXX-XXXX"
+                        placeholder="0712345678"
                       />
                       <Button
                         size="icon"
