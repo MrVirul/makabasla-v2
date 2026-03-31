@@ -64,8 +64,8 @@ services:
   # Billing Service
   billing-service:
     build:
-      context: ./backend-services/billing-service
-      dockerfile: Dockerfile
+      context: ./backend-services
+      dockerfile: billing-service/Dockerfile
       args:
         - GO_VERSION=1.26-alpine
     container_name: makabasla-billing-service
