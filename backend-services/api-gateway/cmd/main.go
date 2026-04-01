@@ -12,11 +12,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Nerzal/gocloak/v13"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/makabas/api-gateway/config"
-	mw "github.com/makabas/api-gateway/internal/middleware"
+	gatehandler "github.com/makabas/api-gateway/internal/handler"
+	// _ "github.com/Nerzal/gocloak/v13" 
+	// _ "github.com/makabas/api-gateway/internal/middleware"
 )
 
 func NewProxy(targetHost, prefixToRemove string) echo.HandlerFunc {
@@ -73,15 +74,26 @@ func main() {
 	}))
 
 	// Apply Keycloak authentication
-	// The frontend routes under /api will be intercepted by the Keycloak middleware, except for some ignored paths.
-	keycloakClient := gocloak.NewClient(cfg.KeycloakURL)
-	e.Use(mw.KeycloakAuthMiddleware(keycloakClient, cfg.KeycloakRealm, cfg.KeycloakClient, cfg.KeycloakSecret, cfg.IAMServiceURL))
+	// TODO: Re-enable KeycloakAuthMiddleware before production deployment
+	// keycloakClient := gocloak.NewClient(cfg.KeycloakURL)
+	// e.Use(mw.KeycloakAuthMiddleware(keycloakClient, cfg.KeycloakRealm, cfg.KeycloakClient, cfg.KeycloakSecret, cfg.IAMServiceURL))
 
 
+
+	// Initialize internal handlers
+	billH := gatehandler.NewBillingHandler("billing-service:8083")
 
 	// Service Routes mapping the Docker hostnames and proxying requests.
 	// We map the incoming path prefix, remove it, and forward to the root of the targeted service.
-	e.Any("/api/billing/*", NewProxy("http://billing-service:8083", "/api/billing"))
+	
+	// Complex/Bridged Routes
+	e.GET("/api/billing/:vehicleId", billH.GetBilling)
+	e.POST("/api/billing/:vehicleId", billH.StartBilling)
+	e.POST("/api/billing/:vehicleId/expense", billH.AddExpense)
+	e.POST("/api/billing/:vehicleId/advance", billH.AddAdvance)
+	e.DELETE("/api/billing/:vehicleId", billH.DeleteBilling)
+
+	// Direct Proxy Routes
 	e.Any("/api/auth/*", NewProxy("http://iam-service:8084", "/api/auth"))            // IAM maps to auth here
 	e.Any("/keycloak/*", NewProxy("http://keycloak:8180", "/keycloak"))
 	e.Any("/api/appointment/*", NewProxy("http://appointment-service:8085", "/api/appointment"))
