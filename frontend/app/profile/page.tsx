@@ -94,7 +94,7 @@ export default function ProfilePage() {
 
   const fetchProfile = useCallback(
     async (forced: boolean = false) => {
-      if (!userId || !accessToken) return;
+      if (!userId) return;
 
       // Don't re-sync automatically if we already have a session, unless forced
       if (hasSyncedRef.current && !forced) return;
@@ -103,12 +103,16 @@ export default function ProfilePage() {
         setLoading(true);
         console.log("Fetching profile for:", userId);
 
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (accessToken) {
+          headers["Authorization"] = `Bearer ${accessToken}`;
+        }
+
         const syncRes = await fetch(`${API_BASE}/profile`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
+          headers: headers,
           body: JSON.stringify({
             id: userId,
             email: session?.user?.email,
@@ -144,12 +148,16 @@ export default function ProfilePage() {
     setSaving(true);
     console.log("Saving phone number:", editedPhone);
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+
       const res = await fetch(`${API_BASE}/profile`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: headers,
         body: JSON.stringify({
           id: userId,
           email: session?.user?.email,
@@ -179,12 +187,16 @@ export default function ProfilePage() {
     if (!accessToken || !userId) return;
     console.log("Submitting new vehicle...");
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+
       const res = await fetch(`${API_BASE}/vehicle`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: headers,
         body: JSON.stringify({
           ...newVehicle,
           year: Number(newVehicle.year),

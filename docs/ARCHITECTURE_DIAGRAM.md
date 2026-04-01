@@ -25,10 +25,10 @@ The Makabasla v2 architecture has been modernized from Java to Go to minimize me
        │
        ▼
 ┌─────────────────────────────────────────────────────────┐
-│                    Go Microservices                     │
+│              Go Microservices (HTTP & gRPC)             │
 ├─────────────┬─────────────┬─────────────┬───────────────┤
 │ IAM Service │ Billing Svc │ Appointment │ Task Mgt Svc  │ (Webstore
-│ (Port 8084) │ (Port 8083) │ (Port 8085) │ (Port 8086)   │  Port 8087)
+│ (Port 8084) │(gRPC :8083) │ (Port 8085) │ (Port 8086)   │  Port 8087)
 └──────┬──────┴──────┬──────┴──────┬──────┴──────┬────────┘
        │             │             │             │
        ▼             ▼             ▼             ▼
@@ -52,11 +52,11 @@ Acts as the entry point for all client requests. It resolves internal IP address
 Provides distributed service discovery and health-checking. All downstream Go services register themselves on port startup.
 
 ### Downstream Services
-All services utilize Go 1.26 and connect directly to their localized logical databases within the shared PostgreSQL server container to enforce the Database-Per-Service pattern constraints.
+All services utilize Go 1.26 and connect directly to their localized logical databases within the shared PostgreSQL server container to enforce the Database-Per-Service pattern constraints. Certain services expose gRPC endpoints for high-performance internal communication.
 
 * `iam-service`: Handles Identity & Access Management. (Port 8084)
 * `keycloak`: External Identity & Access Management server. (Port 8180)
-* `billing-service`: Connects to `billingdb` - Financial ledgers and invoices. (Port 8083)
+* `billing-service`: Connects to `billingdb` - Financial ledgers and invoices. (gRPC Port 8083)
 * `appointment-service`: Connects to `appointmentdb` - Scheduler and calendars. (Port 8085)
 * `task-mgt-service`: Connects to `taskdb` - Task orchestration. (Port 8086)
 * `webstore-service`: Connects to `webstoredb` - Product catalog and e-commerce. (Port 8087)
