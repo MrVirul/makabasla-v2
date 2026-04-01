@@ -3,6 +3,7 @@ module github.com/makabas/billing-service
 go 1.26.1
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/hashicorp/consul/api v1.33.4
 	github.com/makabas/shared v0.0.0-00010101000000-000000000000
 	github.com/spf13/viper v1.21.0
