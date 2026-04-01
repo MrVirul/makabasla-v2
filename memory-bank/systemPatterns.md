@@ -1,10 +1,11 @@
 # systemPatterns.md
 
 ## Architecture Style
-- **Microservices**: Distributed services communicating over HTTP via a central Gateway.
+- **Microservices**: Distributed services communicating over HTTP via a central Gateway, and inter-service communication over gRPC.
 - **Service Discovery**: HashiCorp Consul for service registration and health checks.
 
 ## Key Patterns
+- **gRPC for Internal Comm**: Using gRPC and Protocol Buffers for fast, typed communication between internal backend microservices.
 - **Database Per Service**: Each microservice owns its PostgreSQL database (e.g., `appointmentdb`, `taskdb`).
 - **API Gateway**: Entry point for all external traffic, handling routing and cross-cutting concerns.
 - **Dependency Injection**: Go services use explicit DI for repositories and internal logic for testability.
