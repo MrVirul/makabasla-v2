@@ -85,9 +85,19 @@ func (h *IamHandler) CreateVehicle(c echo.Context) error {
 	return c.JSON(http.StatusCreated, v)
 }
 
+func (h *IamHandler) GetAllVehicles(c echo.Context) error {
+	vehicles, err := h.srv.GetAllVehicles()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, vehicles)
+}
+
 func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
 	e.GET("/api/v1/user", h.GetUser)
 	e.POST("/api/v1/profile", h.SyncProfile)
 	e.GET("/api/v1/profile/:id", h.GetProfile)
 	e.POST("/api/v1/vehicle", h.CreateVehicle)
+	e.GET("/api/v1/vehicles", h.GetAllVehicles)
 }
