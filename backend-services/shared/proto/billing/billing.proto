@@ -4,20 +4,68 @@ package billing;
 
 option go_package = "github.com/makabas/shared/pkg/pb/billing";
 
-message CreateBillingRequest {
+import "google/protobuf/timestamp.proto";
+
+message Expense {
   string id = 1;
-  uint32 vehicle_id = 2;
-  double expense_cost = 3;
-  double advance_income = 4;
-  double total_expenses = 5;
-  double total_advance = 6;
-  double balance = 7;
+  string date = 2;
+  string description = 3;
+  double amount = 4;
 }
 
-message CreateBillingResponse {
+message Advance {
   string id = 1;
+  string date = 2;
+  string description = 3;
+  double amount = 4;
+}
+
+message Billing {
+  string id = 1;
+  uint32 vehicle_id = 2;
+  repeated Expense expenses = 3;
+  repeated Advance advances = 4;
+  double total_expenses = 5;
+  double total_advances = 6;
+  double balance_due = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message GetBillingRequest {
+  uint32 vehicle_id = 1;
+}
+
+message CreateBillingRequest {
+  uint32 vehicle_id = 1;
+}
+
+message AddExpenseRequest {
+  uint32 vehicle_id = 1;
+  string date = 2;
+  string description = 3;
+  double amount = 4;
+}
+
+message AddAdvanceRequest {
+  uint32 vehicle_id = 1;
+  string date = 2;
+  string description = 3;
+  double amount = 4;
+}
+
+message DeleteBillingRequest {
+  uint32 vehicle_id = 1;
+}
+
+message DeleteResponse {
+  bool success = 1;
 }
 
 service BillingService {
-  rpc CreateBilling(CreateBillingRequest) returns (CreateBillingResponse);
+  rpc GetBilling(GetBillingRequest) returns (Billing);
+  rpc CreateBilling(CreateBillingRequest) returns (Billing);
+  rpc AddExpense(AddExpenseRequest) returns (Billing);
+  rpc AddAdvance(AddAdvanceRequest) returns (Billing);
+  rpc DeleteBilling(DeleteBillingRequest) returns (DeleteResponse);
 }
