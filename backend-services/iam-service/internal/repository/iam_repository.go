@@ -17,6 +17,7 @@ type IamRepository interface {
 	SyncStaff(id string, email string, name string, role string, phone string) (*models.Staff, error)
 	CreateVehicle(vehicle *models.Vehicle) error
 	GetVehicles(customerID string) ([]models.Vehicle, error)
+	GetAllVehicles() ([]models.Vehicle, error)
 }
 
 type iamRepository struct {
@@ -107,6 +108,12 @@ func (r *iamRepository) CreateVehicle(vehicle *models.Vehicle) error {
 func (r *iamRepository) GetVehicles(customerID string) ([]models.Vehicle, error) {
 	var vehicles []models.Vehicle
 	err := r.db.Find(&vehicles, "customer_id = ?", customerID).Error
+	return vehicles, err
+}
+
+func (r *iamRepository) GetAllVehicles() ([]models.Vehicle, error) {
+	var vehicles []models.Vehicle
+	err := r.db.Preload("Customer").Find(&vehicles).Error
 	return vehicles, err
 }
 
