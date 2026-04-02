@@ -3,6 +3,7 @@
 ## Technologies
 - **Language**: Go 1.26
 - **Server Framework**: Echo (v4)
+- **RPC Framework**: gRPC / Protocol Buffers
 - **Service Discovery**: HashiCorp Consul
 - **Identity Provider**: Keycloak 26.0
 - **Database**: Cloud-based PostgreSQL (Neon DB)

@@ -13,6 +13,7 @@ type IamService interface {
 	GetProfile(id string) (interface{}, error)
 	AddVehicle(vehicle *models.Vehicle) error
 	GetVehicles(customerID string) ([]models.Vehicle, error)
+	GetAllVehicles() ([]models.Vehicle, error)
 }
 
 type iamService struct {
@@ -49,6 +50,10 @@ func (s *iamService) AddVehicle(vehicle *models.Vehicle) error {
 
 func (s *iamService) GetVehicles(customerID string) ([]models.Vehicle, error) {
 	return s.repo.GetVehicles(customerID)
+}
+
+func (s *iamService) GetAllVehicles() ([]models.Vehicle, error) {
+	return s.repo.GetAllVehicles()
 }
 
 func (s *iamService) GetUserInfo(username string) (string, error) {

@@ -8,17 +8,14 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowLeft,
-  User as UserIcon,
-  Lock,
-  EyeOff,
-  Eye,
-  Loader2,
-  ShieldCheck,
-} from "lucide-react";
+  ArrowLeftIcon,
+  UserIcon,
+  LockClosedIcon,
+  EyeSlashIcon,
+  EyeIcon,
+} from "@heroicons/react/24/outline";
 
 export default function AdminLayout({
   children,
@@ -27,7 +24,6 @@ export default function AdminLayout({
 }>) {
   const { data: session, status } = useSession();
 
-  // Login states for the gatekeeper
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -49,11 +45,10 @@ export default function AdminLayout({
       });
 
       if (result?.error) {
-        setError("Invalid internal credentials.");
+        setError("invalid authentication constraints.");
       }
     } catch (err) {
-      console.error("Login error:", err);
-      setError("An unexpected error occurred.");
+      setError("system error occurred.");
     } finally {
       setIsLoading(false);
     }
@@ -61,157 +56,125 @@ export default function AdminLayout({
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#F5A623] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#0B0B0B] flex items-center justify-center">
+        <div className="w-5 h-5 border-2 border-[#1A1A1A] border-t-[#F5A623] rounded-full animate-spin" />
       </div>
     );
   }
 
-  // Gatekeeper: Show login if not authenticated as internal
-  const isInternal = !!(session as any)?.isInternal;
+  const isAdmin = !!(session as any)?.isAdmin;
 
-  if (!isInternal) {
+  if (!isAdmin) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#050505] relative overflow-hidden font-sans">
+      <div className="flex min-h-screen items-center justify-center bg-[#0B0B0B] relative text-[#D1D0C5] font-sans">
         <Link
           href="/"
-          className="absolute top-8 left-8 flex items-center gap-2 text-[#CFCFCF]/60 hover:text-white transition-all group z-50 px-4 py-2 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10"
+          className="absolute top-12 left-12 flex items-center gap-2 text-[#646669] hover:text-[#D1D0C5] transition-colors duration-300"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium tracking-tight">
-            Return to Site
-          </span>
+          <ArrowLeftIcon className="w-4 h-4 stroke-[1.5]" />
+          <span className="font-mono text-xs uppercase tracking-widest">escape</span>
         </Link>
 
-        <div className="w-full max-w-[440px] p-6 animate-reveal z-10">
-          <div className="glass rounded-[2.5rem] p-8 lg:p-10 border border-white/10 shadow-2xl backdrop-blur-xl">
-            <div className="text-center mb-10">
-              <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
-                Staff Portal
-              </h1>
-              <p className="text-[#CFCFCF]/50 text-sm font-medium">
-                Internal Credentials Required
-              </p>
+        <div className="w-full max-w-sm p-8">
+          <div className="mb-12">
+            <h1 className="text-xl font-medium tracking-tight mb-2">
+              staff restricted
+            </h1>
+            <p className="font-mono text-xs text-[#646669] tracking-widest uppercase">
+              internal credentials strictly required
+            </p>
+          </div>
+
+          <form onSubmit={handleAdminLogin} className="space-y-6">
+            {error && (
+              <div className="font-mono text-xs text-[#ca4754] border border-[#ca4754]/30 bg-[#ca4754]/10 py-3 px-4 rounded-sm">
+                {error}
+              </div>
+            )}
+            {session && !isAdmin && (
+              <div className="font-mono text-xs text-[#F5A623] border border-[#F5A623]/30 bg-[#F5A623]/10 py-3 px-4 rounded-sm">
+                active node misses elevated permissions.
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="relative group">
+                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#646669] group-focus-within:text-[#F5A623] transition-colors stroke-[1.5]" />
+                <input
+                  type="text"
+                  placeholder="identity"
+                  required
+                  value={formData.username}
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
+                  className="w-full h-12 bg-transparent border-b border-[#1A1A1A] px-12 font-mono text-xs text-[#D1D0C5] placeholder:text-[#646669] focus:outline-none focus:border-[#F5A623] transition-colors"
+                />
+              </div>
+
+              <div className="relative group">
+                <LockClosedIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#646669] group-focus-within:text-[#F5A623] transition-colors stroke-[1.5]" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="passcode"
+                  required
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  className="w-full h-12 bg-transparent border-b border-[#1A1A1A] px-12 font-mono text-xs text-[#D1D0C5] placeholder:text-[#646669] focus:outline-none focus:border-[#F5A623] transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#646669] hover:text-[#D1D0C5] transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="w-4 h-4 stroke-[1.5]" />
+                  ) : (
+                    <EyeIcon className="w-4 h-4 stroke-[1.5]" />
+                  )}
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={handleAdminLogin} className="space-y-5">
-              {error && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs py-3 px-4 rounded-xl text-center mb-4 font-medium italic">
-                  {error}
-                </div>
-              )}
-              {session && !isInternal && (
-                <div className="bg-[#F5A623]/10 border border-[#F5A623]/20 text-[#F5A623] text-xs py-3 px-4 rounded-xl text-center mb-4 font-medium italic">
-                  Your account does not have staff permissions.
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <div className="relative group">
-                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#CFCFCF]/40 group-focus-within:text-[#F5A623] transition-colors" />
-                  <input
-                    type="text"
-                    placeholder="Username"
-                    required
-                    value={formData.username}
-                    onChange={(e) =>
-                      setFormData({ ...formData, username: e.target.value })
-                    }
-                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 text-white text-sm placeholder:text-[#CFCFCF]/30 focus:outline-none focus:ring-2 focus:ring-[#F5A623]/20 focus:border-[#F5A623]/40 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#CFCFCF]/40 group-focus-within:text-[#F5A623] transition-colors" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Password"
-                    required
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl pl-11 pr-12 text-white text-sm placeholder:text-[#CFCFCF]/30 focus:outline-none focus:ring-2 focus:ring-[#F5A623]/20 focus:border-[#F5A623]/40 transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#CFCFCF]/40 hover:text-white transition-colors"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-12 rounded-xl bg-[#F5A623] text-black font-bold flex items-center justify-center gap-2 hover:bg-[#C97A00] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-lg shadow-[#F5A623]/10"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  "Authorize Access"
-                )}
-              </button>
-            </form>
-          </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="mt-8 font-mono text-xs uppercase tracking-widest text-[#646669] hover:text-[#F5A623] active:scale-[0.99] transition-all disabled:opacity-50"
+            >
+              {isLoading ? "validating..." : "[ process auth sequence ]"}
+            </button>
+          </form>
         </div>
-        <style jsx global>{`
-          .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-          }
-          @keyframes reveal {
-            from {
-              opacity: 0;
-              transform: translateY(10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          .animate-reveal {
-            animation: reveal 0.5s ease-out forwards;
-          }
-        `}</style>
       </div>
     );
   }
 
-  // Internal user: Show actual Admin Interface with Sidebar
   return (
     <SidebarProvider>
       <AdminSidebar />
-      <SidebarInset className="bg-[#050505] flex flex-col min-h-screen">
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-white/5 px-6 sticky top-0 bg-[#050505]/80 backdrop-blur-md z-40">
-          <div className="flex items-center gap-4">
-            <SidebarTrigger className="text-gray-400 hover:text-white" />
-            <div className="h-4 w-px bg-white/10" />
+      <SidebarInset className="bg-[#0B0B0B] flex flex-col min-h-screen text-[#D1D0C5]">
+        <header className="flex h-16 items-center justify-between gap-4 border-b border-[#1A1A1A] px-10 sticky top-0 bg-[#0B0B0B] z-40">
+          <div className="flex items-center gap-6">
+            <SidebarTrigger className="text-[#646669] hover:text-[#D1D0C5] transition-colors" />
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex flex-col items-end mr-2">
-              <span className="text-xs font-bold text-white leading-none mb-1">
+            <div className="hidden md:flex flex-col items-end">
+              <span className="font-mono text-xs text-[#D1D0C5] lowercase">
                 {session?.user?.name}
               </span>
-              <span className="text-[10px] text-[#F5A623] font-bold uppercase tracking-tighter">
-                Administrator
+              <span className="font-mono text-[10px] text-[#F5A623] uppercase tracking-widest">
+                administrator
               </span>
             </div>
-            <div className="h-10 w-10 rounded-full bg-[#1A1A1A] border border-white/10 flex items-center justify-center text-[#F5A623] font-bold shadow-inner">
+            <div className="h-8 w-8 rounded-sm bg-[#1A1A1A] flex items-center justify-center text-[#F5A623] font-mono font-bold text-xs uppercase">
               {session?.user?.name?.charAt(0)}
             </div>
           </div>
         </header>
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 overflow-x-hidden">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
