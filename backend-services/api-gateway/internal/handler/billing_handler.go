@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -12,16 +13,18 @@ import (
 )
 
 type BillingHandler struct {
-	billingClient billingpb.BillingServiceClient
+	billingClient   billingpb.BillingServiceClient
+	billingRestBase string
 }
 
-func NewBillingHandler(billingServiceAddr string) *BillingHandler {
+func NewBillingHandler(billingServiceAddr string, billingRestBase string) *BillingHandler {
 	conn, err := grpc.Dial(billingServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil
 	}
 	return &BillingHandler{
-		billingClient: billingpb.NewBillingServiceClient(conn),
+		billingClient:   billingpb.NewBillingServiceClient(conn),
+		billingRestBase: billingRestBase,
 	}
 }
 
@@ -39,6 +42,22 @@ func (h *BillingHandler) GetBilling(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, res)
+}
+
+// GetAllBillings proxies to the billing-service internal REST monitoring endpoint.
+func (h *BillingHandler) GetAllBillings(c echo.Context) error {
+	resp, err := http.Get(h.billingRestBase + "/api/v1/internal/billings")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadGateway, "billing monitoring service unavailable")
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to read billing data")
+	}
+
+	return c.JSONBlob(resp.StatusCode, body)
 }
 
 func (h *BillingHandler) StartBilling(c echo.Context) error {

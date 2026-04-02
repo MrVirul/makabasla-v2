@@ -62,10 +62,17 @@ message DeleteResponse {
   bool success = 1;
 }
 
+message ListBillingsRequest {}
+
+message ListBillingsResponse {
+  repeated Billing billings = 1;
+}
+
 service BillingService {
   rpc GetBilling(GetBillingRequest) returns (Billing);
   rpc CreateBilling(CreateBillingRequest) returns (Billing);
   rpc AddExpense(AddExpenseRequest) returns (Billing);
   rpc AddAdvance(AddAdvanceRequest) returns (Billing);
   rpc DeleteBilling(DeleteBillingRequest) returns (DeleteResponse);
+  rpc ListBillings(ListBillingsRequest) returns (ListBillingsResponse);
 }

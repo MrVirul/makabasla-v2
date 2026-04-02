@@ -11,6 +11,7 @@ type BillingRepository interface {
 	UpdateBilling(billing *models.Billing) error
 	AddExpense(expense *models.Expense) error
 	AddAdvance(advance *models.Advance) error
+	GetAllBillings() ([]models.Billing, error)
 	DeleteBillingByVehicleID(vehicleID uint) error
 }
 
@@ -45,6 +46,12 @@ func (r *repository) AddExpense(expense *models.Expense) error {
 
 func (r *repository) AddAdvance(advance *models.Advance) error {
 	return r.db.Create(advance).Error
+}
+
+func (r *repository) GetAllBillings() ([]models.Billing, error) {
+	var billings []models.Billing
+	err := r.db.Preload("Expenses").Preload("Advances").Find(&billings).Error
+	return billings, err
 }
 
 func (r *repository) DeleteBillingByVehicleID(vehicleID uint) error {

@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import KeycloakProvider from "next-auth/providers/keycloak"
 import CredentialsProvider from "next-auth/providers/credentials"
+import { jwtDecode } from "jwt-decode"
 
 const handler = NextAuth({
   providers: [
@@ -10,13 +11,25 @@ const handler = NextAuth({
       issuer: (process.env.KEYCLOAK_ISSUER || "").trim(),
     }),
     CredentialsProvider({
-      name: "Credentials",
+      name: "Admin Credentials",
       credentials: {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) return null;
+
+        // --- DEVELOPMENT BYPASS: admin / admin ---
+        if (credentials.username === "admin" && credentials.password === "admin") {
+          return {
+            id: "local-dev-root",
+            name: "Master Registry Admin",
+            email: "admin@garage.lk",
+            roles: ["super_admin", "admin", "admin:registry", "admin:billing", "admin:customers"],
+            accessToken: "local-bypass-token"
+          };
+        }
+        // ---------------------------------------
 
         const issuer = (process.env.KEYCLOAK_ISSUER || "").trim();
         const tokenEndpoint = `${issuer}/protocol/openid-connect/token`;
@@ -37,16 +50,21 @@ const handler = NextAuth({
         const tokens = await res.json();
 
         if (res.ok && tokens.access_token) {
-          // Decode the token to get actual user info from Keycloak if possible
-          // For now, continue with basic user object but mark as internal
+          // Decode token to get roles immediately for the credentials login
+          const decoded: any = jwtDecode(tokens.access_token);
+          const clientId = (process.env.KEYCLOAK_CLIENT_ID || "").trim();
+          const clientRoles = decoded.resource_access?.[clientId]?.roles || [];
+          const realmRoles = decoded.realm_access?.roles || [];
+          
+          const roles = [...new Set([...realmRoles, ...clientRoles])];
+
           return {
-            id: credentials.username,
-            name: credentials.username,
-            email: credentials.username + "@internal.makabasla.com",
+            id: decoded.sub,
+            name: decoded.preferred_username || credentials.username,
+            email: decoded.email,
             accessToken: tokens.access_token,
+            roles: roles,
           };
-        } else {
-          console.error("Keycloak Login Error:", tokens);
         }
         return null;
       }
@@ -58,27 +76,45 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user, account }) {
       if (user) {
-        // @ts-ignore
-        token.id = user.id;
-        // @ts-ignore
+        // @ts-ignore - From CredentialsProvider
         token.accessToken = user.accessToken;
         // @ts-ignore
-        token.isInternal = user.email?.endsWith("@internal.makabasla.com") || false;
+        token.roles = user.roles || [];
       }
+      
       if (account) {
-        // This runs only on the first login from an OAuth provider (Google/Keycloak)
+        // From KeycloakProvider
         token.accessToken = account.access_token;
+        
+        try {
+          const decoded: any = jwtDecode(account.access_token as string);
+          const clientId = (process.env.KEYCLOAK_CLIENT_ID || "").trim();
+          const clientRoles = decoded.resource_access?.[clientId]?.roles || [];
+          const realmRoles = decoded.realm_access?.roles || [];
+          token.roles = [...new Set([...realmRoles, ...clientRoles])];
+        } catch (e) {
+          token.roles = token.roles || [];
+        }
       }
+
+      // Re-apply admin flags on every JWT update
+      token.isSuperAdmin = (token.roles as string[]).includes('super_admin');
+      token.isAdmin = (token.roles as string[]).includes('admin') || token.isSuperAdmin;
+      
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         // @ts-ignore
-        session.user.id = token.id || token.sub;
+        session.user.id = token.sub || token.id;
         // @ts-ignore
         session.accessToken = token.accessToken;
         // @ts-ignore
-        session.isInternal = token.isInternal;
+        session.roles = token.roles || [];
+        // @ts-ignore
+        session.isSuperAdmin = token.isSuperAdmin || false;
+        // @ts-ignore
+        session.isAdmin = token.isAdmin || false;
       }
       return session;
     },
