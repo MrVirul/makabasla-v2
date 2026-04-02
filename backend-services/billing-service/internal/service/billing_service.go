@@ -14,6 +14,7 @@ type BillingService interface {
 	CreateBilling(vehicleID uint) (*models.Billing, error)
 	AddExpense(vehicleID uint, date, desc string, amount float64) (*models.Billing, error)
 	AddAdvance(vehicleID uint, date, desc string, amount float64) (*models.Billing, error)
+	GetAllBillings() ([]models.Billing, error)
 	DeleteBillingByVehicleID(vehicleID uint) error
 }
 
@@ -121,6 +122,10 @@ func (s *service) AddAdvance(vehicleID uint, date, desc string, amount float64) 
 	}
 
 	return s.repo.GetBillingByVehicleID(vehicleID)
+}
+
+func (s *service) GetAllBillings() ([]models.Billing, error) {
+	return s.repo.GetAllBillings()
 }
 
 func (s *service) DeleteBillingByVehicleID(vehicleID uint) error {

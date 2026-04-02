@@ -81,12 +81,14 @@ func main() {
 
 
 	// Initialize internal handlers
-	billH := gatehandler.NewBillingHandler("billing-service:8083")
+	billH := gatehandler.NewBillingHandler("billing-service:8083", "http://billing-service:8089")
 
 	// Service Routes mapping the Docker hostnames and proxying requests.
 	// We map the incoming path prefix, remove it, and forward to the root of the targeted service.
-	
+
 	// Complex/Bridged Routes
+	// NOTE: /internal route must be registered BEFORE the /:vehicleId wildcard to avoid shadowing.
+	e.GET("/api/billing/internal/billings", billH.GetAllBillings)
 	e.GET("/api/billing/:vehicleId", billH.GetBilling)
 	e.POST("/api/billing/:vehicleId", billH.StartBilling)
 	e.POST("/api/billing/:vehicleId/expense", billH.AddExpense)

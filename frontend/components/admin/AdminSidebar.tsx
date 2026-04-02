@@ -2,17 +2,16 @@
 
 import * as React from "react";
 import {
-  LayoutDashboard,
-  Users,
-  Car,
-  Settings,
-  LogOut,
-  ShieldCheck,
-  User as UserIcon,
-} from "lucide-react";
+  Squares2X2Icon,
+  UsersIcon,
+  TruckIcon,
+  Cog6ToothIcon,
+  ArrowRightStartOnRectangleIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 import {
   Sidebar,
@@ -20,7 +19,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -28,73 +26,84 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-const items = [
+const adminItems = [
   {
-    title: "Dashboard",
+    title: "dashboard",
     url: "/admin",
-    icon: LayoutDashboard,
+    icon: Squares2X2Icon,
+    permission: "admin:dashboard", // Default access for all admins
   },
   {
-    title: "Customers",
+    title: "customers",
     url: "/admin/customers",
-    icon: Users,
+    icon: UsersIcon,
+    permission: "admin:customers",
   },
   {
-    title: "Vehicles",
+    title: "registry",
     url: "/admin/vehicles",
-    icon: Car,
+    icon: TruckIcon,
+    permission: "admin:registry",
   },
   {
-    title: "My Profile",
+    title: "user management",
     url: "/admin/profile",
-    icon: UserIcon,
-  },
-  {
-    title: "Settings",
-    url: "/admin/settings",
-    icon: Settings,
+    icon: Cog6ToothIcon,
+    permission: "super_admin",
   },
 ];
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  
+  const userRoles = (session as any)?.roles || [];
+  const isSuperAdmin = (session as any)?.isSuperAdmin;
+
+  // Filter items based on dynamic permissions
+  const filteredItems = adminItems.filter(item => {
+    if (isSuperAdmin) return true;
+    if (item.permission === "admin:dashboard") return true; 
+    return userRoles.includes(item.permission);
+  });
 
   return (
-    <Sidebar collapsible="icon" className="border-white/10 bg-[#0A0A0A]">
-      <SidebarHeader className="border-b border-white/5 p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5A623] text-black shadow-lg shadow-[#F5A623]/20">
-            <ShieldCheck size={20} />
-          </div>
-          <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="text-sm font-bold tracking-tight text-white line-clamp-1">
-              Makabasla Admin
-            </span>
-            <span className="text-[10px] uppercase tracking-widest text-[#F5A623] font-bold">
-              Owner View
+    <Sidebar collapsible="icon" className="border-r border-[#1A1A1A] bg-[#0B0B0B] [&_[data-sidebar=sidebar]]:bg-[#0B0B0B]">
+      <SidebarHeader className="border-b border-[#1A1A1A] p-6 h-16 flex justify-center">
+        <div className="flex items-center gap-4">
+          <div className="h-4 w-4 bg-[#F5A623] rounded-sm flex-shrink-0" />
+          <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
+            <span className="text-xs font-mono uppercase tracking-widest text-[#D1D0C5] line-clamp-1 truncate">
+              {isSuperAdmin ? "system manager" : "admin access"}
             </span>
           </div>
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="py-6 scrollbar-hide">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[#CFCFCF]/40 group-data-[collapsible=icon]:hidden px-2">
-            Management
-          </SidebarGroupLabel>
+          <div className="text-[10px] font-mono tracking-widest uppercase text-[#646669] px-6 mb-6 group-data-[collapsible=icon]:hidden">
+            navigation
+          </div>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
+            <SidebarMenu className="px-3 gap-2">
+              {filteredItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === item.url}
                     tooltip={item.title}
-                    className={`hover:bg-white/5 data-[active=true]:bg-[#F5A623]/10 data-[active=true]:text-[#F5A623] transition-all py-5 ${pathname === item.url ? "text-[#F5A623]" : "text-gray-400"}`}
+                    className={`font-mono text-xs lowercase px-3 py-6 rounded-sm transition-all focus-visible:ring-1 focus-visible:ring-[#F5A623]
+                      ${
+                        pathname === item.url
+                          ? "bg-[#1A1A1A] text-[#F5A623]"
+                          : "text-[#646669] hover:bg-[#1A1A1A]/50 hover:text-[#D1D0C5]"
+                      }
+                    `}
                   >
-                    <Link href={item.url} className="flex items-center gap-3">
-                      <item.icon size={20} />
-                      <span className="font-medium">{item.title}</span>
+                    <Link href={item.url} className="flex items-center gap-4">
+                      <item.icon className="w-5 h-5 stroke-[1.5]" />
+                      <span className="font-mono">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -104,16 +113,16 @@ export function AdminSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-white/5 p-4">
+      <SidebarFooter className="border-t border-[#1A1A1A] p-3">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="text-gray-400 hover:text-white hover:bg-white/5 py-5"
+              className="font-mono text-xs lowercase text-[#646669] hover:text-[#F5A623] hover:bg-transparent px-3 py-6 transition-colors"
               onClick={() => signOut({ callbackUrl: "/admin" })}
             >
-              <LogOut size={20} />
-              <span className="font-medium group-data-[collapsible=icon]:hidden">
-                Sign Out
+              <ArrowRightStartOnRectangleIcon className="w-5 h-5 stroke-[1.5]" />
+              <span className="group-data-[collapsible=icon]:hidden">
+                logout
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
