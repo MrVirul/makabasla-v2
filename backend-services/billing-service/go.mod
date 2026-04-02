@@ -1,14 +1,19 @@
 module github.com/makabas/billing-service
 
-go 1.26
+go 1.26.1
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/hashicorp/consul/api v1.33.4
 	github.com/labstack/echo/v4 v4.15.1
+	github.com/makabas/shared v0.0.0-00010101000000-000000000000
 	github.com/spf13/viper v1.21.0
+	google.golang.org/grpc v1.79.3
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
 )
+
+replace github.com/makabas/shared => ../shared
 
 require (
 	github.com/armon/go-metrics v0.4.1 // indirect
@@ -50,4 +55,6 @@ require (
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 )

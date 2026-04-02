@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strings" // Added
+	// "strings" // Unused in dev mode (Basic Auth skipped)
 	"syscall"
 	"time"
 
@@ -37,18 +37,19 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.Recover())
 
-	e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
-		Skipper: func(c echo.Context) bool {
-			// Allow all /api/v1 prefix routes (which are verified by Gateway) 
-			return strings.HasPrefix(c.Path(), "/api/v1")
-		},
-		Validator: func(username, password string, c echo.Context) (bool, error) {
-			if username == cfg.Username && password == cfg.Password {
-				return true, nil
-			}
-			return false, nil
-		},
-	}))
+	// TODO: Re-enable Basic Auth before production
+	// e.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
+	// 	Skipper: func(c echo.Context) bool {
+	// 		// Allow all /api/v1 prefix routes (which are verified by Gateway) 
+	// 		return strings.HasPrefix(c.Path(), "/api/v1")
+	// 	},
+	// 	Validator: func(username, password string, c echo.Context) (bool, error) {
+	// 		if username == cfg.Username && password == cfg.Password {
+	// 			return true, nil
+	// 		}
+	// 		return false, nil
+	// 	},
+	// }))
 
 	h.RegisterRoutes(e)
 
