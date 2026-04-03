@@ -1,32 +1,27 @@
 export default function HeroSection() {
   return (
-    <main className="flex-grow flex flex-col items-center justify-center p-8 pt-32 text-center sm:p-20">
-      <div className="flex flex-col items-center gap-12 max-w-4xl">
-        {/* Decorative background glow */}
-        <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03)_0%,transparent_50%)]" />
+    <main className="flex-grow flex flex-col items-center justify-center p-12 pt-40 text-center font-sans tracking-tight">
+      <div className="max-w-3xl flex flex-col items-center gap-10">
+        <div className="font-mono text-[10px] uppercase tracking-widest text-[#F5A623]">
+          operations online.
+        </div>
+        <h1 className="text-5xl sm:text-7xl text-[#D1D0C5] leading-[1.1] font-medium">
+          integrated
+          <br />
+          excellence.
+        </h1>
+        <p className="max-w-xl text-[#646669] font-mono text-sm leading-relaxed">
+          managing scale seamlessly. a resilient ecosystem designed for minimal interference and absolute control.
+        </p>
 
-        <div className="flex flex-col items-center gap-8 animate-reveal">
-          <div className="px-5 py-2 rounded-full glass text-[10px] font-bold tracking-[0.2em] uppercase text-[#F5A623]/60 mb-4 animate-fade-in">
-            Enterprise Ready Services
-          </div>
-
-          <h1 className="text-6xl sm:text-8xl font-black text-gradient leading-tight tracking-tighter">
-            Integrated <br /> Excellence.
-          </h1>
-
-          <p className="max-w-xl text-lg sm:text-2xl text-[#CFCFCF] font-medium leading-relaxed">
-            Managing appointments, billing, identity, and tasks has never been
-            more seamless. The Makabasla ecosystem is built for scale.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-6 mt-4">
-            <button className="h-16 px-12 rounded-full bg-[#F5A623] text-black font-bold hover:bg-[#C97A00] transition-all active:scale-95 glow shadow-[#F5A623]/20">
-              Explore Services
-            </button>
-            <button className="h-16 px-12 rounded-full glass text-[#F5F5F5] font-semibold hover:bg-white/5 transition-all">
-              Contact Sales
-            </button>
-          </div>
+        <div className="flex items-center gap-8 mt-12 font-mono text-xs uppercase tracking-widest">
+          <button className="text-[#F5A623] hover:text-[#D1D0C5] transition-colors active:scale-95">
+            [ interface start ]
+          </button>
+          <span className="text-[#1A1A1A]">/</span>
+          <button className="text-[#646669] hover:text-[#D1D0C5] transition-colors active:scale-95">
+            contact.sys
+          </button>
         </div>
       </div>
     </main>

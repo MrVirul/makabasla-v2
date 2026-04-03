@@ -51,6 +51,7 @@ type Vehicle struct {
 	Color       string    `json:"color"`
 	PlateNumber string    `gorm:"uniqueIndex" json:"plate_number"`
 	CustomerID  string    `gorm:"index" json:"customer_id"`
+	Customer    *Customer `gorm:"foreignKey:CustomerID" json:"customer,omitempty"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

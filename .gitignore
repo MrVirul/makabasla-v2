@@ -49,3 +49,7 @@ buildNumber.properties
 
 # OS #
 .DS_Store
+
+# Development artifacts
+**/tmp/
+**/node_modules/

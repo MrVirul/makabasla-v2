@@ -13,7 +13,7 @@ The entire project shifted to Go 1.24+ (configured as `go 1.26` for future-proof
 ### Shared Infrastructure (Shared Library)
 To prevent code duplication, a `shared` library was introduced:
 - **Internal HTTP Client**: Wrapped `Resty` with automatic retries and Keycloak token propagation.
-- **gRPC Support**: Standardized gRPC server/client wrappers with health checks and reflection.
+- **gRPC Support**: Standardized gRPC server/client wrappers with health checks and reflection. Recently adopted for `billing-service`.
 - **Service Discovery**: Unified Consul registration logic used across all services.
 - **Logging & Config**: Structured JSON logging (Zap) and centralized environment configuration (Viper).
 
@@ -28,7 +28,7 @@ makabasla-v2/
 │   ├── appointment-service/ # Scheduling domains
 │   ├── task-mgt-service/    # Task creation/management
 │   ├── webstore-service/    # Product catalogs
-│   ├── billing-service/     # FinOps/Invoicing capabilities
+│   ├── billing-service/     # FinOps/Invoicing capabilities (gRPC implementation)
 │   └── setup-databases.sql  # Initializes logical PostgreSQL schema per service
 ├── go.work                  # Go workspace for seamless local module sharing
 ├── compose.yaml             # Complete orchestration file
