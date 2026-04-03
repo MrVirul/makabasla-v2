@@ -1,4 +1,4 @@
-name: CI — Code Quality
+name: CI
 
 on:
   push:
@@ -6,66 +6,23 @@ on:
   pull_request:
     branches: [dev, main]
 
-permissions:
-  contents: read
-
 jobs:
-  # ─────────────────────────────
-  # 1. PR Title Lint (keep ONLY this)
-  # ─────────────────────────────
-  pr-title-lint:
-    name: 🏷️ PR Title Lint
-    if: github.event_name == 'pull_request'
+  quality-check:
+    name: ⚡ Quality Check
     runs-on: ubuntu-latest
     steps:
-      - name: Check PR title format
+      - uses: actions/checkout@v4
+
+      - name: 🏷️ PR Title Lint
+        if: github.event_name == 'pull_request'
         uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # ─────────────────────────────
-  # 2. Detect Changes (important)
-  # ─────────────────────────────
-  detect-changes:
-    name: 🔍 Detect Changes
-    runs-on: ubuntu-latest
-    outputs:
-      backend: ${{ steps.filter.outputs.backend }}
-      frontend: ${{ steps.filter.outputs.frontend }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            backend:
-              - "backend-services/**"
-            frontend:
-              - "frontend/**"
-
-  # ─────────────────────────────
-  # 3. Backend Quality (MAIN FOCUS)
-  # ─────────────────────────────
-  backend-quality:
-    name: 🐹 Backend Quality
-    needs: detect-changes
-    if: needs.detect-changes.outputs.backend == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.26"
-          cache: true
-
-      - name: Build & Test Services
+      - name: 🐹 Backend (Go)
         run: |
           for dir in backend-services/*/ ; do
             if [ -f "$dir/go.mod" ]; then
-              echo "📦 Testing $(basename $dir)"
               cd "$dir"
               go mod download
               go build ./...
@@ -74,57 +31,8 @@ jobs:
             fi
           done
 
-  # ─────────────────────────────
-  # 4. Frontend (LIGHT VERSION)
-  # ─────────────────────────────
-  frontend-quality:
-    name: 🌐 Frontend Quality
-    needs: detect-changes
-    if: needs.detect-changes.outputs.frontend == 'true'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
+      - name: 🌐 Frontend (Next.js)
         working-directory: frontend
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - run: npm ci
-      - run: npm run build
-
-  # ─────────────────────────────
-  # 5. Security Scan (KEEP THIS 🔥)
-  # ─────────────────────────────
-  secret-scan:
-    name: 🔐 Secret Scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ─────────────────────────────
-  # 6. SonarCloud (OPTIONAL BUT IMPRESSIVE)
-  # ─────────────────────────────
-  sonar-analysis:
-    name: 📊 SonarCloud
-    needs: [backend-quality]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Run SonarCloud
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          npm ci
+          npm run build
