@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 export default function LoginPage() {
   const { status } = useSession();
@@ -18,84 +18,46 @@ export default function LoginPage() {
   }, [status, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#050505] relative overflow-hidden font-sans">
-      {/* Back button */}
+    <div className="flex min-h-screen items-center justify-center bg-[#0B0B0B] relative font-sans text-[#D1D0C5]">
       <Link
         href="/"
-        className="absolute top-8 left-8 flex items-center gap-2 text-[#CFCFCF]/60 hover:text-white transition-all group z-50 px-4 py-2 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10"
+        className="absolute top-12 left-12 flex items-center gap-2 text-[#646669] hover:text-[#D1D0C5] transition-colors duration-300"
       >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-        <span className="text-sm font-medium tracking-tight">
-          Return to Home
-        </span>
+        <ArrowLeftIcon className="w-5 h-5 stroke-[1.5]" />
+        <span className="text-sm tracking-widest font-mono uppercase">escape</span>
       </Link>
 
-      <div className="w-full max-w-[440px] p-6 lg:p-8 animate-reveal z-10">
-        <div className="flex justify-center mb-10 transition-transform hover:scale-105 duration-500">
+      <div className="w-full max-w-sm flex flex-col gap-12 z-10 p-6">
+        <div className="flex justify-center flex-col items-center">
           <Image
             src="/home/navBar%20Logo.png"
             alt="Makabasla Logo"
-            width={180}
-            height={45}
-            className="h-10 w-auto object-contain"
+            width={160}
+            height={40}
+            className="h-8 w-auto object-contain opacity-90"
             priority
           />
+          <h1 className="mt-8 text-xl font-medium tracking-tight text-[#D1D0C5]">identify</h1>
+          <p className="font-mono text-xs mt-2 text-[#646669] tracking-widest uppercase">login to authenticate</p>
         </div>
 
-        <div className="glass rounded-[2.5rem] p-8 lg:p-10 border border-white/10 shadow-2xl relative overflow-hidden backdrop-blur-xl">
-          {/* Subtle light leak */}
-          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-
-          <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
-              Welcome Back
-            </h1>
-            <p className="text-[#CFCFCF]/50 text-sm font-medium">
-              Sign in to access the Makabasla ecosystem
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
-              <button
-                onClick={() =>
-                  signIn(
-                    "keycloak",
-                    { callbackUrl: "/" },
-                    { kc_idp_hint: "google" },
-                  )
-                }
-                className="w-full h-14 rounded-2xl bg-white text-black font-bold flex items-center justify-center gap-3 hover:bg-[#F5F5F5] transition-all active:scale-[0.98] shadow-lg group relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                <span className="relative z-10">Continue with Google</span>
-              </button>
-
-              <div className="relative py-2">
-                <div className="absolute inset-0 flex items-center">
-                  {/* <div className="w-full border-t border-white/5"></div> */}
-                </div>
-                {/* <div className="relative flex justify-center text-xs uppercase tracking-widest">
-                  <span className="bg-[#000000]/20 px-4 text-[#CFCFCF]/30 font-bold backdrop-blur-sm">
-                    Secure Access
-                  </span>
-                </div> */}
-              </div>
-            </div>
-          </div>
-
-          {/* <div className="mt-8 pt-6 border-t border-white/5 text-center">
-            <Link
-              href="/help"
-              className="text-xs text-[#CFCFCF]/40 hover:text-[#F5A623] transition-colors"
-            >
-              Access Issues? View Documentation
-            </Link>
-          </div> */}
+        <div className="bg-[#1A1A1A] p-10 rounded-sm">
+          <button
+            onClick={() =>
+              signIn(
+                "keycloak",
+                { callbackUrl: "/" },
+                { kc_idp_hint: "google" },
+              )
+            }
+            className="w-full py-3 px-4 font-mono text-xs rounded-sm border border-transparent bg-[#0B0B0B] text-[#D1D0C5] hover:border-[#646669] hover:text-[#F5A623] transition-colors duration-300 flex items-center justify-center gap-3 active:scale-[0.99]"
+          >
+            continue processing
+          </button>
         </div>
 
-        <p className="mt-8 text-center text-xs text-[#CFCFCF]/20 font-mono tracking-widest uppercase">
-          Ecosystem Node: 0x{new Date().getUTCFullYear()}8B2
+        <p className="text-center text-[10px] text-[#646669] font-mono tracking-widest uppercase">
+          node: 0x{new Date().getUTCFullYear()}8B2
         </p>
       </div>
     </div>

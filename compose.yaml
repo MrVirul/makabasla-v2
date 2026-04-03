@@ -1,5 +1,5 @@
 services:
-  # Keycloak - Identity & Access Management
+  # Identity & Access Management
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: makabasla-keycloak
@@ -26,7 +26,7 @@ services:
       retries: 5
       start_period: 30s
 
-  # Consul - Service Discovery
+  # Service Discovery
   consul:
     image: hashicorp/consul:1.15
     container_name: makabasla-consul
@@ -42,135 +42,147 @@ services:
       retries: 5
       start_period: 10s
 
-  # API Gateway
+  # API Gateway (Hot-Reload)
   api-gateway:
     build:
-      context: ./backend-services/api-gateway
-      dockerfile: Dockerfile
-      args:
-        - GO_VERSION=1.26-alpine
+      context: ./backend-services
+      dockerfile: Dockerfile.dev
     container_name: makabasla-gateway
     ports:
       - "8080:8080"
+    working_dir: /app/api-gateway
+    volumes:
+      - ./backend-services:/app
+      - ./backend-services/.air.toml:/app/api-gateway/.air.toml
     networks:
       - makabasla-network
     environment:
-      - CONSUL_HOST=${CONSUL_HOST:-consul}
+      - CONSUL_HOST=consul
       - PORT=8080
     depends_on:
       consul:
         condition: service_healthy
 
-  # Billing Service
+  # Billing Service (Hot-Reload)
   billing-service:
     build:
-      context: ./backend-services/billing-service
-      dockerfile: Dockerfile
-      args:
-        - GO_VERSION=1.26-alpine
+      context: ./backend-services
+      dockerfile: Dockerfile.dev
     container_name: makabasla-billing-service
     ports:
       - "8083:8083"
+    working_dir: /app/billing-service
+    volumes:
+      - ./backend-services:/app
+      - ./backend-services/.air.toml:/app/billing-service/.air.toml
     networks:
       - makabasla-network
     environment:
       - DB_URL=${BILLING_DB_URL}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - CONSUL_HOST=${CONSUL_HOST:-consul}
+      - CONSUL_HOST=consul
       - APP_NAME=billing-service
     depends_on:
       consul:
         condition: service_healthy
 
-  # IAM Service
-  iam-service:
-    build:
-      context: ./backend-services/iam-service
-      dockerfile: Dockerfile
-      args:
-        - GO_VERSION=1.26-alpine
-    container_name: makabasla-iam-service
-    ports:
-      - "8084:8084"
-    networks:
-      - makabasla-network
-    environment:
-      - DB_URL=${IAM_DB_URL}
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - CONSUL_HOST=${CONSUL_HOST:-consul}
-      - APP_NAME=iam-service
-    depends_on:
-      consul:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-
-  # Appointment Service
-  appointment-service:
-    build:
-      context: ./backend-services/appointment-service
-      dockerfile: Dockerfile
-      args:
-        - GO_VERSION=1.26-alpine
-    container_name: makabasla-appointment-service
-    ports:
-      - "8085:8085"
-    networks:
-      - makabasla-network
-    environment:
-      - DB_URL=${APPOINTMENT_DB_URL}
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - CONSUL_HOST=${CONSUL_HOST:-consul}
-      - APP_NAME=appointment-service
-    depends_on:
-      consul:
-        condition: service_healthy
-
-  # Task Management Service
+  # Task Management Service (Hot-Reload)
   task-mgt-service:
     build:
-      context: ./backend-services/task-mgt-service
-      dockerfile: Dockerfile
-      args:
-        - GO_VERSION=1.26-alpine
+      context: ./backend-services
+      dockerfile: Dockerfile.dev
     container_name: makabasla-task-mgt-service
     ports:
       - "8086:8086"
+    working_dir: /app/task-mgt-service
+    volumes:
+      - ./backend-services:/app
+      - ./backend-services/.air.toml:/app/task-mgt-service/.air.toml
     networks:
       - makabasla-network
     environment:
       - DB_URL=${TSKMGT_DB_URL}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - CONSUL_HOST=${CONSUL_HOST:-consul}
+      - CONSUL_HOST=consul
       - APP_NAME=task-mgt-service
     depends_on:
       consul:
         condition: service_healthy
 
-  # Webstore Service
+  # Appointment Service (Hot-Reload)
+  appointment-service:
+    build:
+      context: ./backend-services
+      dockerfile: Dockerfile.dev
+    container_name: makabasla-appointment-service
+    ports:
+      - "8085:8085"
+    working_dir: /app/appointment-service
+    volumes:
+      - ./backend-services:/app
+      - ./backend-services/.air.toml:/app/appointment-service/.air.toml
+    networks:
+      - makabasla-network
+    environment:
+      - DB_URL=${APPOINTMENT_DB_URL}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - CONSUL_HOST=consul
+      - APP_NAME=appointment-service
+    depends_on:
+      consul:
+        condition: service_healthy
+
+  # Webstore Service (Hot-Reload)
   webstore-service:
     build:
-      context: ./backend-services/webstore-service
-      dockerfile: Dockerfile
-      args:
-        - GO_VERSION=1.26-alpine
+      context: ./backend-services
+      dockerfile: Dockerfile.dev
     container_name: makabasla-webstore-service
     ports:
       - "8087:8087"
+    working_dir: /app/webstore-service
+    volumes:
+      - ./backend-services:/app
+      - ./backend-services/.air.toml:/app/webstore-service/.air.toml
     networks:
       - makabasla-network
     environment:
       - DB_URL=${WEBSTORE_DB_URL}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - CONSUL_HOST=${CONSUL_HOST:-consul}
+      - CONSUL_HOST=consul
       - APP_NAME=webstore-service
     depends_on:
       consul:
+        condition: service_healthy
+
+  # IAM Service (Hot-Reload)
+  iam-service:
+    build:
+      context: ./backend-services
+      dockerfile: Dockerfile.dev
+    container_name: makabasla-iam-service
+    ports:
+      - "8084:8084"
+    working_dir: /app/iam-service
+    volumes:
+      - ./backend-services:/app
+      - ./backend-services/.air.toml:/app/iam-service/.air.toml
+    networks:
+      - makabasla-network
+    environment:
+      - DB_URL=${IAM_DB_URL}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - CONSUL_HOST=consul
+      - APP_NAME=iam-service
+    depends_on:
+      consul:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
 
 networks:

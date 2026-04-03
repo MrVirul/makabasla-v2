@@ -1,54 +1,68 @@
 ---
-name: frontend-design
-description: Create distinctive, production-grade frontend interfaces for the Makabasla Ecosystem with high design quality. Use this skill when building web components, pages, or applications. Generates creative, polished code using shadcn/ui and a premium dark-metallic aesthetic.
+name: frontend-design-v2.1
+description: Create minimalist, focus-centric frontend interfaces for the Makabasla Ecosystem. Reject "AI slop" in favor of expert design. Prioritizes typography, whitespace, and professional "Zen" aesthetics over decorative clutter. Uses shadcn/ui and Heroicons with a Monkeytype-inspired interaction pattern. Retains obsidian/amber branding while introducing muted desaturated semantic tones.
 license: Complete terms in LICENSE.txt
 ---
 
-This skill guides creation of distinctive, production-grade frontend interfaces for the **Makabasla Ecosystem**. Implement real working code with exceptional attention to aesthetic details, utilizing **shadcn/ui** and **Lucide React** for consistency.
+This skill guides the creation of high-performance, minimalist interfaces for the **Makabasla Ecosystem**. It rejects generic, colorful "AI-generated" clutter in favor of an opinionated, designer-centric approach that feels developed by an expert and looks designed by a senior product designer.
 
-## Makabasla Design Thinking
+## Makabasla Design Thinking: The Zen-Architect
 
-Before coding, understand the context and commit to the Makabasla premium aesthetic:
-- **Tone**: Premium High-Tech. A blend of deep obsidian blacks, metallic grays, and vibrant amber/gold accents. Think luxury automotive dashboard meets secure fintech.
-- **Visual Language**: Heavy use of "Glassmorphism" (backdrop-blur), thin borders (`border-white/10`), and radial gradients for depth.
-- **Component Strategy**: ALWAYS prefer **shadcn/ui** components when applicable. Customize them to fit the Makabasla color palette.
+Before coding, commit to the "Monkeytype" philosophy:
 
-## Makabasla Design System
+- **Tone**: Professional Minimalism. A focus-driven environment where the UI disappears to let the content lead. No superfluous elements.
+- **Visual Language**: Typography-first design. No unnecessary borders, shadows, or gradients. Use background shifts and low-contrast states to manage hierarchy.
+- **Interaction Pattern**: Elements not in focus should fade into the background (`text-muted-foreground/40`). Active elements or specific data use the brand amber or muted semantic tones to "pop" against the obsidian canvas.
 
-### Core Brand Palette (Defined in `frontend/app/globals.css`)
-- **Background**: `#0B0B0B` — Deep obsidian canvas.
-- **Foreground**: `#F5F5F5` — Crisp off-white for primary text.
-- **Primary / Accent**: `#F5A623` — Vibrant Amber/Gold (#F5A623) for CTAs, highlights, and focus states.
-- **Secondary / Muted**: `#1A1A1A` — Dark metallic gray for cards, sidebar, and inactive elements.
-- **Surface (Glass)**: `bg-[#1A1A1A]/60 backdrop-blur-xl border border-[#CFCFCF]/10`.
-- **Border**: `#CFCFCF33` — Subtle gray borders.
+## Makabasla Design System (Zen Edition v2.1)
 
-### Branding Elements
-- **Logo**: Used extensively in headers and login pages. Source: `/home/navBar Logo.png`.
-- **Typography**: Tracking should be tight (`tracking-tight`) for headings. Use `Geist Sans` (default) but ensure bold font weights for hierarchy.
+### Core Brand Palette
+
+- **Background**: `#0B0B0B` — The deep obsidian void.
+- **Foreground**: `#D1D0C5` — A soft, off-white (vibe-check: less harsh than pure white).
+- **Primary / Accent (Branding)**: `#F5A623` — Amber/Gold, used **sparingly** for branding elements and high-priority caret/focus states.
+- **Muted / Neutral UI**: `#646669` — Low-contrast gray for inactive text, secondary UI elements, and "ghost" button states on dark backgrounds.
+- **Surface**: `bg-[#1A1A1A]` — Subtle background lift for cards/sections, used without borders.
+
+### Semantic / Feedback Palette (Desaturated)
+
+_Do NOT use vibrant or generic "Christmas Tree" red/green._
+
+- **Destructive / Negative (Expenses/Loss)**: Muted Rose / Terracotta (e.g., `#E06C75` or `text-rose-400/80`). Used for "Delete" or "Negative Cash Flow."
+- **Success / Positive (Income/Gain)**: Muted Sage / Soft Emerald (e.g., `#98C379` or `text-emerald-400/80`). Used for "Advances" or "Positive Cash Flow."
+
+### Branding & Typography
+
+- **Typography**:
+  - **Sans (UI)**: `Geist Sans` or `Inter` for general UI/Navigation.
+  - **Mono (Data)**: ALWAYS use a high-quality Monospace font (e.g., `JetBrains Mono` or `Geist Mono`) for all financial data (currency values, "Rs. 0"), IDs, counts, and metrics.
+- **Tracking**: Use `tracking-tight` for headings; `tracking-widest` for small, muted labels.
+- **Radius**: Strict `radius-sm` (approx 4px - 6px) for a sharp, modern professional look. Avoid "bubble" roundings.
 
 ## Implementation Guidelines
 
-### 1. shadcn/ui Integration
-- Use `shadcn` for structural components (Modals, Tabs, Buttons, Sheets).
-- When creating new components, check if a shadcn version exists.
-- Extend shadcn themes in `globals.css` or via Tailwind classes to match the Makabasla palette (specifically the amber primary color).
+### 1. shadcn/ui Integration (Customized)
 
-### 2. Motion & Effects
-- Use the `animate-reveal` utility for page transitions.
-- Apply `glow` (`shadow-[0_0_20px_rgba(245,166,35,0.1)]`) to primary buttons.
-- Use `text-gradient` (`bg-gradient-to-br from-[#F5A623] to-[#C97A00]`) for important headlines.
+- **Variants**: Strictly default to **`variant="ghost"`** for secondary or passive actions. Use **`variant="outline"`** for major actions, where the border color matches the muted semantic tone (e.g., a rose outline for a destructive action). Solid backgrounds should be incredibly rare (reserved only for "Primary/Submit").
+- **Inputs**: Remove standard borders. Use a subtle bottom border (`border-b border-muted/20`) that changes color only on focus.
+- **Command Menu**: Use the shadcn `Command` (CMDK) component as the primary navigation pattern instead of bulky sidebars.
 
-### 3. Polish & Details
-- **Shadows**: Use soft, large shadows for depth.
-- **Borders**: Avoid harsh borders; use `white/10` or `white/5`.
-- **Interactions**: Add subtle scale effects (`active:scale-95`) to interactive elements.
+### 2. Iconography (Heroicons)
+
+- **Style**: ALWAYS and ONLY use **Heroicons (Outline)**. Do not use solid icons.
+- **Scale**: Keep icons small and consistent (`w-5 h-5` maximum, often `w-4 h-4` for labels).
+- **Weight**: Set `stroke-width` strictly to `1.5` for a clean, professional, light-weight feel. Icon color should generally inherit the muted tone of the associated action.
+
+### 3. Motion & Focus States
+
+- **The "Fade" Effect**: Use Tailwind `transition-colors` and `duration-300`. Inactive navigation items should be low contrast (`text-muted-foreground/30`) and transition to `text-foreground` on hover.
+- **Active State**: Only the current "task" or "active" element should carry the brand accent (`#F5A623`).
 
 ## Avoid "AI Slop"
-NEVER use:
-- Generic Inter/Arial system fonts without styling.
-- Default blue/purple gradients (unless specifically requested).
-- Predictable, flat, white-background "SaaS" templates.
-- Solid colors without some form of texture (grain, gradient, or depth).
 
-**IMPORTANT**: Makabasla represents security and premium quality. Every pixel should feel intentional, every transition smooth, and every color choice luxurious.
+NEVER use:
+
+- **Default Red/Green/Blue**: If it looks like a bootstrap color scheme, it is rejected. All color must be desaturated and intentional.
+- **Heavy Glassmorphism**: No more heavy `backdrop-blur` or complex gradients. Use flat color blocks (`bg-surface`).
+- **Rounded-full**: Avoid overly rounded "bubble" elements; stay sharp and geometric (`radius-sm`).
+- **Administrative Clutter**: If a screen looks like a standard Admin panel (colored sidebars, heavy borders around tables), simplify it. Remove lines. Increase whitespace (e.g., `p-12`, `gap-10`).

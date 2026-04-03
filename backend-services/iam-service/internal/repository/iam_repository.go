@@ -17,6 +17,7 @@ type IamRepository interface {
 	SyncStaff(id string, email string, name string, role string, phone string) (*models.Staff, error)
 	CreateVehicle(vehicle *models.Vehicle) error
 	GetVehicles(customerID string) ([]models.Vehicle, error)
+	GetAllVehicles() ([]models.Vehicle, error)
 }
 
 type iamRepository struct {
@@ -30,11 +31,16 @@ func (r *iamRepository) SyncCustomer(id string, email string, name string, phone
 		Name:  name,
 		Phone: phone,
 	}
+	updateCols := []string{"email", "name"}
+	if phone != "" {
+		updateCols = append(updateCols, "phone")
+	}
+
 	// This uses GORM's "Clauses" to handle:
 	// IF NOT EXISTS: Insert | IF EXISTS: Do nothing (or Update)
 	err := r.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"email", "name", "phone"}), // Update if info changed
+		DoUpdates: clause.AssignmentColumns(updateCols), // Update if info changed
 	}).Create(customer).Error
 	if err != nil {
 		return nil, err
@@ -55,27 +61,42 @@ func (r *iamRepository) GetCustomer(id string) (*models.Customer, error) {
 
 func (r *iamRepository) SyncAdmin(id string, email string, name string, phone string) (*models.Admin, error) {
 	admin := &models.Admin{ID: id, Email: email, Name: name, Phone: phone}
+	updateCols := []string{"email", "name"}
+	if phone != "" {
+		updateCols = append(updateCols, "phone")
+	}
+
 	err := r.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"email", "name", "phone"}),
+		DoUpdates: clause.AssignmentColumns(updateCols),
 	}).Create(admin).Error
 	return admin, err
 }
 
 func (r *iamRepository) SyncTechnician(id string, email string, name string, phone string) (*models.Technician, error) {
 	tech := &models.Technician{ID: id, Email: email, Name: name, Phone: phone}
+	updateCols := []string{"email", "name"}
+	if phone != "" {
+		updateCols = append(updateCols, "phone")
+	}
+
 	err := r.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"email", "name", "phone"}),
+		DoUpdates: clause.AssignmentColumns(updateCols),
 	}).Create(tech).Error
 	return tech, err
 }
 
 func (r *iamRepository) SyncStaff(id string, email string, name string, role string, phone string) (*models.Staff, error) {
 	staff := &models.Staff{ID: id, Email: email, Name: name, Role: role, Phone: phone}
+	updateCols := []string{"email", "name", "role"}
+	if phone != "" {
+		updateCols = append(updateCols, "phone")
+	}
+
 	err := r.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"email", "name", "role", "phone"}),
+		DoUpdates: clause.AssignmentColumns(updateCols),
 	}).Create(staff).Error
 	return staff, err
 }
@@ -87,6 +108,12 @@ func (r *iamRepository) CreateVehicle(vehicle *models.Vehicle) error {
 func (r *iamRepository) GetVehicles(customerID string) ([]models.Vehicle, error) {
 	var vehicles []models.Vehicle
 	err := r.db.Find(&vehicles, "customer_id = ?", customerID).Error
+	return vehicles, err
+}
+
+func (r *iamRepository) GetAllVehicles() ([]models.Vehicle, error) {
+	var vehicles []models.Vehicle
+	err := r.db.Preload("Customer").Find(&vehicles).Error
 	return vehicles, err
 }
 

@@ -3,7 +3,11 @@ FROM golang:1.26-alpine AS build
 
 WORKDIR /app
 
+# Copy the entire backend-services directory to access the shared module
 COPY . .
+
+# Move into the api-gateway directory to build it
+WORKDIR /app/api-gateway
 
 RUN go env -w GOPROXY=https://proxy.golang.org,direct
 RUN apk add --no-cache git
@@ -15,7 +19,7 @@ FROM alpine:latest
 
 WORKDIR /app
 
-COPY --from=build /app/api-gateway .
+COPY --from=build /app/api-gateway/api-gateway .
 
 RUN addgroup -S makabas && adduser -S makabas -G makabas
 USER makabas:makabas

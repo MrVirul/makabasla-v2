@@ -1,0 +1,18 @@
+# syntax=docker/dockerfile:1
+FROM golang:1.26-alpine
+
+# Set build arguments
+ARG APP_DIR
+
+WORKDIR /app
+
+# Install git and air for hot reloading
+RUN go env -w GOPROXY=https://proxy.golang.org,direct
+RUN apk add --no-cache git curl
+RUN go install github.com/air-verse/air@latest
+
+# The source code will be mounted as a volume in docker-compose
+# We just need to ensure we are in the correct service directory
+# The entrypoint will handle the service-specific air command
+
+ENTRYPOINT ["air"]

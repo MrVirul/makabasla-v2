@@ -3,7 +3,11 @@ FROM golang:1.26-alpine AS build
 
 WORKDIR /app
 
+# Copy the entire backend-services directory to access the shared module
 COPY . .
+
+# Move into the billing-service directory to build it
+WORKDIR /app/billing-service
 
 RUN go env -w GOPROXY=https://proxy.golang.org,direct
 RUN apk add --no-cache git
@@ -15,7 +19,8 @@ FROM alpine:latest
 
 WORKDIR /app
 
-COPY --from=build /app/billing-service .
+# The built binary is located at /app/billing-service/billing-service
+COPY --from=build /app/billing-service/billing-service .
 
 RUN addgroup -S makabas && adduser -S makabas -G makabas
 USER makabas:makabas
