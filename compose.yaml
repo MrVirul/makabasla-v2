@@ -87,6 +87,78 @@ services:
       consul:
         condition: service_healthy
 
+  # Task Management Service (Hot-Reload)
+  task-mgt-service:
+    build:
+      context: ./backend-services
+      dockerfile: Dockerfile.dev
+    container_name: makabasla-task-mgt-service
+    ports:
+      - "8086:8086"
+    working_dir: /app/task-mgt-service
+    volumes:
+      - ./backend-services:/app
+      - ./backend-services/.air.toml:/app/task-mgt-service/.air.toml
+    networks:
+      - makabasla-network
+    environment:
+      - DB_URL=${TSKMGT_DB_URL}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - CONSUL_HOST=consul
+      - APP_NAME=task-mgt-service
+    depends_on:
+      consul:
+        condition: service_healthy
+
+  # Appointment Service (Hot-Reload)
+  appointment-service:
+    build:
+      context: ./backend-services
+      dockerfile: Dockerfile.dev
+    container_name: makabasla-appointment-service
+    ports:
+      - "8085:8085"
+    working_dir: /app/appointment-service
+    volumes:
+      - ./backend-services:/app
+      - ./backend-services/.air.toml:/app/appointment-service/.air.toml
+    networks:
+      - makabasla-network
+    environment:
+      - DB_URL=${APPOINTMENT_DB_URL}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - CONSUL_HOST=consul
+      - APP_NAME=appointment-service
+    depends_on:
+      consul:
+        condition: service_healthy
+
+  # Webstore Service (Hot-Reload)
+  webstore-service:
+    build:
+      context: ./backend-services
+      dockerfile: Dockerfile.dev
+    container_name: makabasla-webstore-service
+    ports:
+      - "8087:8087"
+    working_dir: /app/webstore-service
+    volumes:
+      - ./backend-services:/app
+      - ./backend-services/.air.toml:/app/webstore-service/.air.toml
+    networks:
+      - makabasla-network
+    environment:
+      - DB_URL=${WEBSTORE_DB_URL}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - CONSUL_HOST=consul
+      - APP_NAME=webstore-service
+    depends_on:
+      consul:
+        condition: service_healthy
+
   # IAM Service (Hot-Reload)
   iam-service:
     build:
