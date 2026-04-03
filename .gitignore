@@ -52,3 +52,4 @@ buildNumber.properties
 
 # Development artifacts
 **/tmp/
+**/node_modules/
