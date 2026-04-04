@@ -18,6 +18,7 @@ type IamRepository interface {
 	CreateVehicle(vehicle *models.Vehicle) error
 	GetVehicles(customerID string) ([]models.Vehicle, error)
 	GetAllVehicles() ([]models.Vehicle, error)
+	GetAllCustomers() ([]models.Customer, error)
 }
 
 type iamRepository struct {
@@ -115,6 +116,12 @@ func (r *iamRepository) GetAllVehicles() ([]models.Vehicle, error) {
 	var vehicles []models.Vehicle
 	err := r.db.Preload("Customer").Find(&vehicles).Error
 	return vehicles, err
+}
+
+func (r *iamRepository) GetAllCustomers() ([]models.Customer, error) {
+	var customers []models.Customer
+	err := r.db.Preload("Vehicles").Find(&customers).Error
+	return customers, err
 }
 
 func NewIamRepository(db *gorm.DB) IamRepository {

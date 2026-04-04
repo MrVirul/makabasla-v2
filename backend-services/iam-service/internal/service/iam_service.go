@@ -14,6 +14,7 @@ type IamService interface {
 	AddVehicle(vehicle *models.Vehicle) error
 	GetVehicles(customerID string) ([]models.Vehicle, error)
 	GetAllVehicles() ([]models.Vehicle, error)
+	GetAllCustomers() ([]models.Customer, error)
 }
 
 type iamService struct {
@@ -54,6 +55,10 @@ func (s *iamService) GetVehicles(customerID string) ([]models.Vehicle, error) {
 
 func (s *iamService) GetAllVehicles() ([]models.Vehicle, error) {
 	return s.repo.GetAllVehicles()
+}
+
+func (s *iamService) GetAllCustomers() ([]models.Customer, error) {
+	return s.repo.GetAllCustomers()
 }
 
 func (s *iamService) GetUserInfo(username string) (string, error) {
