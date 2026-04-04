@@ -22,6 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/profile/dialog";
 
 interface Customer {
@@ -75,16 +76,22 @@ export default function AdminVehiclesPage() {
         if (!res.ok) throw new Error("failed to fetch vehicles");
         const data: Vehicle[] = await res.json();
         
-        const vehiclesWithBilling = await Promise.all(
-          data.map(async (v) => {
-            try {
-              const bRes = await fetch(`${BILLING_BASE}/${v.id}`);
-              return { ...v, has_billing: bRes.ok };
-            } catch {
-              return { ...v, has_billing: false };
-            }
-          })
-        );
+        // Fetch all billing records in one go to avoid console 404s and improve performance
+        let allBillings: { vehicle_id: number }[] = [];
+        try {
+          const bRes = await fetch(`${BILLING_BASE}/internal/billings`, { headers });
+          if (bRes.ok) {
+            allBillings = await bRes.json();
+          }
+        } catch (err) {
+          console.error("failed to fetch billing status batch:", err);
+        }
+
+        const billingMap = new Set(allBillings.map(b => b.vehicle_id));
+        const vehiclesWithBilling = data.map(v => ({
+          ...v,
+          has_billing: billingMap.has(v.id)
+        }));
 
         setVehicles(vehiclesWithBilling);
       } catch (err: any) {
@@ -157,91 +164,95 @@ export default function AdminVehiclesPage() {
               <div key={i} className="h-64 rounded-md bg-white/[0.02] animate-pulse" />
             ))}
           </div>
-        ) : filteredVehicles.length === 0 ? (
-          <div className="py-32 flex flex-col items-center justify-center text-center">
-            <TruckIcon className="w-12 h-12 text-[#CFCFCF]/20 mb-6" />
-            <p className="font-mono text-sm text-[#CFCFCF]/40">no vehicles found.</p>
-          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredVehicles.map((v) => (
-              <div
-                key={v.id}
-                className="group relative flex flex-col bg-white/[0.02] rounded-md transition-all hover:bg-white/[0.04] active:scale-[0.99]"
-              >
-                {/* Status Indicator Bar */}
-                <div className={`absolute top-0 left-0 w-full h-[2px] transition-colors ${v.has_billing ? 'bg-[#F5A623]/20 group-hover:bg-[#F5A623]/80' : 'bg-transparent'}`} />
+          <>
+            {filteredVehicles.length === 0 ? (
+              <div className="py-32 flex flex-col items-center justify-center text-center">
+                <TruckIcon className="w-12 h-12 text-[#CFCFCF]/20 mb-6" />
+                <p className="font-mono text-sm text-[#CFCFCF]/40">no vehicles found.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredVehicles.map((v) => (
+                  <div
+                    key={v.id}
+                    className="group relative flex flex-col bg-white/[0.02] rounded-md transition-all hover:bg-white/[0.04] active:scale-[0.99]"
+                  >
+                    {/* Status Indicator Bar */}
+                    <div className={`absolute top-0 left-0 w-full h-[2px] transition-colors ${v.has_billing ? 'bg-[#F5A623]/20 group-hover:bg-[#F5A623]/80' : 'bg-transparent'}`} />
 
-                <div className="p-8 pb-6 flex-1">
-                  <div className="flex justify-between items-start mb-6">
-                    <div>
-                      <h2 className="text-xl font-medium text-white/80 group-hover:text-white transition-colors">
-                        {v.make} {v.model}
-                      </h2>
-                      <div className="flex gap-4 mt-3 font-mono text-xs opacity-60">
-                        <span className="flex items-center gap-1.5 hover:text-[#F5A623] transition-colors cursor-default">
-                          <CalendarDaysIcon className="w-4 h-4" /> {v.year}
-                        </span>
-                        <span className="flex items-center gap-1.5 hover:text-[#F5A623] transition-colors cursor-default lowercase">
-                          <SwatchIcon className="w-4 h-4" /> {v.color || "n/a"}
+                    <div className="p-8 pb-6 flex-1">
+                      <div className="flex justify-between items-start mb-6">
+                        <div>
+                          <h2 className="text-xl font-medium text-white/80 group-hover:text-white transition-colors">
+                            {v.make} {v.model}
+                          </h2>
+                          <div className="flex gap-4 mt-3 font-mono text-xs opacity-60">
+                            <span className="flex items-center gap-1.5 hover:text-[#F5A623] transition-colors cursor-default">
+                              <CalendarDaysIcon className="w-4 h-4" /> {v.year}
+                            </span>
+                            <span className="flex items-center gap-1.5 hover:text-[#F5A623] transition-colors cursor-default lowercase">
+                              <SwatchIcon className="w-4 h-4" /> {v.color || "n/a"}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <span className="font-mono text-xs text-[#F5A623] bg-[#F5A623]/10 px-2 py-1 rounded-sm border border-[#F5A623]/20 flex items-center gap-1">
+                          <HashtagIcon className="w-3 h-3" />
+                          {v.plate_number}
                         </span>
                       </div>
-                    </div>
-                    
-                    <span className="font-mono text-xs text-[#F5A623] bg-[#F5A623]/10 px-2 py-1 rounded-sm border border-[#F5A623]/20 flex items-center gap-1">
-                      <HashtagIcon className="w-3 h-3" />
-                      {v.plate_number}
-                    </span>
-                  </div>
 
-                  <div className="mt-8 pt-6 border-t border-white/5">
-                    <p className="text-sm font-medium text-white/70 mb-2 truncate">
-                      {v.customer?.name || "unknown owner"}
-                    </p>
-                    <div className="flex flex-col gap-2 font-mono text-xs text-[#CFCFCF]/40">
-                      {v.customer?.phone && (
-                        <span className="flex items-center gap-2">
-                          <PhoneIcon className="w-3.5 h-3.5 opacity-60" /> {v.customer.phone}
-                        </span>
-                      )}
-                      {v.customer?.email && (
-                        <span className="flex items-center gap-2 truncate">
-                          <EnvelopeIcon className="w-3.5 h-3.5 opacity-60" /> {v.customer.email.toLowerCase()}
-                        </span>
+                      <div className="mt-8 pt-6 border-t border-white/5">
+                        <p className="text-sm font-medium text-white/70 mb-2 truncate">
+                          {v.customer?.name || "unknown owner"}
+                        </p>
+                        <div className="flex flex-col gap-2 font-mono text-xs text-[#CFCFCF]/40">
+                          {v.customer?.phone && (
+                            <span className="flex items-center gap-2">
+                              <PhoneIcon className="w-3.5 h-3.5 opacity-60" /> {v.customer.phone}
+                            </span>
+                          )}
+                          {v.customer?.email && (
+                            <span className="flex items-center gap-2 truncate">
+                              <EnvelopeIcon className="w-3.5 h-3.5 opacity-60" /> {v.customer.email.toLowerCase()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-8 pt-0 mt-auto">
+                      {v.has_billing ? (
+                        <button
+                          onClick={() => router.push(`/admin/vehicles/${v.id}/billing`)}
+                          className="w-full flex items-center justify-between py-3 px-4 font-mono text-xs text-[#F5A623] bg-transparent border border-[#F5A623]/20 rounded-md hover:bg-[#F5A623] hover:text-black transition-all outline-none focus-visible:ring-1 focus-visible:ring-[#F5A623]"
+                        >
+                          <span className="flex items-center gap-2">
+                            <BanknotesIcon className="w-4 h-4" />
+                            billing active
+                          </span>
+                          <ChevronRightIcon className="w-4 h-4 opacity-70 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setConfirmVehicle(v)}
+                          disabled={checkingBilling[v.id]}
+                          className="w-full flex items-center justify-between py-3 px-4 font-mono text-xs text-white/40 bg-white/[0.02] border border-transparent rounded-md hover:text-white hover:bg-white/[0.05] hover:border-white/10 transition-all outline-none focus-visible:ring-1 focus-visible:ring-white/30 disabled:opacity-50"
+                        >
+                          <span className="flex items-center gap-2">
+                            <PlusIcon className="w-4 h-4 opacity-70" />
+                            {checkingBilling[v.id] ? "starting..." : "start billing"}
+                          </span>
+                          <ChevronRightIcon className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                        </button>
                       )}
                     </div>
                   </div>
-                </div>
-
-                <div className="p-8 pt-0 mt-auto">
-                  {v.has_billing ? (
-                    <button
-                      onClick={() => router.push(`/admin/vehicles/${v.id}/billing`)}
-                      className="w-full flex items-center justify-between py-3 px-4 font-mono text-xs text-[#F5A623] bg-transparent border border-[#F5A623]/20 rounded-md hover:bg-[#F5A623] hover:text-black transition-all outline-none focus-visible:ring-1 focus-visible:ring-[#F5A623]"
-                    >
-                      <span className="flex items-center gap-2">
-                        <BanknotesIcon className="w-4 h-4" />
-                        billing active
-                      </span>
-                      <ChevronRightIcon className="w-4 h-4 opacity-70 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setConfirmVehicle(v)}
-                      disabled={checkingBilling[v.id]}
-                      className="w-full flex items-center justify-between py-3 px-4 font-mono text-xs text-white/40 bg-white/[0.02] border border-transparent rounded-md hover:text-white hover:bg-white/[0.05] hover:border-white/10 transition-all outline-none focus-visible:ring-1 focus-visible:ring-white/30 disabled:opacity-50"
-                    >
-                      <span className="flex items-center gap-2">
-                        <PlusIcon className="w-4 h-4 opacity-70" />
-                        {checkingBilling[v.id] ? "starting..." : "start billing"}
-                      </span>
-                      <ChevronRightIcon className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                  )}
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
 
@@ -249,6 +260,9 @@ export default function AdminVehiclesPage() {
         <DialogContent className="bg-[#0B0B0B] border-white/5 text-[#CFCFCF]/60 sm:max-w-md rounded-md p-8 shadow-2xl">
           <DialogHeader className="mb-8">
             <DialogTitle className="text-xl font-medium text-white/90">start billing</DialogTitle>
+            <DialogDescription className="sr-only">
+              Initialize a new billing cycle for the selected vehicle.
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-6">

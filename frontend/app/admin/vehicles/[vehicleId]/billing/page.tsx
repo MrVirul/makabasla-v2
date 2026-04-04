@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
-  BanknotesIcon,
   PlusIcon,
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
@@ -18,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/profile/dialog";
 
 interface Expense {
@@ -102,22 +102,35 @@ export default function VehicleBillingPage() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.description || !formData.amount) return;
+    if (!formData.amount) {
+      alert("please enter a valid quota amount.");
+      return;
+    }
 
     try {
       setSubmitting(true);
       const endpoint = dialogType === "expense" ? "expense" : "advance";
+      const amount = Number.parseFloat(formData.amount);
+      
+      if (Number.isNaN(amount)) {
+        throw new Error("invalid amount format");
+      }
+
       const res = await fetch(`${API_BASE}/${vehicleId}/${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: formData.date,
-          description: formData.description,
-          amount: Number.parseFloat(formData.amount),
+          description: formData.description || (dialogType === "expense" ? "manual expense allocation" : "manual advance input"),
+          amount: amount,
         }),
       });
 
-      if (!res.ok) throw new Error(`Failed to add ${dialogType}`);
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`failed to add ${dialogType}: ${errorText || res.statusText}`);
+      }
+
       const updatedData = await res.json();
       setBilling(updatedData);
       setIsDialogOpen(false);
@@ -356,6 +369,9 @@ export default function VehicleBillingPage() {
                 ? "allocate expense"
                 : "add advance input"}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Modify the billing registry by adding an expense or advance.
+            </DialogDescription>
             <p className="font-mono text-[10px] text-[#646669] uppercase tracking-widest mt-2">
               modification of billing registry
             </p>
@@ -433,6 +449,9 @@ export default function VehicleBillingPage() {
             <DialogTitle className="text-xl font-medium tracking-tight text-rose-400/80">
               terminate billing session
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Confirm the termination of the current billing session.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-6">
             <p className="font-mono text-xs text-[#646669] leading-relaxed uppercase tracking-widest">

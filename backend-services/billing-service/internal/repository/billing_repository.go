@@ -25,9 +25,12 @@ func NewBillingRepository(db *gorm.DB) BillingRepository {
 
 func (r *repository) GetBillingByVehicleID(vehicleID uint) (*models.Billing, error) {
 	var billing models.Billing
-	err := r.db.Preload("Expenses").Preload("Advances").Where("vehicle_id = ?", vehicleID).First(&billing).Error
-	if err != nil {
-		return nil, err
+	result := r.db.Preload("Expenses").Preload("Advances").Where("vehicle_id = ?", vehicleID).Limit(1).Find(&billing)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return nil, nil
 	}
 	return &billing, nil
 }

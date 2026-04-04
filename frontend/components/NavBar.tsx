@@ -15,11 +15,6 @@ export default function NavBar() {
   const { data: session } = useSession();
   const services = [
     {
-      name: "Dashboard",
-      icon: <HomeIcon className="w-4 h-4 stroke-[1.5]" />,
-      href: "/admin",
-    },
-    {
       name: "webstore",
       icon: <ShoppingBagIcon className="w-4 h-4 stroke-[1.5]" />,
       href: "/webstore",
