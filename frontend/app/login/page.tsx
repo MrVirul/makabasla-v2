@@ -24,7 +24,9 @@ export default function LoginPage() {
         className="absolute top-12 left-12 flex items-center gap-2 text-[#646669] hover:text-[#D1D0C5] transition-colors duration-300"
       >
         <ArrowLeftIcon className="w-5 h-5 stroke-[1.5]" />
-        <span className="text-sm tracking-widest font-mono uppercase">escape</span>
+        <span className="text-sm tracking-widest font-mono uppercase">
+          Go Back
+        </span>
       </Link>
 
       <div className="w-full max-w-sm flex flex-col gap-12 z-10 p-6">
@@ -37,8 +39,12 @@ export default function LoginPage() {
             className="h-8 w-auto object-contain opacity-90"
             priority
           />
-          <h1 className="mt-8 text-xl font-medium tracking-tight text-[#D1D0C5]">identify</h1>
-          <p className="font-mono text-xs mt-2 text-[#646669] tracking-widest uppercase">login to authenticate</p>
+          <h1 className="mt-8 text-xl font-medium tracking-tight text-[#D1D0C5]">
+            Username
+          </h1>
+          <p className="font-mono text-xs mt-2 text-[#646669] tracking-widest uppercase">
+            login to authenticate
+          </p>
         </div>
 
         <div className="bg-[#1A1A1A] p-10 rounded-sm">
