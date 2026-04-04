@@ -40,13 +40,13 @@ const adminItems = [
     permission: "admin:customers",
   },
   {
-    title: "registry",
+    title: "Vehicles",
     url: "/admin/vehicles",
     icon: TruckIcon,
     permission: "admin:registry",
   },
   {
-    title: "user management",
+    title: "Users",
     url: "/admin/profile",
     icon: Cog6ToothIcon,
     permission: "super_admin",
@@ -56,19 +56,22 @@ const adminItems = [
 export function AdminSidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  
+
   const userRoles = (session as any)?.roles || [];
   const isSuperAdmin = (session as any)?.isSuperAdmin;
 
   // Filter items based on dynamic permissions
-  const filteredItems = adminItems.filter(item => {
+  const filteredItems = adminItems.filter((item) => {
     if (isSuperAdmin) return true;
-    if (item.permission === "admin:dashboard") return true; 
+    if (item.permission === "admin:dashboard") return true;
     return userRoles.includes(item.permission);
   });
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-[#1A1A1A] bg-[#0B0B0B] [&_[data-sidebar=sidebar]]:bg-[#0B0B0B]">
+    <Sidebar
+      collapsible="icon"
+      className="border-r border-[#1A1A1A] bg-[#0B0B0B] [&_[data-sidebar=sidebar]]:bg-[#0B0B0B]"
+    >
       <SidebarHeader className="border-b border-[#1A1A1A] p-6 h-16 flex justify-center">
         <div className="flex items-center gap-4">
           <div className="h-4 w-4 bg-[#F5A623] rounded-sm flex-shrink-0" />

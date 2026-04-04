@@ -89,7 +89,7 @@ export default function NavBar() {
               className="text-[#646669] hover:text-[#F5A623] transition-colors flex items-center gap-2"
             >
               <ArrowRightStartOnRectangleIcon className="w-4 h-4 stroke-[1.5]" />
-              oauth
+              Login
             </Link>
           )}
         </div>
