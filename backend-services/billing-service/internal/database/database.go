@@ -12,7 +12,15 @@ import (
 )
 
 func NewDatabase(cfg *config.Config) (*gorm.DB, error) {
-	gormLogger := logger.Default.LogMode(logger.Info)
+	gormLogger := logger.New(
+		log.Default(),
+		logger.Config{
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Info,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
+		},
+	)
 
 	db, err := gorm.Open(postgres.Open(cfg.DBUrl), &gorm.Config{
 		Logger: gormLogger,

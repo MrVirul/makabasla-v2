@@ -385,7 +385,7 @@ export default function AdminDashboard() {
                 <CardDescription className="text-xs text-[#646669] font-mono uppercase tracking-wider">Gross performance over recent cycles</CardDescription>
               </CardHeader>
               <CardContent className="px-0 pb-0">
-                <div className="h-[350px] w-full">
+                <div className="h-[350px] w-full min-h-0 min-w-0">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData}>
                       <defs>
@@ -431,7 +431,7 @@ export default function AdminDashboard() {
                 <CardDescription className="text-xs text-[#646669] font-mono uppercase tracking-wider">Registry by manufacturer</CardDescription>
               </CardHeader>
               <CardContent className="px-0 pb-0 flex flex-col items-center">
-                <div className="h-[280px] w-full">
+                <div className="h-[280px] w-full min-h-0 min-w-0">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie

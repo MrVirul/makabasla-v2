@@ -24,7 +24,10 @@ func NewBillingHandler(srv service.BillingService) *BillingHandler {
 func (h *BillingHandler) GetBilling(_ context.Context, req *billingpb.GetBillingRequest) (*billingpb.Billing, error) {
 	billing, err := h.srv.GetBillingByVehicleID(uint(req.GetVehicleId()))
 	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "billing not found: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to get billing: %v", err)
+	}
+	if billing == nil {
+		return nil, status.Errorf(codes.NotFound, "billing not found for vehicle %d", req.GetVehicleId())
 	}
 	return mapToPbBilling(billing), nil
 }
@@ -42,6 +45,9 @@ func (h *BillingHandler) AddExpense(_ context.Context, req *billingpb.AddExpense
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to add expense: %v", err)
 	}
+	if billing == nil {
+		return nil, status.Errorf(codes.Internal, "failed to add expense: billing record remained nil")
+	}
 	return mapToPbBilling(billing), nil
 }
 
@@ -49,6 +55,9 @@ func (h *BillingHandler) AddAdvance(_ context.Context, req *billingpb.AddAdvance
 	billing, err := h.srv.AddAdvance(uint(req.GetVehicleId()), req.GetDate(), req.GetDescription(), req.GetAmount())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to add advance: %v", err)
+	}
+	if billing == nil {
+		return nil, status.Errorf(codes.Internal, "failed to add advance: billing record remained nil")
 	}
 	return mapToPbBilling(billing), nil
 }

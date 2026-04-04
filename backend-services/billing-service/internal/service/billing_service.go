@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -34,7 +35,7 @@ func (s *service) GetBillingByVehicleID(vehicleID uint) (*models.Billing, error)
 
 func (s *service) CreateBilling(vehicleID uint) (*models.Billing, error) {
 	// Check if already exists
-	if b, err := s.repo.GetBillingByVehicleID(vehicleID); err == nil {
+	if b, err := s.repo.GetBillingByVehicleID(vehicleID); err == nil && b != nil {
 		return b, nil
 	}
 
@@ -54,13 +55,16 @@ func (s *service) CreateBilling(vehicleID uint) (*models.Billing, error) {
 
 func (s *service) AddExpense(vehicleID uint, date, desc string, amount float64) (*models.Billing, error) {
 	billing, err := s.GetBillingByVehicleID(vehicleID)
-	if err != nil {
+	if err != nil || billing == nil {
+		log.Printf("[Service] Billing record not found for vehicle %d, attempting to create. Error: %v", vehicleID, err)
 		// Try creating it if it doesn't exist
 		billing, err = s.CreateBilling(vehicleID)
 		if err != nil {
+			log.Printf("[Service] Failed to create billing record for vehicle %d: %v", vehicleID, err)
 			return nil, fmt.Errorf("failed to ensure billing record: %v", err)
 		}
 	}
+	log.Printf("[Service] Adding expense to billing ID %s for vehicle %d: %s amt=%.2f", billing.ID, vehicleID, desc, amount)
 
 	expense := &models.Expense{
 		ID:          uuid.New().String(),
@@ -73,6 +77,7 @@ func (s *service) AddExpense(vehicleID uint, date, desc string, amount float64) 
 	}
 
 	if err := s.repo.AddExpense(expense); err != nil {
+		log.Printf("[Service] Failed to add expense to DB for vehicle %d: %v", vehicleID, err)
 		return nil, fmt.Errorf("failed to add expense: %v", err)
 	}
 
@@ -81,7 +86,9 @@ func (s *service) AddExpense(vehicleID uint, date, desc string, amount float64) 
 	billing.BalanceDue = billing.TotalExpenses - billing.TotalAdvances
 	billing.UpdatedAt = time.Now()
 
+	log.Printf("[Service] Updating billing totals for vehicle %d: total_exp=%.2f bal=%.2f", vehicleID, billing.TotalExpenses, billing.BalanceDue)
 	if err := s.repo.UpdateBilling(billing); err != nil {
+		log.Printf("[Service] Failed to update billing totals for vehicle %d: %v", vehicleID, err)
 		return nil, fmt.Errorf("failed to update billing totals: %v", err)
 	}
 
@@ -90,13 +97,16 @@ func (s *service) AddExpense(vehicleID uint, date, desc string, amount float64) 
 
 func (s *service) AddAdvance(vehicleID uint, date, desc string, amount float64) (*models.Billing, error) {
 	billing, err := s.GetBillingByVehicleID(vehicleID)
-	if err != nil {
+	if err != nil || billing == nil {
+		log.Printf("[Service] Billing record not found for vehicle %d during advance addition. Error: %v", vehicleID, err)
 		// Try creating it if it doesn't exist
 		billing, err = s.CreateBilling(vehicleID)
 		if err != nil {
+			log.Printf("[Service] Failed to create billing record for vehicle %d during advance: %v", vehicleID, err)
 			return nil, fmt.Errorf("failed to ensure billing record: %v", err)
 		}
 	}
+	log.Printf("[Service] Adding advance to billing ID %s for vehicle %d: %s amt=%.2f", billing.ID, vehicleID, desc, amount)
 
 	advance := &models.Advance{
 		ID:          uuid.New().String(),
@@ -109,6 +119,7 @@ func (s *service) AddAdvance(vehicleID uint, date, desc string, amount float64) 
 	}
 
 	if err := s.repo.AddAdvance(advance); err != nil {
+		log.Printf("[Service] Failed to add advance to DB for vehicle %d: %v", vehicleID, err)
 		return nil, fmt.Errorf("failed to add advance: %v", err)
 	}
 
@@ -117,7 +128,9 @@ func (s *service) AddAdvance(vehicleID uint, date, desc string, amount float64) 
 	billing.BalanceDue = billing.TotalExpenses - billing.TotalAdvances
 	billing.UpdatedAt = time.Now()
 
+	log.Printf("[Service] Updating billing totals for vehicle %d: total_adv=%.2f bal=%.2f", vehicleID, billing.TotalAdvances, billing.BalanceDue)
 	if err := s.repo.UpdateBilling(billing); err != nil {
+		log.Printf("[Service] Failed to update billing totals for vehicle %d: %v", vehicleID, err)
 		return nil, fmt.Errorf("failed to update billing totals: %v", err)
 	}
 
