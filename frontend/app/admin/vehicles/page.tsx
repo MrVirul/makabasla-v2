@@ -13,7 +13,8 @@ import {
   EnvelopeIcon,
   CalendarDaysIcon,
   SwatchIcon,
-  TruckIcon
+  TruckIcon,
+  ClipboardDocumentListIcon
 } from "@heroicons/react/24/outline";
 
 import {
@@ -222,7 +223,7 @@ export default function AdminVehiclesPage() {
                       </div>
                     </div>
 
-                    <div className="p-8 pt-0 mt-auto">
+                    <div className="p-8 pt-0 mt-auto flex flex-col gap-3">
                       {v.has_billing ? (
                         <button
                           onClick={() => router.push(`/admin/vehicles/${v.id}/billing`)}
@@ -247,6 +248,17 @@ export default function AdminVehiclesPage() {
                           <ChevronRightIcon className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
                         </button>
                       )}
+                      
+                      <button
+                        onClick={() => router.push(`/admin/vehicles/${v.id}/tasks`)}
+                        className="w-full flex items-center justify-between py-3 px-4 font-mono text-xs text-white/70 bg-white/[0.03] border border-white/5 rounded-md hover:bg-white/[0.08] hover:text-white transition-all outline-none focus-visible:ring-1 focus-visible:ring-white/30"
+                      >
+                        <span className="flex items-center gap-2">
+                          <ClipboardDocumentListIcon className="w-4 h-4 opacity-70" />
+                          manage tasks
+                        </span>
+                        <ChevronRightIcon className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                      </button>
                     </div>
                   </div>
                 ))}

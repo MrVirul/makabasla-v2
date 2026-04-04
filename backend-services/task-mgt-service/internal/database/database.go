@@ -29,6 +29,11 @@ func NewDatabase(cfg *config.Config) (*gorm.DB, error) {
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
+	err = db.AutoMigrate(&Task{})
+	if err != nil {
+		return nil, err
+	}
+
 	log.Printf("Successfully connected to database for %s", cfg.AppName)
 
 	return db, nil
