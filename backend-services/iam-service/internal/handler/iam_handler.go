@@ -94,10 +94,20 @@ func (h *IamHandler) GetAllVehicles(c echo.Context) error {
 	return c.JSON(http.StatusOK, vehicles)
 }
 
+func (h *IamHandler) GetAllCustomers(c echo.Context) error {
+	customers, err := h.srv.GetAllCustomers()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, customers)
+}
+
 func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
 	e.GET("/api/v1/user", h.GetUser)
 	e.POST("/api/v1/profile", h.SyncProfile)
 	e.GET("/api/v1/profile/:id", h.GetProfile)
 	e.POST("/api/v1/vehicle", h.CreateVehicle)
 	e.GET("/api/v1/vehicles", h.GetAllVehicles)
+	e.GET("/api/v1/customers", h.GetAllCustomers)
 }
