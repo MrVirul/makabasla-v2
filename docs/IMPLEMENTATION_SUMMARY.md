@@ -12,10 +12,24 @@ The entire project shifted to Go 1.24+ (configured as `go 1.26` for future-proof
 
 ### Shared Infrastructure (Shared Library)
 To prevent code duplication, a `shared` library was introduced:
-- **Internal HTTP Client**: Wrapped `Resty` with automatic retries and Keycloak token propagation.
+- **Internal HTTP Client**: Wrapped `Resty` with automatic retries and agnostic token propagation.
 - **gRPC Support**: Standardized gRPC server/client wrappers with health checks and reflection. Recently adopted for `billing-service`.
 - **Service Discovery**: Unified Consul registration logic used across all services.
 - **Logging & Config**: Structured JSON logging (Zap) and centralized environment configuration (Viper).
+
+## Recent Enhancements
+
+### 🔐 Google OAuth 2.0 Migration
+Transitioned from an internal Keycloak instance to **Google OAuth 2.0** integrated via **NextAuth.js** on the frontend.
+- **Improved UX**: Users can now sign in using their Google accounts without additional account creation steps.
+- **Profile Image Support**: The system now automatically fetches and displays user avatars from Google.
+- **JIT Provisioning**: The `iam-service` continues to perform Just-In-Time provisioning, syncing Google profile data into local `Customer` and `Admin` records.
+- **Simplified DB Models**: Updated models to support optional phone numbers and dedicated `ImageURL` fields.
+
+### ⚡ Development Environment Cleanup
+Streamlined the Docker development environment for better performance and predictability:
+- **Removed Air**: Transitioned away from Air hot-reloading configurations in favor of standard Go workflows and `go run` commands. This reduced container overhead and fixed filesystem sync issues.
+- **Cleaned Orchestration**: Simplified `compose.yaml` by removing Keycloak, Air volumes, and outdated environment variables.
 
 ## Current Project Structure
 

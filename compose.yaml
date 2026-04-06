@@ -1,6 +1,4 @@
 services:
-  # Identity & Access Management
-
   # Service Discovery
   consul:
     image: hashicorp/consul:1.15
@@ -17,7 +15,7 @@ services:
       retries: 5
       start_period: 10s
 
-  # API Gateway (Hot-Reload)
+  # API Gateway (Development)
   api-gateway:
     build:
       context: ./backend-services
@@ -28,7 +26,6 @@ services:
     working_dir: /app/api-gateway
     volumes:
       - ./backend-services:/app
-      - ./backend-services/.air.toml:/app/api-gateway/.air.toml
     networks:
       - makabasla-network
     environment:
@@ -38,7 +35,7 @@ services:
       consul:
         condition: service_healthy
 
-  # Billing Service (Hot-Reload)
+  # Billing Service (Development)
   billing-service:
     build:
       context: ./backend-services
@@ -49,7 +46,6 @@ services:
     working_dir: /app/billing-service
     volumes:
       - ./backend-services:/app
-      - ./backend-services/.air.toml:/app/billing-service/.air.toml
     networks:
       - makabasla-network
     environment:
@@ -62,7 +58,7 @@ services:
       consul:
         condition: service_healthy
 
-  # Task Management Service (Hot-Reload)
+  # Task Management Service (Development)
   task-mgt-service:
     build:
       context: ./backend-services
@@ -73,7 +69,6 @@ services:
     working_dir: /app/task-mgt-service
     volumes:
       - ./backend-services:/app
-      - ./backend-services/.air.toml:/app/task-mgt-service/.air.toml
     networks:
       - makabasla-network
     environment:
@@ -86,7 +81,7 @@ services:
       consul:
         condition: service_healthy
 
-  # Appointment Service (Hot-Reload)
+  # Appointment Service (Development)
   appointment-service:
     build:
       context: ./backend-services
@@ -97,7 +92,6 @@ services:
     working_dir: /app/appointment-service
     volumes:
       - ./backend-services:/app
-      - ./backend-services/.air.toml:/app/appointment-service/.air.toml
     networks:
       - makabasla-network
     environment:
@@ -110,7 +104,7 @@ services:
       consul:
         condition: service_healthy
 
-  # Webstore Service (Hot-Reload)
+  # Webstore Service (Development)
   webstore-service:
     build:
       context: ./backend-services
@@ -121,7 +115,6 @@ services:
     working_dir: /app/webstore-service
     volumes:
       - ./backend-services:/app
-      - ./backend-services/.air.toml:/app/webstore-service/.air.toml
     networks:
       - makabasla-network
     environment:
@@ -134,7 +127,7 @@ services:
       consul:
         condition: service_healthy
 
-  # IAM Service (Hot-Reload)
+  # IAM Service (Development)
   iam-service:
     build:
       context: ./backend-services
@@ -145,7 +138,6 @@ services:
     working_dir: /app/iam-service
     volumes:
       - ./backend-services:/app
-      - ./backend-services/.air.toml:/app/iam-service/.air.toml
     networks:
       - makabasla-network
     environment:
