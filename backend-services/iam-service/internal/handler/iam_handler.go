@@ -43,6 +43,7 @@ func (h *IamHandler) SyncProfile(c echo.Context) error {
 		Name  string `json:"name"`
 		Phone string `json:"phone"`
 		Role  string `json:"role"`
+		Image string `json:"image"`
 	}
 
 	var req Request
@@ -50,7 +51,7 @@ func (h *IamHandler) SyncProfile(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	profile, err := h.srv.SyncProfile(req.ID, req.Email, req.Name, req.Phone, req.Role)
+	profile, err := h.srv.SyncProfile(req.ID, req.Email, req.Name, req.Phone, req.Role, req.Image)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -103,6 +104,25 @@ func (h *IamHandler) GetAllCustomers(c echo.Context) error {
 	return c.JSON(http.StatusOK, customers)
 }
 
+func (h *IamHandler) Login(c echo.Context) error {
+	type LoginRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	var req LoginRequest
+	if err := c.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	user, err := h.srv.LoginAdmin(req.Username, req.Password)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusUnauthorized, "invalid credentials")
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
+
 func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
 	e.GET("/api/v1/user", h.GetUser)
 	e.POST("/api/v1/profile", h.SyncProfile)
@@ -110,4 +130,5 @@ func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
 	e.POST("/api/v1/vehicle", h.CreateVehicle)
 	e.GET("/api/v1/vehicles", h.GetAllVehicles)
 	e.GET("/api/v1/customers", h.GetAllCustomers)
+	e.POST("/api/v1/auth/login", h.Login)
 }

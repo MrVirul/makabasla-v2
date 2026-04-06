@@ -2,6 +2,7 @@
 
 import { signIn, useSession } from "next-auth/react";
 import { useState } from "react";
+import Image from "next/image";
 import {
   SidebarProvider,
   SidebarInset,
@@ -169,8 +170,17 @@ export default function AdminLayout({
                 administrator
               </span>
             </div>
-            <div className="h-8 w-8 rounded-sm bg-[#1A1A1A] flex items-center justify-center text-[#F5A623] font-mono font-bold text-xs uppercase">
-              {session?.user?.name?.charAt(0)}
+            <div className="h-8 w-8 rounded-sm bg-[#1A1A1A] flex items-center justify-center text-[#F5A623] font-mono font-bold text-xs uppercase overflow-hidden relative border border-[#1A1A1A]">
+              {session?.user?.image ? (
+                <Image
+                  src={session.user.image}
+                  alt={session.user.name || "Admin profile"}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                session?.user?.name?.charAt(0)
+              )}
             </div>
           </div>
         </header>

@@ -8,7 +8,8 @@ type Customer struct {
 	ID        string    `gorm:"primaryKey" json:"id"`
 	Email     string    `gorm:"uniqueIndex" json:"email"`
 	Name      string    `json:"name"`
-	Phone     string    `gorm:"uniqueIndex" json:"phone"`
+	Phone     *string   `gorm:"uniqueIndex" json:"phone"`
+	ImageURL  string    `json:"image_url"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	Vehicles  []Vehicle `gorm:"foreignKey:CustomerID" json:"vehicles"`
@@ -16,9 +17,12 @@ type Customer struct {
 
 type Admin struct {
 	ID        string    `gorm:"primaryKey" json:"id"`
+	Username  string    `gorm:"uniqueIndex" json:"username"`
+	Password  string    `json:"-"` // never expose password
 	Email     string    `gorm:"uniqueIndex" json:"email"`
 	Name      string    `json:"name"`
-	Phone     string    `gorm:"uniqueIndex" json:"phone"`
+	Phone     *string   `gorm:"uniqueIndex" json:"phone"`
+	ImageURL  string    `json:"image_url"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -27,7 +31,8 @@ type Technician struct {
 	ID             string    `gorm:"primaryKey" json:"id"`
 	Email          string    `gorm:"uniqueIndex" json:"email"`
 	Name           string    `json:"name"`
-	Phone          string    `gorm:"uniqueIndex" json:"phone"`
+	Phone          *string   `gorm:"uniqueIndex" json:"phone"`
+	ImageURL       string    `json:"image_url"`
 	Specialization string    `json:"specialization"`
 	CreatedAt      time.Time `json:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at"`
@@ -37,7 +42,8 @@ type Staff struct {
 	ID        string    `gorm:"primaryKey" json:"id"`
 	Email     string    `gorm:"uniqueIndex" json:"email"`
 	Name      string    `json:"name"`
-	Phone     string    `gorm:"uniqueIndex" json:"phone"`
+	Phone     *string   `gorm:"uniqueIndex" json:"phone"`
+	ImageURL  string    `json:"image_url"`
 	Role      string    `json:"role"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
