@@ -5,9 +5,9 @@ The Makabasla v2 architecture has been modernized from Java to Go to minimize me
 ## Microservices Topology
 
 ```text
-┌─────────────────────────────────┐
-│        Frontend / Client        │
-└───────────────┬─────────────────┘
+┌─────────────────────────────────┐      ┌─────────────────────────┐
+│        Frontend / Client        │◀────▶│  Google OAuth (NextAuth)│
+└───────────────┬─────────────────┘      └─────────────────────────┘
                 │ HTTP Requests
                 ▼
 ┌─────────────────────────────────┐
@@ -54,8 +54,8 @@ Provides distributed service discovery and health-checking. All downstream Go se
 ### Downstream Services
 All services utilize Go 1.26 and connect directly to their localized logical databases within the shared PostgreSQL server container to enforce the Database-Per-Service pattern constraints. Certain services expose gRPC endpoints for high-performance internal communication.
 
-* `iam-service`: Handles Identity & Access Management. (Port 8084)
-* `keycloak`: External Identity & Access Management server. (Port 8180)
+* `iam-service`: Handles Identity, Profile Sync, and Authorization. (Port 8084)
+* `google-oauth`: Managed identity provider integrated via NextAuth.js on the frontend.
 * `billing-service`: Connects to `billingdb` - Financial ledgers and invoices. (gRPC Port 8083)
 * `appointment-service`: Connects to `appointmentdb` - Scheduler and calendars. (Port 8085)
 * `task-mgt-service`: Connects to `taskdb` - Task orchestration. (Port 8086)

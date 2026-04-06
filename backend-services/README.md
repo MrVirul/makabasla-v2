@@ -7,7 +7,7 @@ A Go microservices architecture for the Makabasla appointment booking system, wi
 ```
 React Frontend → API Gateway → (Consul) → Microservices → PostgreSQL
                         │
-                        └────────────→ Keycloak (IAM)
+                        └────────────→ Google OAuth (Identity)
 ```
 
 **Technology Stack:**
@@ -16,7 +16,7 @@ React Frontend → API Gateway → (Consul) → Microservices → PostgreSQL
 - Echo (HTTP server/router)
 - gRPC (Inter-service communication)
 - Consul (Service discovery + health checks)
-- Keycloak (Identity provider)
+- Google OAuth (Identity provider via NextAuth)
 - PostgreSQL (Database)
 - Resty (Internal HTTP client with retries)
 - Docker / Docker Compose
@@ -44,10 +44,10 @@ docker compose -f compose.yaml up --build
 | Component / Service | URL | Purpose |
 | --- | --- | --- |
 | Consul UI | http://localhost:8500 | Service discovery UI + health status |
-| Keycloak | http://localhost:8180 | Identity provider |
+| Google Cloud | https://console.cloud.google.com | Identity provider config |
 | API Gateway | http://localhost:8080 | Gateway (routes/auth) |
 | Billing Service | http://localhost:8083 | Billing APIs |
-| IAM Service | http://localhost:8084 | IAM integration APIs (Authz) |
+| IAM Service | http://localhost:8084 | IAM integration APIs (Local Authz/Profiles) |
 | Appointment Service | http://localhost:8085 | Appointment APIs |
 | Task Mgt Service | http://localhost:8086 | Task APIs |
 | Webstore Service | http://localhost:8087 | Webstore APIs |
@@ -57,7 +57,7 @@ docker compose -f compose.yaml up --build
 ### Infrastructure & Shared
 
 - **Consul**: Service discovery and health monitoring.
-- **Keycloak**: Centralized IAM.
+- **Google OAuth**: External identity management.
 - **[shared/](shared/)**: Common library for:
   - Internal HTTP Client (Retry, Token propagation)
   - gRPC Server/Client wrappers
@@ -68,7 +68,7 @@ docker compose -f compose.yaml up --build
 ### Microservices
 
 - **[billing-service/](billing-service/)**: Billing operations (PostgreSQL)
-- **[iam-service/](iam-service/)**: IAM integration endpoints (Keycloak)
+- **[iam-service/](iam-service/)**: IAM integration endpoints (Profile Sync/Authz)
 - **[appointment-service/](appointment-service/)**: Appointment scheduling (PostgreSQL)
 - **[task-mgt-service/](task-mgt-service/)**: Task management (PostgreSQL)
 - **[webstore-service/](webstore-service/)**: Web store operations (PostgreSQL)
@@ -102,7 +102,7 @@ Comprehensive documentation is in the [`docs/`](../docs/) directory:
 
 - ✅ **Service Discovery** - Automatic registration with Consul
 - ✅ **CORS Support** - Configured for React (ports 3000, 5173)
-- ✅ **Auth Integration** - Gateway integrates with Keycloak (see `compose.yaml`)
+- ✅ **Auth Integration** - Frontend integrates with Google OAuth via NextAuth
 - ✅ **Health Monitoring** - Lightweight `/health` endpoints used by Consul checks
 - ✅ **Database Per Service** - appointmentdb, taskdb, webstoredb
 - ✅ **Centralized Routing** - All requests through API Gateway
@@ -114,7 +114,7 @@ Comprehensive documentation is in the [`docs/`](../docs/) directory:
 | Component / Service | Port | Database |
 | --- | --- | --- |
 | Consul | 8500 | - |
-| Keycloak | 8180 | iamdb (PostgreSQL) |
+| Google OAuth | -    | - |
 | API Gateway | 8080 | - |
 | Billing Service | 8083 | billingdb |
 | IAM Service | 8084 | - |

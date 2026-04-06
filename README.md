@@ -55,7 +55,7 @@ docker compose up --build
 
 - API Gateway: http://localhost:8080
 - Consul UI: http://localhost:8500
-- Keycloak: http://localhost:8180
+- Google Cloud Console (OAuth setup)
 
 ### Frontend
 
@@ -84,7 +84,7 @@ Complete documentation is available in the [`docs/`](docs/) directory:
 - **gRPC**: Inter-service communication
 - **PostgreSQL**: Database
 - **Consul**: Service discovery
-- **Keycloak**: Identity provider
+- **Google OAuth**: Identity provider via NextAuth
 - **JWT**: Authentication (gateway)
 - **Resty**: Internal HTTP client with retries
 
@@ -104,7 +104,7 @@ Complete documentation is available in the [`docs/`](docs/) directory:
 - ✅ **User Profile Sync** - Just-in-Time provisioning for customer data
 - ✅ **Vehicle Management** - Customer vehicle registration system
 - ✅ **Modern Dashboard** - Premium glassmorphic UI with Shadcn components
-- ✅ **Keycloak/Google Auth** - Full OIDC integration with session management
+- ✅ **Google Authentication** - OAuth 2.0 integration with NextAuth.js
 
 ## 📖 Getting Started
 
@@ -147,7 +147,7 @@ Complete documentation is available in the [`docs/`](docs/) directory:
 - ✅ **API Gateway** - Complete with auth + CORS + routing
 - ✅ **IAM Service** - User Profile & Vehicle Management functional
 - ✅ **Frontend** - Next.js + Tailwind 4 + Shadcn UI integration complete
-- ✅ **Infrastructure** - Consul, Keycloak, and PostgreSQL integrated
+- ✅ **Infrastructure** - Consul, Google OAuth, and PostgreSQL integrated
 
 ---
 
