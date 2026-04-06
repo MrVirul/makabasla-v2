@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState, useCallback, useRef } from "react";
+import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import {
   CheckBadgeIcon,
@@ -57,6 +58,7 @@ interface CustomerProfile {
   email: string;
   name: string;
   phone: string;
+  image_url: string;
   vehicles: Vehicle[];
 }
 
@@ -73,6 +75,12 @@ export default function ProfilePage() {
   const [billings, setBillings] = useState<Record<number, BillingData>>({});
   const [billingVehicleId, setBillingVehicleId] = useState<number | null>(null);
   const [isBillingOpen, setIsBillingOpen] = useState(false);
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const API_BASE = "http://127.0.0.1:8080/api/auth/api/v1";
   const userId = session?.user?.id || (session?.user as any)?.sub;
@@ -122,6 +130,7 @@ export default function ProfilePage() {
             name: session?.user?.name,
             phone: "", 
             role: userRole,
+            image: session?.user?.image,
           }),
         });
 
@@ -141,7 +150,7 @@ export default function ProfilePage() {
         setLoading(false);
       }
     },
-    [session?.user?.email, session?.user?.name, session as any, userId, accessToken],
+    [session?.user?.email, session?.user?.name, session?.user?.image, session as any, userId, accessToken],
   );
 
   useEffect(() => {
@@ -169,6 +178,7 @@ export default function ProfilePage() {
           email: session?.user?.email,
           name: session?.user?.name,
           phone: editedPhone,
+          image: session?.user?.image,
         }),
       });
       if (res.ok) {
@@ -194,6 +204,16 @@ export default function ProfilePage() {
         </div>
       </div>
     );
+  }
+
+  const sImage = session?.user?.image;
+  const pImage = profile?.image_url;
+  
+  let userImage: string | null = null;
+  if (sImage && sImage !== "null" && sImage !== "") {
+    userImage = sImage;
+  } else if (pImage && pImage !== "null" && pImage !== "") {
+    userImage = pImage;
   }
 
   return (
@@ -226,9 +246,19 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div className="flex flex-col gap-6">
               <div className="flex items-center gap-6">
-                 <div className="w-20 h-20 bg-[#1A1A1A] rounded-sm flex items-center justify-center text-[#F5A623] text-2xl font-mono font-medium uppercase border-b-2 border-transparent">
-                   {session?.user?.name?.charAt(0) || "U"}
-                 </div>
+                  <div className="w-20 h-20 bg-[#1A1A1A] rounded-sm flex items-center justify-center text-[#F5A623] text-2xl font-mono font-medium uppercase border-b-2 border-transparent overflow-hidden relative">
+                    {mounted && userImage ? (
+                      <Image
+                        src={userImage}
+                        alt={profile?.name || session?.user?.name || "User profile image"}
+                        fill
+                        className="object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      (profile?.name || session?.user?.name || "U").charAt(0)
+                    )}
+                  </div>
                  <div className="flex flex-col">
                    <h2 className="text-xl font-medium">{profile?.name || session?.user?.name}</h2>
                    <span className="flex items-center gap-2 mt-2 text-[#646669] font-mono text-xs uppercase tracking-widest">
@@ -414,13 +444,13 @@ export default function ProfilePage() {
                        <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#646669]">Expenses</h4>
                        <div className="text-right">
                           <span className="font-mono text-[9px] text-[#646669] uppercase block mb-1">Total Expenses</span>
-                          <span className="text-2xl font-mono text-white">Rs. {(billings[billingVehicleId]?.total_expenses ?? 0).toLocaleString()}</span>
+                          <span className="text-2xl font-mono text-white">Rs. {(billings[billingVehicleId!]?.total_expenses ?? 0).toLocaleString()}</span>
                        </div>
                     </div>
                     
                     <div className="space-y-4">
-                      {billings[billingVehicleId]?.expenses?.length > 0 ? (
-                        billings[billingVehicleId].expenses.map(e => (
+                      {billings[billingVehicleId!]?.expenses?.length > 0 ? (
+                        billings[billingVehicleId!].expenses.map((e: any) => (
                           <div key={e.id} className="grid grid-cols-[100px_1fr_120px] gap-8 py-4 border-b border-[#1A1A1A]/20 font-mono text-[11px] hover:bg-white/[0.02] px-4 transition-colors">
                             <span className="text-[#646669]">{e.date}</span>
                             <span className="text-[#D1D0C5] uppercase">{e.description}</span>
@@ -440,8 +470,8 @@ export default function ProfilePage() {
                     </div>
                     
                     <div className="space-y-4">
-                      {billings[billingVehicleId]?.advances?.length > 0 ? (
-                        billings[billingVehicleId].advances.map(a => (
+                      {billings[billingVehicleId!]?.advances?.length > 0 ? (
+                        billings[billingVehicleId!].advances.map((a: any) => (
                           <div key={a.id} className="grid grid-cols-[100px_1fr_120px] gap-8 py-4 border-b border-[#1A1A1A]/20 font-mono text-[11px] hover:bg-white/[0.02] px-4 transition-colors">
                             <span className="text-[#646669]">{a.date}</span>
                             <span className="text-emerald-400/70 uppercase">Payment - {a.description}</span>
@@ -456,7 +486,7 @@ export default function ProfilePage() {
                     <div className="flex justify-end pt-4">
                        <div className="text-right">
                           <span className="font-mono text-[9px] text-[#646669] uppercase block mb-1">Total Payments</span>
-                          <span className="text-2xl font-mono text-emerald-400">Rs. {(billings[billingVehicleId]?.total_advances ?? 0).toLocaleString()}</span>
+                          <span className="text-2xl font-mono text-emerald-400">Rs. {(billings[billingVehicleId!]?.total_advances ?? 0).toLocaleString()}</span>
                        </div>
                     </div>
                   </div>
@@ -467,8 +497,8 @@ export default function ProfilePage() {
                         <h5 className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#646669]">Outstanding Balance</h5>
                         <p className="font-mono text-[9px] text-[#333] uppercase mt-1 italic font-medium">Final adjustment telemetry</p>
                      </div>
-                     <p className={`text-4xl font-mono tracking-tighter ${(billings[billingVehicleId]?.balance_due ?? 0) > 0 ? "text-[#F5A623]" : "text-emerald-400"}`}>
-                        Rs. {(billings[billingVehicleId]?.balance_due ?? 0).toLocaleString()}
+                     <p className={`text-4xl font-mono tracking-tighter ${(billings[billingVehicleId!]?.balance_due ?? 0) > 0 ? "text-[#F5A623]" : "text-emerald-400"}`}>
+                        Rs. {(billings[billingVehicleId!]?.balance_due ?? 0).toLocaleString()}
                      </p>
                   </div>
                 </div>
@@ -480,4 +510,4 @@ export default function ProfilePage() {
       </main>
     </div>
   );
-}
+  }

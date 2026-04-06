@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   MagnifyingGlassIcon,
   InformationCircleIcon,
@@ -10,7 +11,6 @@ import {
   CalendarDaysIcon,
   UserIcon,
   TruckIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -32,6 +32,7 @@ interface Customer {
   name: string;
   email: string;
   phone: string;
+  image_url: string;
   created_at: string;
   vehicles?: Vehicle[];
 }
@@ -142,8 +143,17 @@ export default function AdminCustomersPage() {
                   className="group grid grid-cols-[1fr_2fr_1.5fr_80px] gap-4 px-8 py-6 items-center bg-[#141414]/20 hover:bg-[#141414] transition-all border-b border-[#1A1A1A]/50"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 rounded-sm bg-[#0B0B0B] flex items-center justify-center text-[#F5A623] font-mono text-xs">
-                      {c.name.charAt(0)}
+                    <div className="w-8 h-8 rounded-sm bg-[#0B0B0B] flex items-center justify-center text-[#F5A623] font-mono text-xs overflow-hidden relative">
+                      {c.image_url ? (
+                        <Image
+                          src={c.image_url}
+                          alt={c.name}
+                          fill
+                          className="object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                        />
+                      ) : (
+                        c.name.charAt(0)
+                      )}
                     </div>
                     <span className="text-sm font-medium text-[#D1D0C5] truncate">{c.name}</span>
                   </div>
@@ -181,9 +191,16 @@ export default function AdminCustomersPage() {
                 <DialogTitle className="text-2xl font-medium tracking-tight text-white mb-2">
                   Node Analysis
                 </DialogTitle>
-                <p className="font-mono text-[10px] text-[#646669] uppercase tracking-widest mt-1">
-                  id: {selectedCustomer?.id}
-                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full overflow-hidden relative bg-[#1A1A1A]">
+                    {selectedCustomer?.image_url && (
+                        <Image src={selectedCustomer.image_url} alt="" fill className="object-cover" />
+                    )}
+                  </div>
+                  <p className="font-mono text-[10px] text-[#646669] uppercase tracking-widest">
+                    id: {selectedCustomer?.id}
+                  </p>
+                </div>
               </div>
             </div>
           </DialogHeader>

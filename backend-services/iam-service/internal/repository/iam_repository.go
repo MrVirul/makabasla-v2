@@ -10,44 +10,55 @@ import (
 
 type IamRepository interface {
 	GetUser(username string) (string, error)
-	SyncCustomer(id string, email string, name string, phone string) (*models.Customer, error)
+	SyncCustomer(id string, email string, name string, phone string, image string) (*models.Customer, error)
 	GetCustomer(id string) (*models.Customer, error)
-	SyncAdmin(id string, email string, name string, phone string) (*models.Admin, error)
-	SyncTechnician(id string, email string, name string, phone string) (*models.Technician, error)
-	SyncStaff(id string, email string, name string, role string, phone string) (*models.Staff, error)
+	SyncAdmin(id string, email string, name string, phone string, image string) (*models.Admin, error)
+	SyncTechnician(id string, email string, name string, phone string, image string) (*models.Technician, error)
+	SyncStaff(id string, email string, name string, role string, phone string, image string) (*models.Staff, error)
 	CreateVehicle(vehicle *models.Vehicle) error
 	GetVehicles(customerID string) ([]models.Vehicle, error)
 	GetAllVehicles() ([]models.Vehicle, error)
 	GetAllCustomers() ([]models.Customer, error)
+	LoginAdmin(username string, password string) (*models.Admin, error)
 }
 
 type iamRepository struct {
 	db *gorm.DB
 }
 
-func (r *iamRepository) SyncCustomer(id string, email string, name string, phone string) (*models.Customer, error) {
+// nullablePhone returns nil if phone is empty, otherwise returns a pointer to the value.
+// This prevents empty-string uniqueness conflicts when phone is not provided.
+func nullablePhone(phone string) *string {
+	if phone == "" {
+		return nil
+	}
+	return &phone
+}
+
+func (r *iamRepository) SyncCustomer(id string, email string, name string, phone string, image string) (*models.Customer, error) {
 	customer := &models.Customer{
-		ID:    id,
-		Email: email,
-		Name:  name,
-		Phone: phone,
+		ID:       id,
+		Email:    email,
+		Name:     name,
+		Phone:    nullablePhone(phone),
+		ImageURL: image,
 	}
 	updateCols := []string{"email", "name"}
+	if image != "" {
+		updateCols = append(updateCols, "image_url")
+	}
 	if phone != "" {
 		updateCols = append(updateCols, "phone")
 	}
 
-	// This uses GORM's "Clauses" to handle:
-	// IF NOT EXISTS: Insert | IF EXISTS: Do nothing (or Update)
 	err := r.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns(updateCols), // Update if info changed
+		DoUpdates: clause.AssignmentColumns(updateCols),
 	}).Create(customer).Error
 	if err != nil {
 		return nil, err
 	}
 
-	// Fetch full profile with preloaded vehicles after sync
 	return r.GetCustomer(id)
 }
 
@@ -60,9 +71,18 @@ func (r *iamRepository) GetCustomer(id string) (*models.Customer, error) {
 	return &customer, nil
 }
 
-func (r *iamRepository) SyncAdmin(id string, email string, name string, phone string) (*models.Admin, error) {
-	admin := &models.Admin{ID: id, Email: email, Name: name, Phone: phone}
+func (r *iamRepository) SyncAdmin(id string, email string, name string, phone string, image string) (*models.Admin, error) {
+	admin := &models.Admin{
+		ID:       id,
+		Email:    email,
+		Name:     name,
+		Phone:    nullablePhone(phone),
+		ImageURL: image,
+	}
 	updateCols := []string{"email", "name"}
+	if image != "" {
+		updateCols = append(updateCols, "image_url")
+	}
 	if phone != "" {
 		updateCols = append(updateCols, "phone")
 	}
@@ -74,9 +94,18 @@ func (r *iamRepository) SyncAdmin(id string, email string, name string, phone st
 	return admin, err
 }
 
-func (r *iamRepository) SyncTechnician(id string, email string, name string, phone string) (*models.Technician, error) {
-	tech := &models.Technician{ID: id, Email: email, Name: name, Phone: phone}
+func (r *iamRepository) SyncTechnician(id string, email string, name string, phone string, image string) (*models.Technician, error) {
+	tech := &models.Technician{
+		ID:       id,
+		Email:    email,
+		Name:     name,
+		Phone:    nullablePhone(phone),
+		ImageURL: image,
+	}
 	updateCols := []string{"email", "name"}
+	if image != "" {
+		updateCols = append(updateCols, "image_url")
+	}
 	if phone != "" {
 		updateCols = append(updateCols, "phone")
 	}
@@ -88,9 +117,19 @@ func (r *iamRepository) SyncTechnician(id string, email string, name string, pho
 	return tech, err
 }
 
-func (r *iamRepository) SyncStaff(id string, email string, name string, role string, phone string) (*models.Staff, error) {
-	staff := &models.Staff{ID: id, Email: email, Name: name, Role: role, Phone: phone}
+func (r *iamRepository) SyncStaff(id string, email string, name string, role string, phone string, image string) (*models.Staff, error) {
+	staff := &models.Staff{
+		ID:       id,
+		Email:    email,
+		Name:     name,
+		Role:     role,
+		Phone:    nullablePhone(phone),
+		ImageURL: image,
+	}
 	updateCols := []string{"email", "name", "role"}
+	if image != "" {
+		updateCols = append(updateCols, "image_url")
+	}
 	if phone != "" {
 		updateCols = append(updateCols, "phone")
 	}
@@ -129,9 +168,16 @@ func NewIamRepository(db *gorm.DB) IamRepository {
 }
 
 func (r *iamRepository) GetUser(username string) (string, error) {
-	// Mock implementation
 	if username == "" {
 		return "", errors.New("username cannot be empty")
 	}
 	return "mock_user", nil
+}
+
+func (r *iamRepository) LoginAdmin(username string, password string) (*models.Admin, error) {
+	var admin models.Admin
+	if err := r.db.Where("username = ?", username).First(&admin).Error; err != nil {
+		return nil, err
+	}
+	return &admin, nil
 }

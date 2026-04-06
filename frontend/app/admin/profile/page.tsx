@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/profile/dialog";
+import Image from "next/image";
 
 interface AdminUser {
   id: string;
@@ -45,6 +46,11 @@ export default function UserManagementPage() {
     roles: [] as string[],
   });
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const isSuperAdmin = (session as any)?.isSuperAdmin;
 
   const toggleRole = (role: string) => {
@@ -72,13 +78,28 @@ export default function UserManagementPage() {
   return (
     <div className="max-w-[1240px] p-12 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8 border-b border-[#1A1A1A] pb-12">
-        <div>
-          <h1 className="text-3xl font-medium tracking-tight text-[#D1D0C5]">
-            user management
-          </h1>
-          <p className="font-mono text-xs text-[#646669] tracking-widest uppercase mt-4">
-            manage accounts and access permissions
-          </p>
+        <div className="flex items-center gap-8">
+          <div className="w-20 h-20 bg-[#1A1A1A] rounded-sm flex items-center justify-center text-[#F5A623] text-2xl font-mono font-medium uppercase border-b-2 border-transparent overflow-hidden relative">
+            {mounted && session?.user?.image ? (
+              <Image
+                src={session.user.image}
+                alt={session.user.name || "User profile image"}
+                fill
+                className="object-cover"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              (session?.user?.name || "U").charAt(0)
+            )}
+          </div>
+          <div>
+            <h1 className="text-3xl font-medium tracking-tight text-[#D1D0C5]">
+              user management
+            </h1>
+            <p className="font-mono text-xs text-[#646669] tracking-widest uppercase mt-4">
+              manage accounts and access permissions
+            </p>
+          </div>
         </div>
         <button
           onClick={() => setIsCreateOpen(true)}

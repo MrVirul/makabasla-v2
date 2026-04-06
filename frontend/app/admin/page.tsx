@@ -352,7 +352,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-mono tracking-tighter text-[#D1D0C5]">
-              ${stats.revenue.toLocaleString()}
+              Rs {stats.revenue.toLocaleString()}
             </div>
             <div className="flex items-center gap-1.5 mt-2">
               <TrendingUp className="h-3 w-3 text-green-500" />
@@ -372,7 +372,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-mono tracking-tighter text-[#D1D0C5]">
-              ${stats.balance.toLocaleString()}
+              Rs {stats.balance.toLocaleString()}
             </div>
             <p className="text-[10px] text-[#646669] font-mono mt-2 tracking-wide uppercase">
               Outstanding balance
@@ -493,7 +493,7 @@ export default function AdminDashboard() {
                         tickLine={false}
                         axisLine={false}
                         fontFamily="monospace"
-                        tickFormatter={(value) => `$${value}`}
+                        tickFormatter={(value) => `Rs ${value}`}
                       />
                       <RechartsTooltip
                         cursor={{ fill: "rgba(255, 255, 255, 0.03)" }}
@@ -667,10 +667,10 @@ export default function AdminDashboard() {
                           {vehicle?.customer?.name || "unidentified"}
                         </TableCell>
                         <TableCell className="py-4 text-xs font-mono text-white/70">
-                          ${b.total_expenses.toLocaleString()}
+                          Rs {b.total_expenses.toLocaleString()}
                         </TableCell>
                         <TableCell className="py-4 text-xs font-mono text-[#F5A623]/80">
-                          ${b.total_advances.toLocaleString()}
+                          Rs {b.total_advances.toLocaleString()}
                         </TableCell>
                         <TableCell className="py-4 text-xs font-mono">
                           <span
@@ -681,7 +681,7 @@ export default function AdminDashboard() {
                                 : "bg-green-500/10 text-green-500",
                             )}
                           >
-                            ${b.balance_due.toLocaleString()}
+                            Rs {b.balance_due.toLocaleString()}
                           </span>
                         </TableCell>
                         <TableCell className="py-4 text-right">
