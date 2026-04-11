@@ -136,16 +136,16 @@ export default function AdminVehiclesPage() {
         {/* Header & Search */}
         <div className="mb-12 flex flex-col items-start gap-8 md:flex-row md:items-end justify-between border-b border-white/5 pb-8">
           <div>
-            <h1 className="text-3xl font-medium text-white/90">registry</h1>
-            <p className="text-sm mt-3 opacity-60">vehicle and billing management workspace</p>
+            <h1 className="text-3xl font-medium text-white/90">Vehicle Hub</h1>
+            <p className="text-sm mt-3 opacity-60">Manage vehicles and billing records</p>
           </div>
           
           <div className="relative w-full md:w-80 group">
-            <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#CFCFCF]/40 group-focus-within:text-[#F5A623] transition-colors" />
+            <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1A1] group-focus-within:text-[#F5A623] transition-colors" />
             <input
               autoFocus
-              placeholder="type to filter..."
-              className="w-full bg-white/[0.03] text-white pl-12 pr-4 py-3 rounded-md border-transparent outline-none ring-0 placeholder:text-[#CFCFCF]/30 focus:bg-white/5 focus:border-[#F5A623]/20 focus:ring-1 focus:ring-[#F5A623] transition-all font-mono text-sm"
+              placeholder="Search vehicles..."
+              className="w-full bg-white/[0.03] text-white pl-12 pr-4 py-3 rounded-md border-transparent outline-none ring-0 placeholder:text-[#A1A1A1] focus:bg-white/5 focus:border-[#F5A623]/20 focus:ring-1 focus:ring-[#F5A623] transition-all font-mono text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -170,7 +170,7 @@ export default function AdminVehiclesPage() {
             {filteredVehicles.length === 0 ? (
               <div className="py-32 flex flex-col items-center justify-center text-center">
                 <TruckIcon className="w-12 h-12 text-[#CFCFCF]/20 mb-6" />
-                <p className="font-mono text-sm text-[#CFCFCF]/40">no vehicles found.</p>
+                <p className="font-mono text-xs text-[#A1A1A1] mt-4 uppercase tracking-widest">no vehicles found.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -192,13 +192,13 @@ export default function AdminVehiclesPage() {
                             <span className="flex items-center gap-1.5 hover:text-[#F5A623] transition-colors cursor-default">
                               <CalendarDaysIcon className="w-4 h-4" /> {v.year}
                             </span>
-                            <span className="flex items-center gap-1.5 hover:text-[#F5A623] transition-colors cursor-default lowercase">
+                            <span className="group flex items-center gap-2 text-[#A1A1A1] hover:text-[#D1D0C5] transition-colors mb-6 font-mono text-[10px] tracking-widest uppercase">
                               <SwatchIcon className="w-4 h-4" /> {v.color || "n/a"}
                             </span>
                           </div>
                         </div>
                         
-                        <span className="font-mono text-xs text-[#F5A623] bg-[#F5A623]/10 px-2 py-1 rounded-sm border border-[#F5A623]/20 flex items-center gap-1">
+                        <span className="font-mono text-[10px] tracking-widest uppercase text-[#A1A1A1]">
                           <HashtagIcon className="w-3 h-3" />
                           {v.plate_number}
                         </span>
@@ -208,7 +208,7 @@ export default function AdminVehiclesPage() {
                         <p className="text-sm font-medium text-white/70 mb-2 truncate">
                           {v.customer?.name || "unknown owner"}
                         </p>
-                        <div className="flex flex-col gap-2 font-mono text-xs text-[#CFCFCF]/40">
+                        <div className="border-b border-[#0B0B0B] text-[10px] uppercase tracking-widest text-[#A1A1A1]">
                           {v.customer?.phone && (
                             <span className="flex items-center gap-2">
                               <PhoneIcon className="w-3.5 h-3.5 opacity-60" /> {v.customer.phone}
@@ -231,7 +231,7 @@ export default function AdminVehiclesPage() {
                         >
                           <span className="flex items-center gap-2">
                             <BanknotesIcon className="w-4 h-4" />
-                            billing active
+                            billing in progress
                           </span>
                           <ChevronRightIcon className="w-4 h-4 opacity-70 group-hover:translate-x-1 transition-transform" />
                         </button>
@@ -243,7 +243,7 @@ export default function AdminVehiclesPage() {
                         >
                           <span className="flex items-center gap-2">
                             <PlusIcon className="w-4 h-4 opacity-70" />
-                            {checkingBilling[v.id] ? "starting..." : "start billing"}
+                            {checkingBilling[v.id] ? "Starting..." : "Start Billing"}
                           </span>
                           <ChevronRightIcon className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
                         </button>
@@ -271,7 +271,7 @@ export default function AdminVehiclesPage() {
       <Dialog open={!!confirmVehicle} onOpenChange={(open) => !open && setConfirmVehicle(null)}>
         <DialogContent className="bg-[#0B0B0B] border-white/5 text-[#CFCFCF]/60 sm:max-w-md rounded-md p-8 shadow-2xl">
           <DialogHeader className="mb-8">
-            <DialogTitle className="text-xl font-medium text-white/90">start billing</DialogTitle>
+            <DialogTitle className="text-xl font-medium text-white/90">Start Billing</DialogTitle>
             <DialogDescription className="sr-only">
               Initialize a new billing cycle for the selected vehicle.
             </DialogDescription>
@@ -279,17 +279,17 @@ export default function AdminVehiclesPage() {
           
           <div className="space-y-6">
             <p className="text-sm">
-              initialize a new billing cycle. this action creates a permanent registry record.
+              Start a new billing record. This action creates a new official entry.
             </p>
             
             <div className="bg-white/[0.02] rounded-md p-6 font-mono text-sm space-y-4">
-              <div className="flex justify-between items-center text-white/50">
-                <span>vehicle</span>
+              <div className="flex justify-between items-center text-[#A1A1A1]">
+                <span>Vehicle</span>
                 <span className="text-white/90">{confirmVehicle?.make?.toLowerCase()} {confirmVehicle?.model?.toLowerCase()}</span>
               </div>
-              <div className="flex justify-between items-center text-white/50">
-                <span>plate</span>
-                <span className="text-[#F5A623]">{confirmVehicle?.plate_number}</span>
+              <div className="flex justify-between items-center text-[#A1A1A1]">
+                <span>Plate</span>
+                <span className="text-[#A1A1A1] uppercase tracking-widest">{confirmVehicle?.plate_number}</span>
               </div>
             </div>
           </div>
@@ -297,9 +297,9 @@ export default function AdminVehiclesPage() {
           <DialogFooter className="mt-10 sm:justify-between items-center">
             <button 
               onClick={() => setConfirmVehicle(null)}
-              className="font-mono text-xs text-white/30 hover:text-white/60 transition-colors py-2 outline-none"
+              className="font-mono text-xs text-[#A1A1A1] hover:text-white transition-colors py-2 outline-none"
             >
-              escape to cancel
+              Cancel
             </button>
             <button 
               onClick={() => confirmVehicle && startBilling(confirmVehicle.id)}

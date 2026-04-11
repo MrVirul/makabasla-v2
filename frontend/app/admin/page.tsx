@@ -279,12 +279,12 @@ export default function AdminDashboard() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 border-b border-white/5 pb-10">
         <div className="space-y-2">
           <h1 className="text-4xl font-medium tracking-tight text-white/90">
-            Intelligence
+            Dashboard Overview
           </h1>
           <div className="flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <p className="font-mono text-[10px] text-[#646669] tracking-widest uppercase">
-              Real-time performance monitoring active
+            <p className="font-mono text-[10px] text-[#A1A1A1] tracking-widest uppercase">
+              Live system monitoring active
             </p>
           </div>
         </div>
@@ -336,7 +336,7 @@ export default function AdminDashboard() {
             onClick={fetchData}
             className="mt-2 font-mono text-[10px] text-white/40 hover:text-white underline uppercase tracking-widest"
           >
-            retry connection
+            Try Again
           </button>
         </div>
       )}
@@ -365,8 +365,8 @@ export default function AdminDashboard() {
 
         <Card className="bg-[#141414] border-none shadow-sm group hover:bg-[#1A1A1A] transition-all">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#646669]">
-              Receivables
+            <CardTitle className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#A1A1A1]">
+              Outstanding Payments
             </CardTitle>
             <TrendingDown className="h-4 w-4 text-[#ca4754] opacity-50 group-hover:opacity-100 transition-opacity" />
           </CardHeader>
@@ -374,15 +374,15 @@ export default function AdminDashboard() {
             <div className="text-4xl font-mono tracking-tighter text-[#D1D0C5]">
               Rs {stats.balance.toLocaleString()}
             </div>
-            <p className="text-[10px] text-[#646669] font-mono mt-2 tracking-wide uppercase">
-              Outstanding balance
+            <p className="text-[10px] text-[#A1A1A1] font-mono mt-2 tracking-wide uppercase">
+              Total balance due
             </p>
           </CardContent>
         </Card>
 
         <Card className="bg-[#141414] border-none shadow-sm group hover:bg-[#1A1A1A] transition-all">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#646669]">
+            <CardTitle className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#A1A1A1]">
               Velocity
             </CardTitle>
             <Activity className="h-4 w-4 text-blue-500 opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -391,7 +391,7 @@ export default function AdminDashboard() {
             <div className="text-4xl font-mono tracking-tighter text-[#D1D0C5]">
               {stats.activeCycles}
             </div>
-            <p className="text-[10px] text-[#646669] font-mono mt-2 tracking-wide uppercase">
+            <p className="text-[10px] text-[#A1A1A1] font-mono mt-2 tracking-wide uppercase">
               Open billing cycles
             </p>
           </CardContent>
@@ -399,8 +399,8 @@ export default function AdminDashboard() {
 
         <Card className="bg-[#141414] border-none shadow-sm group hover:bg-[#1A1A1A] transition-all">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#646669]">
-              Fleet Size
+            <CardTitle className="text-[10px] font-mono tracking-[0.2em] uppercase text-[#A1A1A1]">
+              Total Vehicles
             </CardTitle>
             <Users className="h-4 w-4 text-purple-500 opacity-50 group-hover:opacity-100 transition-opacity" />
           </CardHeader>
@@ -408,8 +408,8 @@ export default function AdminDashboard() {
             <div className="text-4xl font-mono tracking-tighter text-[#D1D0C5]">
               {stats.totalVehicles}
             </div>
-            <p className="text-[10px] text-[#646669] font-mono mt-2 tracking-wide uppercase">
-              Assets in registry
+            <p className="text-[10px] text-[#A1A1A1] font-mono mt-2 tracking-wide uppercase">
+              Vehicles in system
             </p>
           </CardContent>
         </Card>
@@ -423,13 +423,13 @@ export default function AdminDashboard() {
               value="analytics"
               className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[#F5A623] data-[state=active]:bg-transparent data-[state=active]:text-white px-0 py-4 font-mono text-[10px] tracking-[0.2em] uppercase transition-all"
             >
-              Visual Analytics
+              Statistics
             </TabsTrigger>
             <TabsTrigger
               value="registry"
               className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-[#F5A623] data-[state=active]:bg-transparent data-[state=active]:text-white px-0 py-4 font-mono text-[10px] tracking-[0.2em] uppercase transition-all"
             >
-              Registry Log
+              Billing History
             </TabsTrigger>
           </TabsList>
         </div>
@@ -600,9 +600,9 @@ export default function AdminDashboard() {
 
               <div className="flex items-center gap-3 w-full md:w-auto">
                 <div className="relative flex-1 md:w-64 group">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-[#646669] group-focus-within:text-[#F5A623] transition-colors" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-[#A1A1A1] group-focus-within:text-[#F5A623] transition-colors" />
                   <input
-                    placeholder="SEARCH RECORDS..."
+                    placeholder="SEARCH BILLING..."
                     className="w-full bg-white/[0.02] border border-white/5 rounded-sm py-2 pl-9 pr-4 text-[10px] font-mono tracking-widest uppercase outline-none focus:border-[#F5A623]/20 focus:bg-white/[0.04] transition-all"
                   />
                 </div>
@@ -619,26 +619,26 @@ export default function AdminDashboard() {
               <Table>
                 <TableHeader className="bg-white/[0.02]">
                   <TableRow className="border-white/5 hover:bg-transparent">
-                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#646669]">
-                      Session
+                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#A1A1A1]">
+                      ID
                     </TableHead>
-                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#646669]">
-                      Vehicle Entity
+                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#A1A1A1]">
+                      Vehicle Info
                     </TableHead>
-                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#646669]">
-                      Principal
+                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#A1A1A1]">
+                      Customer
                     </TableHead>
-                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#646669]">
-                      Gross
+                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#A1A1A1]">
+                      Total Amount
                     </TableHead>
-                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#646669]">
-                      Advances
+                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#A1A1A1]">
+                      Payments
                     </TableHead>
-                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#646669]">
-                      Net Due
+                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#A1A1A1]">
+                      Balance
                     </TableHead>
-                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-right text-[#646669]">
-                      Analysis
+                    <TableHead className="py-5 font-mono text-[10px] tracking-widest uppercase text-[#A1A1A1]">
+                      Details
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -700,7 +700,7 @@ export default function AdminDashboard() {
                     <TableRow>
                       <TableCell colSpan={7} className="h-40 text-center py-20">
                         <Activity className="h-6 w-6 text-[#1A1A1A] mx-auto mb-4" />
-                        <p className="font-mono text-[10px] text-[#646669] tracking-widest uppercase">
+                        <p className="font-mono text-[10px] text-[#A1A1A1] tracking-widest uppercase">
                           no transactional data found in currently selected
                           range
                         </p>
@@ -720,13 +720,13 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
             <p className="font-mono text-[9px] tracking-[0.2em] uppercase">
-              Gateway: secure
+              System status: Secure
             </p>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
             <p className="font-mono text-[9px] tracking-[0.2em] uppercase">
-              Shards: 8 active
+              Data: Active
             </p>
           </div>
         </div>

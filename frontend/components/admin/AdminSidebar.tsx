@@ -28,13 +28,13 @@ import {
 
 const adminItems = [
   {
-    title: "dashboard",
+    title: "Dashboard",
     url: "/admin",
     icon: Squares2X2Icon,
     permission: "admin:dashboard", // Default access for all admins
   },
   {
-    title: "customers",
+    title: "Customers",
     url: "/admin/customers",
     icon: UsersIcon,
     permission: "admin:customers",
@@ -77,7 +77,7 @@ export function AdminSidebar() {
           <div className="h-4 w-4 bg-[#F5A623] rounded-sm flex-shrink-0" />
           <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
             <span className="text-xs font-mono uppercase tracking-widest text-[#D1D0C5] line-clamp-1 truncate">
-              {isSuperAdmin ? "system manager" : "admin access"}
+              {isSuperAdmin ? "System Admin" : "Staff Access"}
             </span>
           </div>
         </div>
@@ -85,8 +85,8 @@ export function AdminSidebar() {
 
       <SidebarContent className="py-6 scrollbar-hide">
         <SidebarGroup>
-          <div className="text-[10px] font-mono tracking-widest uppercase text-[#646669] px-6 mb-6 group-data-[collapsible=icon]:hidden">
-            navigation
+          <div className="text-[10px] font-mono tracking-widest uppercase text-[#A1A1A1] px-6 mb-6 group-data-[collapsible=icon]:hidden">
+            Navigation
           </div>
           <SidebarGroupContent>
             <SidebarMenu className="px-3 gap-2">
@@ -100,7 +100,7 @@ export function AdminSidebar() {
                       ${
                         pathname === item.url
                           ? "bg-[#1A1A1A] text-[#F5A623]"
-                          : "text-[#646669] hover:bg-[#1A1A1A]/50 hover:text-[#D1D0C5]"
+                          : "text-[#A1A1A1] hover:bg-[#1A1A1A]/50 hover:text-[#D1D0C5]"
                       }
                     `}
                   >
@@ -120,12 +120,12 @@ export function AdminSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="font-mono text-xs lowercase text-[#646669] hover:text-[#F5A623] hover:bg-transparent px-3 py-6 transition-colors"
+              className="font-mono text-xs lowercase text-[#A1A1A1] hover:text-[#F5A623] hover:bg-transparent px-3 py-6 transition-colors"
               onClick={() => signOut({ callbackUrl: "/admin" })}
             >
               <ArrowRightStartOnRectangleIcon className="w-5 h-5 stroke-[1.5]" />
               <span className="group-data-[collapsible=icon]:hidden">
-                logout
+                Logout
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>

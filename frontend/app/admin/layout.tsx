@@ -46,10 +46,10 @@ export default function AdminLayout({
       });
 
       if (result?.error) {
-        setError("invalid authentication constraints.");
+        setError("Invalid username or password.");
       }
     } catch (err) {
-      setError("system error occurred.");
+      setError("System error occurred.");
     } finally {
       setIsLoading(false);
     }
@@ -67,73 +67,73 @@ export default function AdminLayout({
 
   if (!isAdmin) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0B0B0B] relative text-[#D1D0C5] font-sans">
+      <div className="flex min-h-screen items-center justify-center bg-[#0B0B0B] relative text-white/90 font-sans">
         <Link
           href="/"
-          className="absolute top-12 left-12 flex items-center gap-2 text-[#646669] hover:text-[#D1D0C5] transition-colors duration-300"
+          className="absolute top-12 left-12 flex items-center gap-2 text-white/70 hover:text-white transition-colors duration-300"
         >
           <ArrowLeftIcon className="w-4 h-4 stroke-[1.5]" />
-          <span className="font-mono text-xs uppercase tracking-widest">escape</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em]">
+            BACK
+          </span>
         </Link>
 
-        <div className="w-full max-w-sm p-8">
+        <div className="w-full max-w-sm p-8 relative">
           <div className="mb-12">
-            <h1 className="text-xl font-medium tracking-tight mb-2">
-              staff restricted
+            <h1 className="text-2xl text-center font-light tracking-[0.2em] text-white">
+              STAFF LOGIN
             </h1>
-            <p className="font-mono text-xs text-[#646669] tracking-widest uppercase">
-              internal credentials strictly required
-            </p>
+            <div className="h-px w-12 bg-[#F5A623] mx-auto mt-4" />
           </div>
 
-          <form onSubmit={handleAdminLogin} className="space-y-6">
+          <form onSubmit={handleAdminLogin} className="space-y-8">
             {error && (
-              <div className="font-mono text-xs text-[#ca4754] border border-[#ca4754]/30 bg-[#ca4754]/10 py-3 px-4 rounded-sm">
+              <div className="font-mono text-[10px] text-[#FF453A] border border-[#FF453A]/40 bg-[#FF453A]/10 py-3 px-4 rounded-sm tracking-wider uppercase">
                 {error}
               </div>
             )}
             {session && !isAdmin && (
-              <div className="font-mono text-xs text-[#F5A623] border border-[#F5A623]/30 bg-[#F5A623]/10 py-3 px-4 rounded-sm">
-                active node misses elevated permissions.
+              <div className="font-mono text-[10px] text-[#F5A623] border border-[#F5A623]/40 bg-[#F5A623]/10 py-3 px-4 rounded-sm tracking-wider uppercase">
+                Access Denied: You do not have permission to view this page.
               </div>
             )}
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="relative group">
-                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#646669] group-focus-within:text-[#F5A623] transition-colors stroke-[1.5]" />
+                <UserIcon className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70 group-focus-within:text-[#F5A623] transition-colors stroke-[1.5]" />
                 <input
                   type="text"
-                  placeholder="identity"
+                  placeholder="USERNAME"
                   required
                   value={formData.username}
                   onChange={(e) =>
                     setFormData({ ...formData, username: e.target.value })
                   }
-                  className="w-full h-12 bg-transparent border-b border-[#1A1A1A] px-12 font-mono text-xs text-[#D1D0C5] placeholder:text-[#646669] focus:outline-none focus:border-[#F5A623] transition-colors"
+                  className="w-full h-12 bg-transparent border-b border-white/20 px-8 font-mono text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#F5A623] transition-all"
                 />
               </div>
 
               <div className="relative group">
-                <LockClosedIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#646669] group-focus-within:text-[#F5A623] transition-colors stroke-[1.5]" />
+                <LockClosedIcon className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70 group-focus-within:text-[#F5A623] transition-colors stroke-[1.5]" />
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="passcode"
+                  placeholder="PASSWORD"
                   required
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
                   }
-                  className="w-full h-12 bg-transparent border-b border-[#1A1A1A] px-12 font-mono text-xs text-[#D1D0C5] placeholder:text-[#646669] focus:outline-none focus:border-[#F5A623] transition-colors"
+                  className="w-full h-12 bg-transparent border-b border-white/20 px-8 font-mono text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#F5A623] transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#646669] hover:text-[#D1D0C5] transition-colors"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
                 >
                   {showPassword ? (
-                    <EyeSlashIcon className="w-4 h-4 stroke-[1.5]" />
+                    <EyeSlashIcon className="w-4 h-4 stroke-[1.2]" />
                   ) : (
-                    <EyeIcon className="w-4 h-4 stroke-[1.5]" />
+                    <EyeIcon className="w-4 h-4 stroke-[1.2]" />
                   )}
                 </button>
               </div>
@@ -142,9 +142,13 @@ export default function AdminLayout({
             <button
               type="submit"
               disabled={isLoading}
-              className="mt-8 font-mono text-xs uppercase tracking-widest text-[#646669] hover:text-[#F5A623] active:scale-[0.99] transition-all disabled:opacity-50"
+              className="w-full mt-10 h-12 border border-white/30 font-mono text-xs uppercase tracking-[0.3em] text-white hover:border-white hover:bg-white/10 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {isLoading ? "validating..." : "[ process auth sequence ]"}
+              {isLoading ? (
+                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              ) : (
+                "LOGIN"
+              )}
             </button>
           </form>
         </div>
@@ -158,7 +162,7 @@ export default function AdminLayout({
       <SidebarInset className="bg-[#0B0B0B] flex flex-col min-h-screen text-[#D1D0C5]">
         <header className="flex h-16 items-center justify-between gap-4 border-b border-[#1A1A1A] px-10 sticky top-0 bg-[#0B0B0B] z-40">
           <div className="flex items-center gap-6">
-            <SidebarTrigger className="text-[#646669] hover:text-[#D1D0C5] transition-colors" />
+            <SidebarTrigger className="text-[#A1A1A1] hover:text-[#D1D0C5] transition-colors" />
           </div>
 
           <div className="flex items-center gap-4">
@@ -167,7 +171,7 @@ export default function AdminLayout({
                 {session?.user?.name}
               </span>
               <span className="font-mono text-[10px] text-[#F5A623] uppercase tracking-widest">
-                administrator
+                Administrator
               </span>
             </div>
             <div className="h-8 w-8 rounded-sm bg-[#1A1A1A] flex items-center justify-center text-[#F5A623] font-mono font-bold text-xs uppercase overflow-hidden relative border border-[#1A1A1A]">
