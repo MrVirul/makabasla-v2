@@ -97,6 +97,7 @@ interface Billing {
 
 const API_BASE = "http://localhost:8080/api/auth/api/v1";
 const BILLING_BASE = "http://localhost:8080/api/billing";
+const COLORS = ["#F5A623", "#646669", "#D1D0C5", "#ca4754", "#1A1A1A"];
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
@@ -253,8 +254,6 @@ export default function AdminDashboard() {
       fill: COLORS[index % COLORS.length],
     }));
   }, [vehicles]);
-
-  const COLORS = ["#F5A623", "#646669", "#D1D0C5", "#ca4754", "#1A1A1A"];
 
   if (loading) {
     return (
