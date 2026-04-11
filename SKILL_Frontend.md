@@ -11,18 +11,19 @@ This skill guides the creation of high-performance, minimalist interfaces for th
 Before coding, commit to the "Monkeytype" philosophy:
 
 - **Tone**: Professional Minimalism. A focus-driven environment where the UI disappears to let the content lead. No superfluous elements.
-- **Visual Language**: Typography-first design. No unnecessary borders, shadows, or gradients. Use background shifts and low-contrast states to manage hierarchy.
-- **Interaction Pattern**: Elements not in focus should fade into the background (`text-muted-foreground/40`). Active elements or specific data use the brand amber or muted semantic tones to "pop" against the obsidian canvas.
+- **Visual Language**: Typography-first design. No unnecessary borders, shadows, or gradients. Use background shifts and intentional contrast to manage hierarchy.
+- **Terminology**: Use clear, user-friendly language. Avoid overly technical or jargon-heavy terms (e.g., use "Sign In" instead of "Initialize Session", "Email" instead of "Network Identifier").
+- **Interaction Pattern**: Crucial legibility is paramount. Elements not in focus should use medium-contrast states (`text-white/60`) to remain visible against the obsidian background without distracting. Inactive navigation items should be low-contrast (`text-white/40`) but NEVER invisible. Active elements use the brand amber or pure white to "pop".
 
 ## Makabasla Design System (Zen Edition v2.1)
 
 ### Core Brand Palette
 
-- **Background**: `#0B0B0B` — The deep obsidian void.
-- **Foreground**: `#D1D0C5` — A soft, off-white (vibe-check: less harsh than pure white).
-- **Primary / Accent (Branding)**: `#F5A623` — Amber/Gold, used **sparingly** for branding elements and high-priority caret/focus states.
-- **Muted / Neutral UI**: `#646669` — Low-contrast gray for inactive text, secondary UI elements, and "ghost" button states on dark backgrounds.
-- **Surface**: `bg-[#1A1A1A]` — Subtle background lift for cards/sections, used without borders.
+- **Background**: `#0B0B0B` — Deep obsidian. The canvas for all elements.
+- **Foreground (Primary)**: `text-white` — Pure white for titles, primary actions, and critical data. High-contrast legibility is the priority.
+- **Primary / Accent (Branding)**: `#F5A623` — Amber/Gold. Used for branding, focus states (caret/input borders), and highlighting active nodes.
+- **Muted / Secondary UI**: `text-white/60` — Use white with opacity for inactive text, secondary labels, and placeholders. Avoid low-visibility grays like `#646669` which bleed into the background.
+- **Surface**: `bg-[#1A1A1A]` — Subtle background lift for cards/sections.
 
 ### Semantic / Feedback Palette (Desaturated)
 
@@ -55,8 +56,15 @@ _Do NOT use vibrant or generic "Christmas Tree" red/green._
 
 ### 3. Motion & Focus States
 
-- **The "Fade" Effect**: Use Tailwind `transition-colors` and `duration-300`. Inactive navigation items should be low contrast (`text-muted-foreground/30`) and transition to `text-foreground` on hover.
-- **Active State**: Only the current "task" or "active" element should carry the brand accent (`#F5A623`).
+- **The "Breathe" Effect**: Use Tailwind `transition-all` and `duration-300`.
+- **Visibility Threshold**: Ensure inactive items always meet a minimum visibility threshold (`text-white/40`). Hovering should transition elements to `text-white`.
+- **Active State**: Only the current "task" or "active" element should carry the brand accent (`#F5A623`) or a distinct white border.
+
+### 4. Visibility Checklist (Dark Backgrounds)
+
+- **Placeholders**: Should be `text-white/40` at minimum.
+- **Borders**: If using borders for structure, use `white/10` or `white/20`.
+- **Buttons**: Outlined buttons should at least have a `white/30` border for clear definition against the pitch-black background.
 
 ## Avoid "AI Slop"
 
