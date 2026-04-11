@@ -115,12 +115,50 @@ func (h *IamHandler) Login(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
+	// Heuristic: if it contains @, try customer login first
+	if containsEmail(req.Username) {
+		user, err := h.srv.LoginCustomer(req.Username, req.Password)
+		if err == nil {
+			return c.JSON(http.StatusOK, user)
+		}
+	}
+
 	user, err := h.srv.LoginAdmin(req.Username, req.Password)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid credentials")
 	}
 
 	return c.JSON(http.StatusOK, user)
+}
+
+func (h *IamHandler) Register(c echo.Context) error {
+	type RegisterRequest struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+		Name     string `json:"name"`
+		Phone    string `json:"phone"`
+	}
+
+	var req RegisterRequest
+	if err := c.Bind(&req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	user, err := h.srv.RegisterCustomer(req.Email, req.Password, req.Name, req.Phone)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, user)
+}
+
+func containsEmail(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] == '@' {
+			return true
+		}
+	}
+	return false
 }
 
 func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
@@ -131,4 +169,5 @@ func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
 	e.GET("/api/v1/vehicles", h.GetAllVehicles)
 	e.GET("/api/v1/customers", h.GetAllCustomers)
 	e.POST("/api/v1/auth/login", h.Login)
+	e.POST("/api/v1/register", h.Register)
 }

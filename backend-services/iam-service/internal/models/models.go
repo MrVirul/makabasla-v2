@@ -7,6 +7,7 @@ import (
 type Customer struct {
 	ID        string    `gorm:"primaryKey" json:"id"`
 	Email     string    `gorm:"uniqueIndex" json:"email"`
+	Password  string    `json:"-"` // never expose password
 	Name      string    `json:"name"`
 	Phone     *string   `gorm:"uniqueIndex" json:"phone"`
 	ImageURL  string    `json:"image_url"`
@@ -56,6 +57,7 @@ type Vehicle struct {
 	Year        int       `json:"year"`
 	Color       string    `json:"color"`
 	PlateNumber string    `gorm:"uniqueIndex" json:"plate_number"`
+	ImageURL    string    `json:"image_url"`
 	CustomerID  string    `gorm:"index" json:"customer_id"`
 	Customer    *Customer `gorm:"foreignKey:CustomerID" json:"customer,omitempty"`
 	CreatedAt   time.Time `json:"created_at"`
