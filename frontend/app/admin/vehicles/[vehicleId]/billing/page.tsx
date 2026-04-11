@@ -162,16 +162,16 @@ export default function VehicleBillingPage() {
           <div>
             <button
               onClick={() => router.back()}
-              className="group flex items-center gap-2 text-[#646669] hover:text-[#D1D0C5] transition-colors mb-6 font-mono text-[10px] tracking-widest uppercase"
+              className="group flex items-center gap-2 text-[#A1A1A1] hover:text-[#D1D0C5] transition-colors mb-6 font-mono text-[10px] tracking-widest uppercase"
             >
               <ChevronLeftIcon className="w-4 h-4 stroke-[1.5] group-hover:-translate-x-1 transition-transform" />
-              return to registry
+              Back to Vehicles
             </button>
             <h1 className="text-3xl font-medium tracking-tight text-white flex items-center gap-4">
               Billing Report
             </h1>
-            <p className="font-mono text-xs text-[#646669] mt-4 uppercase tracking-widest">
-              allocation telemetry for vehicle #{vehicleId}
+            <p className="font-mono text-xs text-[#A1A1A1] mt-4 uppercase tracking-widest">
+              Billing details for vehicle #{vehicleId}
             </p>
           </div>
 
@@ -181,7 +181,7 @@ export default function VehicleBillingPage() {
               onClick={() => setShowDeleteConfirm(true)}
               className="text-[#646669] hover:text-white transition-colors py-2 active:scale-95 flex items-center gap-2 h-auto px-0 bg-transparent"
             >
-              <TrashIcon className="w-4 h-4 stroke-[1.5]" /> terminate session
+              <TrashIcon className="w-4 h-4 stroke-[1.5]" /> Delete Record
             </Button>
             <Button
               variant="ghost"
@@ -189,9 +189,9 @@ export default function VehicleBillingPage() {
                 setDialogType("expense");
                 setIsDialogOpen(true);
               }}
-              className="text-[#646669] hover:text-white transition-colors py-2 active:scale-95 flex items-center gap-2 h-auto px-0 bg-transparent"
+              className="text-[#A1A1A1] hover:text-white transition-colors py-2 active:scale-95 flex items-center gap-2 h-auto px-0 bg-transparent"
             >
-              <PlusIcon className="w-4 h-4 stroke-[1.5]" /> allocate expense
+              <PlusIcon className="w-4 h-4 stroke-[1.5]" /> Add Expense
             </Button>
             <Button
               variant="ghost"
@@ -199,9 +199,9 @@ export default function VehicleBillingPage() {
                 setDialogType("advance");
                 setIsDialogOpen(true);
               }}
-              className="text-[#646669] hover:text-white transition-colors py-2 active:scale-95 flex items-center gap-2 h-auto px-0 bg-transparent"
+              className="text-[#A1A1A1] hover:text-white transition-colors py-2 active:scale-95 flex items-center gap-2 h-auto px-0 bg-transparent"
             >
-              <PlusIcon className="w-4 h-4 stroke-[1.5]" /> add advance
+              <PlusIcon className="w-4 h-4 stroke-[1.5]" /> Add Payment
             </Button>
           </div>
         </div>
@@ -211,7 +211,7 @@ export default function VehicleBillingPage() {
           <div className="bg-[#1A1A1A] rounded-sm p-8 flex flex-col border-l-[3px] border-transparent hover:border-rose-400/30 transition-colors">
             <div className="flex justify-between items-start mb-8">
               <span className="font-mono text-[10px] tracking-widest uppercase text-[#646669]">
-                gross expenses
+                Total Expenses
               </span>
               <ArrowTrendingDownIcon className="w-5 h-5 text-rose-400/60 stroke-[1.5]" />
             </div>
@@ -223,7 +223,7 @@ export default function VehicleBillingPage() {
           <div className="bg-[#1A1A1A] rounded-sm p-8 flex flex-col border-l-[3px] border-transparent hover:border-emerald-400/30 transition-colors">
             <div className="flex justify-between items-start mb-8">
               <span className="font-mono text-[10px] tracking-widest uppercase text-[#646669]">
-                advance input
+                Total Payments
               </span>
               <ArrowTrendingUpIcon className="w-5 h-5 text-emerald-400/60 stroke-[1.5]" />
             </div>
@@ -235,7 +235,7 @@ export default function VehicleBillingPage() {
           <div className="bg-[#1A1A1A] rounded-sm p-8 flex flex-col border-l-[3px] border-transparent hover:border-[#F5A623]/30 transition-colors">
             <div className="flex justify-between items-start mb-8">
               <span className="font-mono text-[10px] tracking-widest uppercase text-[#F5A623]/60">
-                net balance
+                Balance Due
               </span>
               <WalletIcon className="w-5 h-5 text-[#F5A623]/60 stroke-[1.5]" />
             </div>
@@ -248,7 +248,7 @@ export default function VehicleBillingPage() {
         {/* Expense Section */}
         <div className="space-y-12">
           <h2 className="text-2xl font-medium tracking-tight text-[#D1D0C5] flex items-center gap-4">
-            expenses
+            Expenses
           </h2>
           <div className="bg-[#1A1A1A] rounded-sm overflow-hidden">
             <table className="w-full text-left border-collapse font-mono text-xs">
@@ -256,7 +256,7 @@ export default function VehicleBillingPage() {
                 <tr className="border-b border-[#0B0B0B] text-[10px] uppercase tracking-widest text-[#646669]">
                   <th className="px-8 py-6 font-medium">timestamp</th>
                   <th className="px-8 py-6 font-medium">description</th>
-                  <th className="px-8 py-6 font-medium text-right">quota</th>
+                  <th className="px-8 py-6 font-medium text-right">Amount</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#0B0B0B]">
@@ -265,7 +265,7 @@ export default function VehicleBillingPage() {
                     key={e.id}
                     className="group hover:bg-white/[0.01] transition-colors"
                   >
-                    <td className="px-8 py-6 text-[#646669]">{e.date}</td>
+                    <td className="px-8 py-6 text-[#A1A1A1]">{e.date}</td>
                     <td className="px-8 py-6 text-[#D1D0C5] lowercase">
                       {e.description}
                     </td>
@@ -280,7 +280,7 @@ export default function VehicleBillingPage() {
                       colSpan={3}
                       className="px-8 py-16 text-center text-[#646669]"
                     >
-                      no active expenses recorded.
+                      No expenses recorded yet.
                     </td>
                   </tr>
                 )}
@@ -291,7 +291,7 @@ export default function VehicleBillingPage() {
                     colSpan={2}
                     className="px-8 py-6 text-[10px] uppercase tracking-widest text-[#646669] text-right font-medium"
                   >
-                    cumulative loss
+                    Total Expenses
                   </td>
                   <td className="px-8 py-6 text-xl text-rose-400/80 text-right tracking-tighter">
                     Rs. {(billing?.total_expenses ?? 0).toLocaleString()}
@@ -305,7 +305,7 @@ export default function VehicleBillingPage() {
         {/* Advance Section */}
         <div className="space-y-12 pb-24">
           <h2 className="text-2xl font-medium tracking-tight text-[#D1D0C5] flex items-center gap-4">
-            advances and income
+            Payments
           </h2>
           <div className="bg-[#1A1A1A] rounded-sm overflow-hidden">
             <table className="w-full text-left border-collapse font-mono text-xs">
@@ -322,7 +322,7 @@ export default function VehicleBillingPage() {
                     key={a.id}
                     className="group hover:bg-white/[0.01] transition-colors"
                   >
-                    <td className="px-8 py-6 text-[#646669]">{a.date}</td>
+                    <td className="px-8 py-6 text-[#A1A1A1]">{a.date}</td>
                     <td className="px-8 py-6 text-[#D1D0C5] lowercase">
                       {a.description}
                     </td>
@@ -337,7 +337,7 @@ export default function VehicleBillingPage() {
                       colSpan={3}
                       className="px-8 py-16 text-center text-[#646669]"
                     >
-                      no advance history.
+                      No payment history yet.
                     </td>
                   </tr>
                 )}
@@ -348,7 +348,7 @@ export default function VehicleBillingPage() {
                     colSpan={2}
                     className="px-8 py-6 text-[10px] uppercase tracking-widest text-[#646669] text-right font-medium"
                   >
-                    cumulative gain
+                    Total Payments
                   </td>
                   <td className="px-8 py-6 text-xl text-emerald-400/80 text-right tracking-tighter">
                     Rs. {(billing?.total_advances ?? 0).toLocaleString()}
@@ -365,22 +365,20 @@ export default function VehicleBillingPage() {
         <DialogContent className="bg-[#0B0B0B] border-[#1A1A1A] text-[#D1D0C5] p-10 max-w-[440px] rounded-sm shadow-2xl">
           <DialogHeader className="mb-10">
             <DialogTitle className="text-xl font-medium tracking-tight">
-              {dialogType === "expense"
-                ? "allocate expense"
-                : "add advance input"}
+              {dialogType === "expense" ? "Add Expense" : "Add Payment"}
             </DialogTitle>
             <DialogDescription className="sr-only">
               Modify the billing registry by adding an expense or advance.
             </DialogDescription>
-            <p className="font-mono text-[10px] text-[#646669] uppercase tracking-widest mt-2">
-              modification of billing registry
+            <p className="font-mono text-[10px] text-[#A1A1A1] uppercase tracking-widest mt-2">
+              Add a new entry
             </p>
           </DialogHeader>
 
           <div className="flex flex-col gap-8 font-mono text-xs">
             <div className="flex flex-col gap-2">
               <span className="text-[#646669] uppercase tracking-widest">
-                timestamp
+                Date
               </span>
               <input
                 type="date"
@@ -393,7 +391,7 @@ export default function VehicleBillingPage() {
             </div>
             <div className="flex flex-col gap-2">
               <span className="text-[#646669] uppercase tracking-widest">
-                variable description
+                Description
               </span>
               <input
                 placeholder={
@@ -410,7 +408,7 @@ export default function VehicleBillingPage() {
             </div>
             <div className="flex flex-col gap-2">
               <span className="text-[#646669] uppercase tracking-widest">
-                quota (lkr)
+                Amount (Rs)
               </span>
               <input
                 type="number"
@@ -427,9 +425,9 @@ export default function VehicleBillingPage() {
           <DialogFooter className="mt-12 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest">
             <button
               onClick={() => setIsDialogOpen(false)}
-              className="text-[#646669] hover:text-[#D1D0C5] transition-colors px-4 py-2"
+              className="text-[#A1A1A1] hover:text-[#D1D0C5] transition-colors px-4 py-2"
             >
-              terminate
+              Cancel
             </button>
             <button
               onClick={handleSubmit}
@@ -447,30 +445,28 @@ export default function VehicleBillingPage() {
         <DialogContent className="bg-[#0B0B0B] border-[#1A1A1A] text-[#D1D0C5] p-10 max-w-[440px] rounded-sm shadow-2xl">
           <DialogHeader className="mb-8">
             <DialogTitle className="text-xl font-medium tracking-tight text-rose-400/80">
-              terminate billing session
+              Delete Billing Record
             </DialogTitle>
             <DialogDescription className="sr-only">
               Confirm the termination of the current billing session.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-6">
-            <p className="font-mono text-xs text-[#646669] leading-relaxed uppercase tracking-widest">
-              are you sure you want to purge registry node #{vehicleId}? this
-              action is permanent and unrecoverable.
+            <p className="font-mono text-xs text-[#A1A1A1] leading-relaxed uppercase tracking-widest">
+              Are you sure you want to delete billing for vehicle #{vehicleId}? This action is permanent and cannot be undone.
             </p>
             <div className="bg-rose-400/5 border border-rose-400/10 p-6 rounded-sm">
               <p className="font-mono text-[10px] text-rose-400/60 uppercase tracking-widest leading-relaxed">
-                critical: all associated quotas and payment logs will be
-                destroyed.
+                Critical: All expenses and payments will be deleted.
               </p>
             </div>
           </div>
           <DialogFooter className="mt-12 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest">
             <button
               onClick={() => setShowDeleteConfirm(false)}
-              className="text-[#646669] hover:text-[#D1D0C5] transition-colors px-4 py-2"
+              className="text-[#A1A1A1] hover:text-[#D1D0C5] transition-colors px-4 py-2"
             >
-              abort
+              Cancel
             </button>
             <button
               onClick={deleteBilling}
