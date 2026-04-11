@@ -51,6 +51,7 @@ const handler = NextAuth({
               id: data.id,
               name: data.name,
               email: data.email,
+              image: data.image,
               roles: data.roles || ["customer"],
               accessToken: "backend-issued-token", // In a real app, this would be a JWT from backend
             };
@@ -97,17 +98,11 @@ const handler = NextAuth({
     },
     async session({ session, token }) {
       if (session.user) {
-        // @ts-ignore
         session.user.id = token.sub || token.id;
-        // @ts-ignore
         session.accessToken = token.accessToken;
-        // @ts-ignore
         session.roles = token.roles || [];
-        // @ts-ignore
         session.isSuperAdmin = token.isSuperAdmin || false;
-        // @ts-ignore
         session.isAdmin = token.isAdmin || false;
-        // @ts-ignore
         session.user.image = token.picture || session.user.image;
       }
       return session;
