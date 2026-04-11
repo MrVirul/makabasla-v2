@@ -74,7 +74,7 @@ export default function NavBar() {
                 <Link
                   key={service.name}
                   href={service.href}
-                  className="text-[#646669] hover:text-[#D1D0C5] transition-colors duration-300 flex items-center gap-2"
+                  className="text-[#A1A1A1] hover:text-[#D1D0C5] transition-colors duration-300 flex items-center gap-2"
                 >
                   {service.icon}
                   {service.name}
@@ -97,7 +97,7 @@ export default function NavBar() {
                 <div className="flex items-center gap-6">
                   <Link
                     href="/profile"
-                    className="flex items-center gap-3 text-[#646669] hover:text-[#D1D0C5] transition-colors group"
+                    className="flex items-center gap-3 text-[#A1A1A1] hover:text-[#D1D0C5] transition-colors group"
                   >
                     {session.user?.image ? (
                       <div className="relative w-5 h-5 overflow-hidden rounded-full ring-1 ring-[#1A1A1A] group-hover:ring-[#D1D0C5] transition-all">
@@ -116,28 +116,23 @@ export default function NavBar() {
                     </span>
                   </Link>
                   <button
-                    onClick={() => signOut()}
-                    className="text-[#646669] hover:text-[#F5A623] transition-colors"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="text-[#A1A1A1] hover:text-[#F5A623] transition-colors"
                     title="Log Out"
                   >
                     <ArrowRightStartOnRectangleIcon className="w-4 h-4 stroke-[1.5]" />
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={() =>
-                    signIn(
-                      "google",
-                      { callbackUrl: "/" },
-                    )
-                  }
-                  className="text-[#646669] hover:text-[#F5A623] transition-all duration-300 flex items-center gap-3 font-mono text-[11px] tracking-[0.2em] uppercase group"
-                >
-                  <div className="opacity-40 group-hover:opacity-100 transition-opacity duration-300 filter grayscale group-hover:grayscale-0">
-                    <GoogleIcon />
-                  </div>
-                  Login
-                </button>
+              <Link
+                href="/auth/signin"
+                className="text-[#A1A1A1] hover:text-[#D1D0C5] transition-all duration-300 flex items-center gap-3 font-mono text-[11px] tracking-[0.2em] uppercase group"
+              >
+                <div className="w-5 h-5 flex items-center justify-center bg-white/5 rounded-full border border-white/10 opacity-60 group-hover:opacity-100 group-hover:border-[#F5A623]/30 transition-all">
+                  <UserIcon className="w-3 h-3" />
+                </div>
+                Sign In / Register
+              </Link>
               )}
             </>
           ) : null}

@@ -13,11 +13,10 @@ const handler = NextAuth({
         },
       },
     }),
-    // Admin credentials-based login (dev bypass + future internal auth)
     CredentialsProvider({
-      name: "Admin Credentials",
+      name: "Credentials",
       credentials: {
-        username: { label: "Username", type: "text" },
+        username: { label: "Identifier", type: "text" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
@@ -32,6 +31,32 @@ const handler = NextAuth({
             roles: ["super_admin", "admin", "admin:registry", "admin:billing", "admin:customers"],
             accessToken: "local-bypass-token"
           } as any;
+        }
+
+        // --- BACKEND AUTHENTICATION ---
+        try {
+          const res = await fetch("http://127.0.0.1:8080/api/auth/api/v1/auth/login", {
+            method: "POST",
+            body: JSON.stringify({
+              username: credentials.username,
+              password: credentials.password,
+            }),
+            headers: { "Content-Type": "application/json" },
+          });
+
+          const data = await res.json();
+
+          if (res.ok && data) {
+            return {
+              id: data.id,
+              name: data.name,
+              email: data.email,
+              roles: data.roles || ["customer"],
+              accessToken: "backend-issued-token", // In a real app, this would be a JWT from backend
+            };
+          }
+        } catch (error) {
+          console.error("Auth error:", error);
         }
 
         return null;
