@@ -52,13 +52,23 @@ function SignInForm() {
     <div className="w-full max-w-[400px] space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       <div className="flex flex-col items-center gap-6">
         {/* Brand/Logo */}
-        <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm group hover:border-[#F5A623]/30 transition-all duration-500">
-           <div className="w-5 h-5 border-2 border-[#F5A623] rounded-sm transform rotate-45 group-hover:rotate-90 transition-transform duration-700" />
-        </div>
+        <Link
+            href="/"
+            className="hover:brightness-110 transition-all duration-300"
+          >
+            <Image
+              src="/home/logo1.png"
+              alt="Makabasla Logo"
+              width={320}
+              height={80}
+              className="h-20 w-auto object-contain"
+              priority
+            />
+          </Link>
         
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-medium tracking-tight text-white/90">Sign In</h1>
-          <p className="font-mono text-[10px] text-white/40 uppercase tracking-[0.3em]">
+        <div className="text-center font-mono space-y-2">
+          <h1 className="text-2xl font-medium tracking-tight uppercase text-white/90">Sign In</h1>
+          <p className="font-mono text-[12px] text-white/80 uppercase tracking-[0.3em]">
             Access your account
           </p>
         </div>
@@ -72,7 +82,7 @@ function SignInForm() {
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 text-white/90 px-4 py-3 rounded-lg outline-none focus:border-[#F5A623]/40 focus:bg-white/10 transition-all font-mono text-[11px] placeholder:text-white/20 tracking-wider"
+              className="w-full bg-white/5 border border-white/10 text-white/90 px-4 py-3 rounded-lg outline-none focus:border-[#F5A623]/40 focus:bg-white/10 transition-all font-mono text-[11px] placeholder:text-white/60 tracking-wider"
               required
             />
           </div>
@@ -82,7 +92,7 @@ function SignInForm() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 text-white/90 px-4 py-3 rounded-lg outline-none focus:border-[#F5A623]/40 focus:bg-white/10 transition-all font-mono text-[11px] placeholder:text-white/20 tracking-wider"
+              className="w-full bg-white/5 border border-white/10 text-white/90 px-4 py-3 rounded-lg outline-none focus:border-[#F5A623]/40 focus:bg-white/10 transition-all font-mono text-[11px] placeholder:text-white/60 tracking-wider"
               required
             />
           </div>
@@ -107,7 +117,7 @@ function SignInForm() {
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-white/10"></span>
         </div>
-        <div className="relative flex justify-center text-[9px] uppercase tracking-[0.3em] font-mono text-white/20">
+        <div className="relative flex justify-center text-[13px] uppercase tracking-[0.em] font-mono text-white/80">
           <span className="bg-[#0B0B0B] px-4">OR CONTINUE WITH</span>
         </div>
       </div>
@@ -139,13 +149,10 @@ function SignInForm() {
       </button>
 
       <div className="text-center space-y-4">
-        <p className="font-mono text-[9px] text-white/30 uppercase tracking-[0.2em]">
-          Makabasla v2.0
-        </p>
         <div className="pt-2">
           <Link 
             href="/auth/signup" 
-            className="font-mono text-[10px] text-white/60 hover:text-white transition-colors uppercase tracking-widest border-b border-white/10 hover:border-[#F5A623]/30 pb-1"
+            className="font-mono text-[10px] text-white hover:text-white transition-colors uppercase tracking-widest border-b border-white/10 hover:border-[#F5A623]/30 pb-1"
           >
             Don't have an account? Sign Up
           </Link>

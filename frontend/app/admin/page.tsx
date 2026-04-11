@@ -39,7 +39,6 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
-  Cell,
   Pie,
   PieChart,
 } from "recharts";
@@ -248,7 +247,11 @@ export default function AdminDashboard() {
     vehicles.forEach((v) => {
       makes[v.make] = (makes[v.make] || 0) + 1;
     });
-    return Object.entries(makes).map(([name, value]) => ({ name, value }));
+    return Object.entries(makes).map(([name, value], index) => ({
+      name,
+      value,
+      fill: COLORS[index % COLORS.length],
+    }));
   }, [vehicles]);
 
   const COLORS = ["#F5A623", "#646669", "#D1D0C5", "#ca4754", "#1A1A1A"];
@@ -539,14 +542,7 @@ export default function AdminDashboard() {
                         paddingAngle={8}
                         dataKey="value"
                         stroke="none"
-                      >
-                        {distributionData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${entry.name}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
+                      />
                       <RechartsTooltip
                         contentStyle={{
                           backgroundColor: "#1A1A1A",
