@@ -1,30 +1,122 @@
 # Makabasla v2
 
-Modern healthcare management system built with Spring Boot microservices and React.
+Modern healthcare management system built with Go microservices and a Next.js frontend.
 
 ## 🏗️ Project Structure
 
-```
+```text
 makabasla-v2/
-├── backend-services/           # Go microservices
-│   ├── shared/                # Shared logic & protos
-│   ├── api-gateway/           # API gateway with JWT & CORS
-│   ├── billing-service/       # Billing operations
-│   ├── iam-service/           # Authentication & authorization
-│   ├── appointment-service/   # Appointment scheduling
-│   ├── task-mgt-service/      # Task management
-│   └── webstore-service/      # Web store operations
-│
-├── frontend/                  # React application
-│
-├── docs/                      # Documentation
-│   ├── SETUP_GUIDE.md        # Complete implementation guide
-│   ├── QUICK_REFERENCE.md    # Command reference
-│   ├── ARCHITECTURE_DIAGRAM.md # System architecture
-│   ├── IMPLEMENTATION_SUMMARY.md # Overview
-│   └── CHECKLIST.md          # Testing & deployment
-│
-└── CONTRIBUTING.md           # Contribution guidelines
+├── compose.yaml                                 # Local orchestration (development)
+├── go.work                                      # Go workspace for all backend modules
+├── README.md
+├── backend-services/
+│   ├── Dockerfile.dev                           # Shared dev image for backend workflows
+│   ├── README.md
+│   ├── api-gateway/
+│   │   ├── Dockerfile                           # API Gateway container image
+│   │   ├── go.mod
+│   │   ├── cmd/main.go
+│   │   ├── config/config.go
+│   │   └── internal/
+│   │       ├── handler/
+│   │       └── middleware/
+│   ├── appointment-service/
+│   │   ├── Dockerfile                           # Appointment service container image
+│   │   ├── go.mod
+│   │   ├── cmd/main.go
+│   │   ├── config/config.go
+│   │   └── internal/
+│   │       ├── database/
+│   │       ├── discovery/
+│   │       ├── handler/
+│   │       ├── models/
+│   │       ├── repository/
+│   │       └── service/
+│   ├── billing-service/
+│   │   ├── Dockerfile                           # Billing service container image
+│   │   ├── go.mod
+│   │   ├── cmd/main.go
+│   │   ├── config/config.go
+│   │   └── internal/
+│   │       ├── database/
+│   │       ├── discovery/
+│   │       ├── handler/
+│   │       ├── models/
+│   │       ├── repository/
+│   │       └── service/
+│   ├── iam-service/
+│   │   ├── Dockerfile                           # IAM service container image
+│   │   ├── go.mod
+│   │   ├── cmd/main.go
+│   │   ├── config/config.go
+│   │   └── internal/
+│   │       ├── database/
+│   │       ├── discovery/
+│   │       ├── handler/
+│   │       ├── models/
+│   │       ├── repository/
+│   │       └── service/
+│   ├── task-mgt-service/
+│   │   ├── Dockerfile                           # Task management service container image
+│   │   ├── go.mod
+│   │   ├── cmd/main.go
+│   │   ├── config/config.go
+│   │   └── internal/
+│   │       ├── database/
+│   │       ├── discovery/
+│   │       ├── handler/
+│   │       ├── repository/
+│   │       └── service/
+│   ├── webstore-service/
+│   │   ├── Dockerfile                           # Webstore service container image
+│   │   ├── go.mod
+│   │   ├── cmd/main.go
+│   │   ├── config/config.go
+│   │   └── internal/
+│   │       ├── database/
+│   │       ├── discovery/
+│   │       ├── handler/
+│   │       ├── repository/
+│   │       └── service/
+│   └── shared/
+│       ├── go.mod
+│       ├── Makefile
+│       ├── pkg/                                 # Shared config, discovery, grpc, httpclient, logger
+│       └── proto/                               # Shared protobuf contracts
+├── frontend/
+│   ├── package.json
+│   ├── next.config.ts
+│   ├── app/
+│   ├── components/
+│   ├── hooks/
+│   ├── lib/
+│   └── public/
+├── billing-api/
+│   └── opencollection.yml
+├── docs/
+│   ├── ARCHITECTURE_DIAGRAM.md
+│   ├── CHECKLIST.md
+│   ├── CONSUL_HEALTH_CHECKS.md
+│   ├── IMPLEMENTATION_SUMMARY.md
+│   ├── QUICK_REFERENCE.md
+│   ├── REORGANIZATION_SUMMARY.md
+│   └── SETUP_GUIDE.md
+└── memory-bank/
+   ├── activeContext.md
+   ├── productContext.md
+   ├── progress.md
+   ├── projectbrief.md
+   ├── systemPatterns.md
+   └── techContext.md
+
+Dockerfile locations (quick reference):
+- backend-services/Dockerfile.dev
+- backend-services/api-gateway/Dockerfile
+- backend-services/appointment-service/Dockerfile
+- backend-services/billing-service/Dockerfile
+- backend-services/iam-service/Dockerfile
+- backend-services/task-mgt-service/Dockerfile
+- backend-services/webstore-service/Dockerfile
 ```
 
 ## 🚀 Quick Start
