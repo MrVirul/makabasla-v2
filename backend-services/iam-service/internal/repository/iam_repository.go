@@ -20,6 +20,10 @@ type IamRepository interface {
 	GetAllVehicles() ([]models.Vehicle, error)
 	GetAllCustomers() ([]models.Customer, error)
 	LoginAdmin(username string, password string) (*models.Admin, error)
+	LoginCustomer(email string, password string) (*models.Customer, error)
+	CreateCustomer(customer *models.Customer) error
+	GetCustomerByEmail(email string) (*models.Customer, error)
+	GetCustomerByPhone(phone string) (*models.Customer, error)
 }
 
 type iamRepository struct {
@@ -36,6 +40,30 @@ func nullablePhone(phone string) *string {
 }
 
 func (r *iamRepository) SyncCustomer(id string, email string, name string, phone string, image string) (*models.Customer, error) {
+	// If email already exists, update that record to avoid unique-email conflicts
+	// when the incoming identity id differs from the persisted one.
+	var existingByEmail models.Customer
+	err := r.db.First(&existingByEmail, "email = ?", email).Error
+	if err == nil {
+		updates := map[string]interface{}{
+			"name": name,
+		}
+		if image != "" {
+			updates["image_url"] = image
+		}
+		if phone != "" {
+			updates["phone"] = nullablePhone(phone)
+		}
+
+		if err := r.db.Model(&existingByEmail).Updates(updates).Error; err != nil {
+			return nil, err
+		}
+		return r.GetCustomer(existingByEmail.ID)
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+
 	customer := &models.Customer{
 		ID:       id,
 		Email:    email,
@@ -51,7 +79,7 @@ func (r *iamRepository) SyncCustomer(id string, email string, name string, phone
 		updateCols = append(updateCols, "phone")
 	}
 
-	err := r.db.Clauses(clause.OnConflict{
+	err = r.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id"}},
 		DoUpdates: clause.AssignmentColumns(updateCols),
 	}).Create(customer).Error
@@ -180,4 +208,34 @@ func (r *iamRepository) LoginAdmin(username string, password string) (*models.Ad
 		return nil, err
 	}
 	return &admin, nil
+}
+
+func (r *iamRepository) LoginCustomer(email string, password string) (*models.Customer, error) {
+	var customer models.Customer
+	if err := r.db.Where("email = ?", email).First(&customer).Error; err != nil {
+		return nil, err
+	}
+	return &customer, nil
+}
+
+func (r *iamRepository) CreateCustomer(customer *models.Customer) error {
+	return r.db.Create(customer).Error
+}
+
+func (r *iamRepository) GetCustomerByEmail(email string) (*models.Customer, error) {
+	var customer models.Customer
+	err := r.db.First(&customer, "email = ?", email).Error
+	if err != nil {
+		return nil, err
+	}
+	return &customer, nil
+}
+
+func (r *iamRepository) GetCustomerByPhone(phone string) (*models.Customer, error) {
+	var customer models.Customer
+	err := r.db.First(&customer, "phone = ?", phone).Error
+	if err != nil {
+		return nil, err
+	}
+	return &customer, nil
 }
