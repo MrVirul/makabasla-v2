@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -86,6 +87,34 @@ func (h *IamHandler) CreateVehicle(c echo.Context) error {
 	return c.JSON(http.StatusCreated, v)
 }
 
+func (h *IamHandler) UpdateVehicle(c echo.Context) error {
+	var v models.Vehicle
+	if err := c.Bind(&v); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := h.srv.UpdateVehicle(&v); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, v)
+}
+
+func (h *IamHandler) DeleteVehicle(c echo.Context) error {
+	idStr := c.Param("id")
+	// Convert string ID to uint
+	var id uint
+	if _, err := fmt.Sscanf(idStr, "%d", &id); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid id")
+	}
+
+	if err := h.srv.DeleteVehicle(id); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
 func (h *IamHandler) GetAllVehicles(c echo.Context) error {
 	vehicles, err := h.srv.GetAllVehicles()
 	if err != nil {
@@ -166,6 +195,8 @@ func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
 	e.POST("/api/v1/profile", h.SyncProfile)
 	e.GET("/api/v1/profile/:id", h.GetProfile)
 	e.POST("/api/v1/vehicle", h.CreateVehicle)
+	e.PUT("/api/v1/vehicle", h.UpdateVehicle)
+	e.DELETE("/api/v1/vehicle/:id", h.DeleteVehicle)
 	e.GET("/api/v1/vehicles", h.GetAllVehicles)
 	e.GET("/api/v1/customers", h.GetAllCustomers)
 	e.POST("/api/v1/auth/login", h.Login)

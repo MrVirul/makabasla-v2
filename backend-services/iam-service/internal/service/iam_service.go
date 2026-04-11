@@ -20,6 +20,8 @@ type IamService interface {
 	LoginAdmin(username, password string) (interface{}, error)
 	LoginCustomer(email, password string) (interface{}, error)
 	RegisterCustomer(email, password, name, phone string) (interface{}, error)
+	UpdateVehicle(vehicle *models.Vehicle) error
+	DeleteVehicle(id uint) error
 }
 
 type iamService struct {
@@ -92,6 +94,7 @@ func (s *iamService) LoginAdmin(username, password string) (interface{}, error) 
 		"id":    admin.ID,
 		"name":  admin.Name,
 		"email": admin.Email,
+		"image": admin.ImageURL,
 		"roles": []string{"admin", "super_admin"},
 	}, nil
 }
@@ -112,7 +115,7 @@ func (s *iamService) LoginCustomer(email, password string) (interface{}, error) 
 		"id":    customer.ID,
 		"name":  customer.Name,
 		"email": customer.Email,
-		"roles": []string{"customer"},
+		"image": customer.ImageURL, "roles": []string{"customer"},
 	}, nil
 }
 
@@ -161,6 +164,14 @@ func (s *iamService) RegisterCustomer(email, password, name, phone string) (inte
 		"id":    customer.ID,
 		"name":  customer.Name,
 		"email": customer.Email,
-		"roles": []string{"customer"},
+		"image": customer.ImageURL, "roles": []string{"customer"},
 	}, nil
+}
+
+func (s *iamService) UpdateVehicle(vehicle *models.Vehicle) error {
+	return s.repo.UpdateVehicle(vehicle)
+}
+
+func (s *iamService) DeleteVehicle(id uint) error {
+	return s.repo.DeleteVehicle(id)
 }
