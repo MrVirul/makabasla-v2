@@ -203,6 +203,13 @@ export default function VehicleBillingPage() {
             >
               <PlusIcon className="w-4 h-4 stroke-[1.5]" /> Add Payment
             </Button>
+            <Button
+              variant="ghost"
+              onClick={() => router.push(`/admin/vehicles/${vehicleId}/billing/invoice`)}
+              className="text-[#F5A623] hover:text-white transition-colors py-2 active:scale-95 flex items-center gap-2 h-auto px-0 bg-transparent border border-[#F5A623]/20 px-4 rounded-sm"
+            >
+              Get Invoice
+            </Button>
           </div>
         </div>
 

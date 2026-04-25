@@ -3,6 +3,8 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 
+import { useRouter } from "next/navigation";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface LetterData {
   date: string;
@@ -10,6 +12,33 @@ interface LetterData {
   subject: string;
   body: string;
   signatory: string;
+}
+
+interface Expense {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+}
+
+interface Advance {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+}
+
+interface BillingData {
+  plate_number?: string;
+  expenses: Expense[];
+  advances: Advance[];
+  total_expenses: number;
+  total_advances: number;
+  balance_due: number;
+}
+
+interface LetterheadProps {
+  billingData?: BillingData;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -126,14 +155,17 @@ function Dot() {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-export default function MakabaslaLetterhead() {
+export default function MakabaslaLetterhead({ billingData }: Readonly<LetterheadProps>) {
   const printRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const [data, setData] = useState<LetterData>({
     date: todayStr(),
-    to: "",
-    subject: "",
-    body: "",
+    to: billingData?.plate_number ? `Vehicle: ${billingData.plate_number}` : "",
+    subject: billingData ? "BILLING INVOICE & REPAIR STATEMENT" : "",
+    body: billingData 
+      ? `We are pleased to present the detailed billing statement for the vehicle referenced above. This statement includes all repair expenses and payments received to date.`
+      : "",
     signatory: "Authorized Signatory",
   });
 
@@ -244,9 +276,28 @@ export default function MakabaslaLetterhead() {
             marginRight: 8,
           }}
         >
-          Makabasla · Letterhead
+          Makabasla · {billingData ? "Invoice" : "Letterhead"}
         </span>
         <div style={{ flex: 1 }} />
+        {billingData && (
+          <button
+            onClick={() => router.back()}
+            style={{
+              fontFamily: T.font,
+              fontWeight: 700,
+              fontSize: 12,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              padding: "8px 20px",
+              background: "transparent",
+              border: `1px solid ${T.rule}`,
+              color: T.muted,
+              cursor: "pointer",
+            }}
+          >
+            Back
+          </button>
+        )}
         <button
           onClick={handleReset}
           style={{
@@ -388,7 +439,7 @@ export default function MakabaslaLetterhead() {
                       marginTop: 5,
                     }}
                   >
-                    Vehicle Modification &amp; Repair Specialists
+                    Jeep Modification &amp; Repair Specialists
                   </div>
                 </div>
               </div>
@@ -570,8 +621,118 @@ export default function MakabaslaLetterhead() {
                 borderBottom: "none",
                 border: "none",
                 padding: 0,
+                minHeight: billingData ? 80 : 260,
               }}
             />
+
+            {billingData && (
+              <div style={{ marginTop: 40, fontFamily: T.body }}>
+                {/* Expenses Table */}
+                <div style={{ marginBottom: 32 }}>
+                  <h3 style={{ 
+                    fontFamily: T.font, 
+                    fontSize: 14, 
+                    fontWeight: 700, 
+                    textTransform: "uppercase", 
+                    letterSpacing: "0.1em",
+                    color: T.black,
+                    borderBottom: `1.5px solid ${T.amber}`,
+                    paddingBottom: 6,
+                    marginBottom: 16
+                  }}>
+                    Repair Expenses
+                  </h3>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ textAlign: "left", color: T.black, textTransform: "uppercase", fontSize: 10, letterSpacing: "0.05em", fontWeight: 700 }}>
+                        <th style={{ padding: "8px 0", borderBottom: `1.5px solid ${T.black}` }}>Date</th>
+                        <th style={{ padding: "8px 0", borderBottom: `1.5px solid ${T.black}` }}>Description</th>
+                        <th style={{ padding: "8px 0", borderBottom: `1.5px solid ${T.black}`, textAlign: "right" }}>Amount (Rs.)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {billingData.expenses.map((e) => (
+                        <tr key={e.id} style={{ color: T.black }}>
+                          <td style={{ padding: "10px 0", borderBottom: `1px solid ${T.rule}` }}>{e.date}</td>
+                          <td style={{ padding: "10px 0", borderBottom: `1px solid ${T.rule}` }}>{e.description}</td>
+                          <td style={{ padding: "10px 0", borderBottom: `1px solid ${T.rule}`, textAlign: "right", fontWeight: 500 }}>
+                            {e.amount.toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colSpan={2} style={{ padding: "12px 0", fontWeight: 700, textAlign: "right", fontSize: 11, textTransform: "uppercase" }}>Total Expenses:</td>
+                        <td style={{ padding: "12px 0", fontWeight: 700, textAlign: "right", color: T.ink }}>
+                          Rs. {billingData.total_expenses.toLocaleString()}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                {/* Payments Table */}
+                <div style={{ marginBottom: 32 }}>
+                  <h3 style={{ 
+                    fontFamily: T.font, 
+                    fontSize: 14, 
+                    fontWeight: 700, 
+                    textTransform: "uppercase", 
+                    letterSpacing: "0.1em",
+                    color: T.black,
+                    borderBottom: `1.5px solid ${T.rule}`,
+                    paddingBottom: 6,
+                    marginBottom: 16
+                  }}>
+                    Payments Received
+                  </h3>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ textAlign: "left", color: T.black, textTransform: "uppercase", fontSize: 10, letterSpacing: "0.05em", fontWeight: 700 }}>
+                        <th style={{ padding: "8px 0", borderBottom: `1.5px solid ${T.black}` }}>Date</th>
+                        <th style={{ padding: "8px 0", borderBottom: `1.5px solid ${T.black}` }}>Description</th>
+                        <th style={{ padding: "8px 0", borderBottom: `1.5px solid ${T.black}`, textAlign: "right" }}>Amount (Rs.)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {billingData.advances.map((a) => (
+                        <tr key={a.id} style={{ color: T.black }}>
+                          <td style={{ padding: "10px 0", borderBottom: `1px solid ${T.rule}` }}>{a.date}</td>
+                          <td style={{ padding: "10px 0", borderBottom: `1px solid ${T.rule}` }}>{a.description}</td>
+                          <td style={{ padding: "10px 0", borderBottom: `1px solid ${T.rule}`, textAlign: "right", fontWeight: 500 }}>
+                            {a.amount.toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colSpan={2} style={{ padding: "12px 0", fontWeight: 700, textAlign: "right", fontSize: 11, textTransform: "uppercase" }}>Total Payments:</td>
+                        <td style={{ padding: "12px 0", fontWeight: 700, textAlign: "right", color: T.ink }}>
+                          Rs. {billingData.total_advances.toLocaleString()}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                {/* Balance Summary */}
+                <div style={{ 
+                  background: T.offwhite, 
+                  padding: "20px", 
+                  border: `1px solid ${T.rule}`,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}>
+                  <span style={{ fontFamily: T.font, fontWeight: 700, fontSize: 16, textTransform: "uppercase", letterSpacing: "0.05em" }}>Balance Due:</span>
+                  <span style={{ fontFamily: T.font, fontWeight: 900, fontSize: 24, color: T.amber }}>
+                    Rs. {billingData.balance_due.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            )}
 
             <div
               style={{
