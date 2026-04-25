@@ -5,6 +5,9 @@ declare module "next-auth" {
   interface Session {
     accessToken?: string
     isInternal?: boolean
+    isAdmin?: boolean
+    isSuperAdmin?: boolean
+    roles?: string[]
     user: {
       id: string
       sub?: string
@@ -15,6 +18,9 @@ declare module "next-auth" {
     id: string
     accessToken?: string
     isInternal?: boolean
+    isAdmin?: boolean
+    isSuperAdmin?: boolean
+    roles?: string[]
   }
 }
 
@@ -23,6 +29,9 @@ declare module "next-auth/jwt" {
     id: string
     accessToken?: string
     isInternal?: boolean
+    isAdmin?: boolean
+    isSuperAdmin?: boolean
+    roles?: string[]
     sub?: string
   }
 }

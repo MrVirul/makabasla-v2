@@ -167,7 +167,7 @@ export default function VehicleBillingPage() {
               <ChevronLeftIcon className="w-4 h-4 stroke-[1.5] group-hover:-translate-x-1 transition-transform" />
               Back to Vehicles
             </button>
-            <h1 className="text-3xl font-medium tracking-tight text-white flex items-center gap-4">
+            <h1 className="text-3xl font-mono font-medium tracking-tight text-white flex items-center gap-4">
               Billing Report
             </h1>
             <p className="font-mono text-xs text-[#A1A1A1] mt-4 uppercase tracking-widest">
@@ -203,6 +203,13 @@ export default function VehicleBillingPage() {
             >
               <PlusIcon className="w-4 h-4 stroke-[1.5]" /> Add Payment
             </Button>
+            <Button
+              variant="ghost"
+              onClick={() => router.push(`/admin/vehicles/${vehicleId}/billing/invoice`)}
+              className="text-[#F5A623] hover:text-white transition-colors py-2 active:scale-95 flex items-center gap-2 h-auto px-0 bg-transparent border border-[#F5A623]/20 px-4 rounded-sm"
+            >
+              Get Invoice
+            </Button>
           </div>
         </div>
 
@@ -210,8 +217,8 @@ export default function VehicleBillingPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-[#1A1A1A] rounded-sm p-8 flex flex-col border-l-[3px] border-transparent hover:border-rose-400/30 transition-colors">
             <div className="flex justify-between items-start mb-8">
-              <span className="font-mono text-[10px] tracking-widest uppercase text-[#646669]">
-                Total Expenses
+              <span className="font-mono text-[10px] tracking-widest uppercase text-[#white]">
+                Total Expenses for Repaire
               </span>
               <ArrowTrendingDownIcon className="w-5 h-5 text-rose-400/60 stroke-[1.5]" />
             </div>
@@ -222,8 +229,8 @@ export default function VehicleBillingPage() {
 
           <div className="bg-[#1A1A1A] rounded-sm p-8 flex flex-col border-l-[3px] border-transparent hover:border-emerald-400/30 transition-colors">
             <div className="flex justify-between items-start mb-8">
-              <span className="font-mono text-[10px] tracking-widest uppercase text-[#646669]">
-                Total Payments
+              <span className="font-mono text-[10px] tracking-widest uppercase text-[#white]">
+                Total Received Payments
               </span>
               <ArrowTrendingUpIcon className="w-5 h-5 text-emerald-400/60 stroke-[1.5]" />
             </div>
@@ -253,7 +260,7 @@ export default function VehicleBillingPage() {
           <div className="bg-[#1A1A1A] rounded-sm overflow-hidden">
             <table className="w-full text-left border-collapse font-mono text-xs">
               <thead>
-                <tr className="border-b border-[#0B0B0B] text-[10px] uppercase tracking-widest text-[#646669]">
+                <tr className="border-b border-[#0B0B0B] text-[12px] uppercase tracking-widest font-bold text-[#white]">
                   <th className="px-8 py-6 font-medium">timestamp</th>
                   <th className="px-8 py-6 font-medium">description</th>
                   <th className="px-8 py-6 font-medium text-right">Amount</th>
@@ -310,10 +317,10 @@ export default function VehicleBillingPage() {
           <div className="bg-[#1A1A1A] rounded-sm overflow-hidden">
             <table className="w-full text-left border-collapse font-mono text-xs">
               <thead>
-                <tr className="border-b border-[#0B0B0B] text-[10px] uppercase tracking-widest text-[#646669]">
+                <tr className="border-b border-[#0B0B0B] text-[12px] uppercase tracking-widest font-bold text-[#white]">
                   <th className="px-8 py-6 font-medium">timestamp</th>
                   <th className="px-8 py-6 font-medium">description</th>
-                  <th className="px-8 py-6 font-medium text-right">credit</th>
+                  <th className="px-8 py-6 font-medium text-right">Amount</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#0B0B0B]">

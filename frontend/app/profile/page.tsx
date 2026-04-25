@@ -69,6 +69,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedPhone, setEditedPhone] = useState("");
@@ -90,6 +91,13 @@ export default function ProfilePage() {
     image_url: ""
   });
   const [adding, setAdding] = useState(false);
+  
+  const [isEditVehicleOpen, setIsEditVehicleOpen] = useState(false);
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+  
+  const [isDeleteVehicleOpen, setIsDeleteVehicleOpen] = useState(false);
+  const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -165,6 +173,64 @@ export default function ProfilePage() {
     },
     [session?.user?.email, session?.user?.name, session?.user?.image, session as any, userId, accessToken],
   );
+
+  const handleEditVehicle = async () => {
+    if (!editingVehicle) return;
+    setAdding(true);
+    try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
+
+      const res = await fetch(`http://127.0.0.1:8080/api/auth/api/v1/vehicle`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify(editingVehicle),
+      });
+
+      if (res.ok) {
+        setIsEditVehicleOpen(false);
+        setEditingVehicle(null);
+        fetchProfile(true);
+        setSuccess("Vehicle details updated successfully");
+        setTimeout(() => setSuccess(null), 5000);
+      } else {
+        const data = await res.json();
+        setError("failed to update vehicle: " + (data.message || res.statusText));
+      }
+    } catch (err: any) {
+      setError("system error: " + err.message);
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleDeleteVehicle = async () => {
+    if (!vehicleToDelete) return;
+    setDeleting(true);
+    try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
+
+      const res = await fetch(`http://127.0.0.1:8080/api/auth/api/v1/vehicle/${vehicleToDelete.id}`, {
+        method: "DELETE",
+        headers,
+      });
+
+      if (res.ok) {
+        setIsDeleteVehicleOpen(false);
+        setVehicleToDelete(null);
+        fetchProfile(true);
+        setSuccess("Vehicle removed from your account");
+        setTimeout(() => setSuccess(null), 5000);
+      } else {
+        setError("failed to delete vehicle");
+      }
+    } catch (err: any) {
+      setError("system error: " + err.message);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const handleImageUpload = async (file: File, type: "profile" | "vehicle", vehicleId?: number) => {
     if (!userId) return;
@@ -278,6 +344,8 @@ export default function ProfilePage() {
           image_url: ""
         });
         fetchProfile(true);
+        setSuccess("New vehicle registered successfully");
+        setTimeout(() => setSuccess(null), 5000);
       } else {
         const data = await res.json();
         setError("failed to add vehicle: " + (data.message || res.statusText));
@@ -361,6 +429,18 @@ export default function ProfilePage() {
           <div className="font-mono text-xs text-[#ca4754] bg-[#ca4754]/10 border border-[#ca4754]/20 p-4 rounded-sm mb-12 flex justify-between items-center">
             <span>Error: {error}</span>
             <button onClick={() => setError(null)} className="text-[#ca4754]/60 hover:text-[#ca4754]">
+              <XMarkIcon className="w-4 h-4 stroke-[1.5]" />
+            </button>
+          </div>
+        )}
+
+        {success && (
+          <div className="font-mono text-xs text-emerald-400 bg-emerald-400/5 border border-emerald-400/10 p-4 rounded-sm mb-12 flex justify-between items-center animate-in fade-in slide-in-from-top-4 duration-500">
+            <div className="flex items-center gap-3">
+              <CheckBadgeIcon className="w-4 h-4" />
+              <span>{success}</span>
+            </div>
+            <button onClick={() => setSuccess(null)} className="text-emerald-400/40 hover:text-emerald-400">
               <XMarkIcon className="w-4 h-4 stroke-[1.5]" />
             </button>
           </div>
@@ -576,15 +656,35 @@ export default function ProfilePage() {
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => {
-                          setBillingVehicleId(vehicle.id);
-                          setIsBillingOpen(true);
-                        }}
-                        className="font-mono text-[10px] text-[#A1A1A1] hover:text-[#D1D0C5] uppercase tracking-widest flex items-center gap-2 transition-colors lg:border-l lg:border-[#1A1A1A] lg:pl-12 h-14 group"
-                      >
-                        View Full Statement
-                      </button>
+                      <div className="flex items-center gap-6 lg:border-l lg:border-[#1A1A1A] lg:pl-12">
+                        <button
+                          onClick={() => {
+                            setEditingVehicle(vehicle);
+                            setIsEditVehicleOpen(true);
+                          }}
+                          className="font-mono text-[10px] text-[#A1A1A1] hover:text-[#F5A623] uppercase tracking-widest transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => {
+                            setVehicleToDelete(vehicle);
+                            setIsDeleteVehicleOpen(true);
+                          }}
+                          className="font-mono text-[10px] text-[#A1A1A1] hover:text-[#ca4754] uppercase tracking-widest transition-colors"
+                        >
+                          Delete
+                        </button>
+                        <button
+                          onClick={() => {
+                            setBillingVehicleId(vehicle.id);
+                            setIsBillingOpen(true);
+                          }}
+                          className="font-mono text-[10px] text-[#A1A1A1] hover:text-[#D1D0C5] uppercase tracking-widest flex items-center gap-2 transition-colors group"
+                        >
+                          View Statement
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -687,13 +787,18 @@ export default function ProfilePage() {
 
         {/* Add Vehicle Dialog */}
         <Dialog open={isAddVehicleOpen} onOpenChange={setIsAddVehicleOpen}>
+          {/* ... (keep existing Add Vehicle dialog content) */}
+        </Dialog>
+
+        {/* Edit Vehicle Dialog */}
+        <Dialog open={isEditVehicleOpen} onOpenChange={setIsEditVehicleOpen}>
           <DialogContent className="max-w-xl bg-[#0B0B0B] border-[#1A1A1A] text-[#D1D0C5] p-0 overflow-hidden shadow-2xl">
             <DialogHeader className="p-8 border-b border-[#1A1A1A] bg-[#0B0B0B]">
               <DialogTitle className="text-2xl font-medium tracking-tight text-white mb-2">
-                Add a New Vehicle
+                Edit Vehicle Details
               </DialogTitle>
               <p className="font-mono text-[10px] text-[#A1A1A1] uppercase tracking-widest">
-                Register a new vehicle to your account
+                Update information for your {editingVehicle?.make} {editingVehicle?.model}
               </p>
             </DialogHeader>
 
@@ -702,101 +807,91 @@ export default function ProfilePage() {
                 <div className="space-y-2">
                   <label className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">Make</label>
                   <input
-                    value={newVehicle.make}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, make: e.target.value })}
+                    value={editingVehicle?.make || ""}
+                    onChange={(e) => editingVehicle && setEditingVehicle({ ...editingVehicle, make: e.target.value })}
                     className="w-full bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all"
-                    placeholder="e.g. Toyota"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">Model</label>
                   <input
-                    value={newVehicle.model}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, model: e.target.value })}
+                    value={editingVehicle?.model || ""}
+                    onChange={(e) => editingVehicle && setEditingVehicle({ ...editingVehicle, model: e.target.value })}
                     className="w-full bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all"
-                    placeholder="e.g. Camry"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">Year</label>
                   <input
                     type="number"
-                    value={newVehicle.year}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, year: parseInt(e.target.value) })}
+                    value={editingVehicle?.year || 0}
+                    onChange={(e) => editingVehicle && setEditingVehicle({ ...editingVehicle, year: parseInt(e.target.value) })}
                     className="w-full bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">Plate Number</label>
                   <input
-                    value={newVehicle.plate_number}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, plate_number: e.target.value })}
+                    value={editingVehicle?.plate_number || ""}
+                    onChange={(e) => editingVehicle && setEditingVehicle({ ...editingVehicle, plate_number: e.target.value })}
                     className="w-full bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all"
-                    placeholder="ABC-1234"
                   />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">Vehicle Image (Link or Upload)</label>
-                <div className="flex gap-4">
-                  <input
-                    value={newVehicle.image_url}
-                    onChange={(e) => setNewVehicle({ ...newVehicle, image_url: e.target.value })}
-                    className="flex-1 bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all"
-                    placeholder="https://..."
-                  />
-                  <div className="relative group">
-                    <button className="px-6 h-full bg-white/5 border border-white/10 rounded-sm hover:bg-white/10 transition-all font-mono text-[10px] uppercase tracking-widest">
-                      Upload
-                    </button>
-                    <input 
-                      type="file" 
-                      className="absolute inset-0 opacity-0 cursor-pointer" 
-                      accept="image/*"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          setAdding(true);
-                          const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-                          const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-                          if (cloudName && uploadPreset) {
-                            const formData = new FormData();
-                            formData.append("file", file);
-                            formData.append("upload_preset", uploadPreset);
-                            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-                              method: "POST",
-                              body: formData,
-                            });
-                            if (res.ok) {
-                              const data = await res.json();
-                              setNewVehicle({ ...newVehicle, image_url: data.secure_url });
-                            }
-                          }
-                          setAdding(false);
-                        }
-                      }}
-                    />
-                  </div>
                 </div>
               </div>
             </div>
 
             <div className="p-8 border-t border-[#1A1A1A] flex justify-end gap-6">
               <button
-                onClick={() => setIsAddVehicleOpen(false)}
+                onClick={() => setIsEditVehicleOpen(false)}
                 className="font-mono text-[10px] text-[#A1A1A1] hover:text-[#D1D0C5] uppercase tracking-widest transition-colors"
                 disabled={adding}
               >
                 Cancel
               </button>
               <button
-                onClick={handleAddVehicle}
+                onClick={handleEditVehicle}
                 disabled={adding}
-                className="flex items-center gap-2 px-8 py-3 bg-[#D1D0C5] text-[#0B0B0B] font-mono text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-white transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-8 py-3 bg-[#F5A623] text-[#0B0B0B] font-mono text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#D1D0C5] transition-all disabled:opacity-50"
               >
                 {adding ? <ArrowPathIcon className="w-3 h-3 animate-spin" /> : null}
-                Save Vehicle
+                Update Vehicle
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={isDeleteVehicleOpen} onOpenChange={setIsDeleteVehicleOpen}>
+          <DialogContent className="max-w-md bg-[#0B0B0B] border-[#1A1A1A] text-[#D1D0C5] p-0 overflow-hidden shadow-2xl">
+            <DialogHeader className="p-8 border-b border-[#1A1A1A] bg-[#0B0B0B]">
+              <DialogTitle className="text-xl font-medium tracking-tight text-white mb-2">
+                Remove Vehicle
+              </DialogTitle>
+              <p className="font-mono text-[10px] text-[#A1A1A1] uppercase tracking-widest">
+                Confirm deletion from your account
+              </p>
+            </DialogHeader>
+
+            <div className="p-8 space-y-4">
+               <p className="text-sm text-[#A1A1A1] leading-relaxed">
+                  Are you sure you want to remove the **{vehicleToDelete?.make} {vehicleToDelete?.model}** ({vehicleToDelete?.plate_number})? This action cannot be undone.
+               </p>
+            </div>
+
+            <div className="p-8 border-t border-[#1A1A1A] flex justify-end gap-6">
+              <button
+                onClick={() => setIsDeleteVehicleOpen(false)}
+                className="font-mono text-[10px] text-[#A1A1A1] hover:text-[#D1D0C5] uppercase tracking-widest transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteVehicle}
+                disabled={deleting}
+                className="flex items-center gap-2 px-8 py-3 bg-[#ca4754] text-white font-mono text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-rose-500 transition-all disabled:opacity-50"
+              >
+                {deleting ? <ArrowPathIcon className="w-3 h-3 animate-spin" /> : null}
+                Delete Permanently
               </button>
             </div>
           </DialogContent>

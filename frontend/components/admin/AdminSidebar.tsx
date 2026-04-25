@@ -7,7 +7,7 @@ import {
   TruckIcon,
   Cog6ToothIcon,
   ArrowRightStartOnRectangleIcon,
-  UserIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,6 +25,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import Image from "next/image";
 
 const adminItems = [
   {
@@ -46,6 +47,12 @@ const adminItems = [
     permission: "admin:registry",
   },
   {
+    title: "Letterhead",
+    url: "/admin/letterhead",
+    icon: DocumentTextIcon,
+    permission: "admin:dashboard",
+  },
+  {
     title: "Users",
     url: "/admin/profile",
     icon: Cog6ToothIcon,
@@ -53,12 +60,12 @@ const adminItems = [
   },
 ];
 
-export function AdminSidebar() {
+export function AdminSidebar({ className }: Readonly<{ className?: string }>) {
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  const userRoles = (session as any)?.roles || [];
-  const isSuperAdmin = (session as any)?.isSuperAdmin;
+  const userRoles = session?.roles || [];
+  const isSuperAdmin = session?.isSuperAdmin;
 
   // Filter items based on dynamic permissions
   const filteredItems = adminItems.filter((item) => {
@@ -70,11 +77,18 @@ export function AdminSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r border-[#1A1A1A] bg-[#0B0B0B] [&_[data-sidebar=sidebar]]:bg-[#0B0B0B]"
+      className={`border-r border-[#1A1A1A] bg-[#0B0B0B] [&_[data-sidebar=sidebar]]:bg-[#0B0B0B] ${className || ""}`}
     >
       <SidebarHeader className="border-b border-[#1A1A1A] p-6 h-16 flex justify-center">
         <div className="flex items-center gap-4">
-          <div className="h-4 w-4 bg-[#F5A623] rounded-sm flex-shrink-0" />
+          <Image
+              src="/home/logo1.png"
+              alt="Makabasla Logo"
+              width={320}
+              height={80}
+              className="h-10 w-auto object-contain"
+              priority
+            />
           <div className="flex flex-col group-data-[collapsible=icon]:hidden overflow-hidden">
             <span className="text-xs font-mono uppercase tracking-widest text-[#D1D0C5] line-clamp-1 truncate">
               {isSuperAdmin ? "System Admin" : "Staff Access"}
