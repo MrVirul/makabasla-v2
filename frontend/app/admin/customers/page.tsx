@@ -43,7 +43,9 @@ export default function AdminCustomersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null,
+  );
 
   const API_BASE = "http://127.0.0.1:8080/api/auth/api/v1";
   const accessToken = (session as any)?.accessToken;
@@ -60,7 +62,9 @@ export default function AdminCustomersPage() {
     const fetchCustomers = async () => {
       try {
         setLoading(true);
-        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
         if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
 
         const res = await fetch(`${API_BASE}/customers`, { headers });
@@ -91,22 +95,23 @@ export default function AdminCustomersPage() {
     (c) =>
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (c.phone && c.phone.includes(searchTerm))
+      (c.phone && c.phone.includes(searchTerm)),
   );
 
   return (
     <div className="min-h-screen bg-[#0B0B0B] text-[#D1D0C5] font-sans selection:bg-[#F5A623]/20">
       <div className="max-w-[1240px] mx-auto p-12">
-        
         {/* Header & Search */}
         <div className="mb-12 flex flex-col items-start gap-8 md:flex-row md:items-end justify-between border-b border-[#1A1A1A] pb-8">
           <div>
-            <h1 className="text-3xl font-medium text-white/90">Customer Directory</h1>
+            <h1 className="text-3xl font-medium text-white/90">
+              Customer Directory
+            </h1>
             <p className="font-mono text-[10px] text-[#A1A1A1] uppercase tracking-widest mt-2">
               View and manage all registered customers
             </p>
           </div>
-          
+
           <div className="relative w-full md:w-80 group">
             <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1A1] group-focus-within:text-[#F5A623] transition-colors" />
             <input
@@ -129,7 +134,10 @@ export default function AdminCustomersPage() {
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-20 rounded-sm bg-[#1A1A1A]/30 animate-pulse" />
+              <div
+                key={i}
+                className="h-20 rounded-sm bg-[#1A1A1A]/30 animate-pulse"
+              />
             ))}
           </div>
         ) : (
@@ -144,7 +152,9 @@ export default function AdminCustomersPage() {
             {filteredCustomers.length === 0 ? (
               <div className="py-32 flex flex-col items-center justify-center text-center">
                 <UserIcon className="w-12 h-12 text-[#1A1A1A] mb-4" />
-                <p className="font-mono text-[10px] text-[#A1A1A1] uppercase tracking-widest">No customers found</p>
+                <p className="font-mono text-[10px] text-[#A1A1A1] uppercase tracking-widest">
+                  No customers found
+                </p>
               </div>
             ) : (
               filteredCustomers.map((c) => (
@@ -165,9 +175,11 @@ export default function AdminCustomersPage() {
                         c.name.charAt(0)
                       )}
                     </div>
-                    <span className="text-sm font-medium text-[#D1D0C5] truncate">{c.name}</span>
+                    <span className="text-sm font-medium text-[#D1D0C5] truncate">
+                      {c.name}
+                    </span>
                   </div>
-                  
+
                   <span className="font-mono text-xs text-[#A1A1A1] truncate lowercase group-hover:text-[#D1D0C5] transition-colors">
                     {c.email}
                   </span>
@@ -193,7 +205,10 @@ export default function AdminCustomersPage() {
       </div>
 
       {/* Customer Analysis Dialog */}
-      <Dialog open={!!selectedCustomer} onOpenChange={(open) => !open && setSelectedCustomer(null)}>
+      <Dialog
+        open={!!selectedCustomer}
+        onOpenChange={(open) => !open && setSelectedCustomer(null)}
+      >
         <DialogContent className="max-w-2xl bg-[#0B0B0B] border-[#1A1A1A] text-[#D1D0C5] p-0 overflow-hidden shadow-2xl">
           <DialogHeader className="p-8 border-b border-[#1A1A1A] bg-[#0B0B0B]">
             <div className="flex justify-between items-start">
@@ -204,7 +219,12 @@ export default function AdminCustomersPage() {
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 rounded-full overflow-hidden relative bg-[#1A1A1A]">
                     {selectedCustomer?.image_url && (
-                        <Image src={selectedCustomer.image_url} alt="" fill className="object-cover" />
+                      <Image
+                        src={selectedCustomer.image_url}
+                        alt=""
+                        fill
+                        className="object-cover"
+                      />
                     )}
                   </div>
                   <p className="font-mono text-[10px] text-[#A1A1A1] uppercase tracking-widest">
@@ -222,63 +242,85 @@ export default function AdminCustomersPage() {
                 <span className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest flex items-center gap-2">
                   <UserIcon className="w-3 h-3" /> Name
                 </span>
-                <p className="text-lg text-[#D1D0C5]">{selectedCustomer?.name}</p>
+                <p className="text-lg text-[#D1D0C5]">
+                  {selectedCustomer?.name}
+                </p>
               </div>
               <div className="space-y-1.5">
                 <span className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest flex items-center gap-2">
                   <CalendarDaysIcon className="w-3 h-3" /> Joined Date
                 </span>
                 <p className="font-mono text-sm text-[#D1D0C5]">
-                  {selectedCustomer?.created_at ? new Date(selectedCustomer.created_at).toLocaleDateString() : "n/a"}
+                  {selectedCustomer?.created_at
+                    ? new Date(selectedCustomer.created_at).toLocaleDateString()
+                    : "n/a"}
                 </p>
               </div>
               <div className="space-y-1.5">
                 <span className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest flex items-center gap-2">
                   <EnvelopeIcon className="w-3 h-3" /> Email Address
                 </span>
-                <p className="font-mono text-sm text-[#D1D0C5] lowercase">{selectedCustomer?.email}</p>
+                <p className="font-mono text-sm text-[#D1D0C5] lowercase">
+                  {selectedCustomer?.email}
+                </p>
               </div>
               <div className="space-y-1.5">
                 <span className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest flex items-center gap-2">
                   <PhoneIcon className="w-3 h-3" /> Phone Number
                 </span>
-                <p className="font-mono text-sm text-[#D1D0C5]">{formatPhoneNumber(selectedCustomer?.phone)}</p>
+                <p className="font-mono text-sm text-[#D1D0C5]">
+                  {formatPhoneNumber(selectedCustomer?.phone)}
+                </p>
               </div>
             </div>
 
             {/* Asset Registry */}
             <div className="space-y-6 pt-8 border-t border-[#1A1A1A]/30">
-               <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#A1A1A1]">Registered Vehicles</h4>
-               
-               <div className="space-y-2">
-                  {selectedCustomer?.vehicles && selectedCustomer.vehicles.length > 0 ? (
-                    selectedCustomer.vehicles.map(v => (
-                       <div key={v.id} className="flex items-center justify-between p-4 bg-[#141414] rounded-sm border-l-2 border-transparent hover:border-[#F5A623]/40 transition-all">
-                          <div className="flex items-center gap-4">
-                             <TruckIcon className="w-4 h-4 text-[#A1A1A1]" />
-                             <div>
-                                <p className="text-sm text-[#D1D0C5]">{v.make} {v.model}</p>
-                                <p className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">License Plate: {v.plate_number}</p>
-                             </div>
-                          </div>
-                          <span className="font-mono text-[10px] text-[#A1A1A1] uppercase tracking-widest">ACTIVE</span>
-                       </div>
-                    ))
-                  ) : (
-                    <div className="p-8 border border-dashed border-[#1A1A1A] rounded-sm text-center">
-                       <p className="font-mono text-[9px] text-[#A1A1A1] uppercase">no vehicles registered</p>
+              <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#A1A1A1]">
+                Registered Vehicles
+              </h4>
+
+              <div className="space-y-2">
+                {selectedCustomer?.vehicles &&
+                selectedCustomer.vehicles.length > 0 ? (
+                  selectedCustomer.vehicles.map((v) => (
+                    <div
+                      key={v.id}
+                      className="flex items-center justify-between p-4 bg-[#141414] rounded-sm border-l-2 border-transparent hover:border-[#F5A623]/40 transition-all"
+                    >
+                      <div className="flex items-center gap-4">
+                        <TruckIcon className="w-4 h-4 text-[#A1A1A1]" />
+                        <div>
+                          <p className="text-sm text-[#D1D0C5]">
+                            {v.make} {v.model}
+                          </p>
+                          <p className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">
+                            License Plate: {v.plate_number}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="font-mono text-[10px] text-[#A1A1A1] uppercase tracking-widest">
+                        ACTIVE
+                      </span>
                     </div>
-                  )}
-               </div>
+                  ))
+                ) : (
+                  <div className="p-8 border border-dashed border-[#1A1A1A] rounded-sm text-center">
+                    <p className="font-mono text-[9px] text-[#A1A1A1] uppercase">
+                      no vehicles registered
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          
+
           <div className="p-8 border-t border-[#1A1A1A] flex justify-end">
             <button
-               onClick={() => setSelectedCustomer(null)}
-               className="font-mono text-[10px] text-[#A1A1A1] hover:text-[#D1D0C5] uppercase tracking-widest transition-colors flex items-center gap-2"
+              onClick={() => setSelectedCustomer(null)}
+              className="font-mono text-[10px] text-[#ff0000] hover:text-[#D1D0C5] uppercase tracking-widest transition-colors flex items-center gap-2"
             >
-               close analysis
+              close
             </button>
           </div>
         </DialogContent>
