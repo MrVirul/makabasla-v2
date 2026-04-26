@@ -28,9 +28,16 @@ export default function NavBar() {
   ];
 
   return (
-    <nav className="relative z-50 bg-[#0B0B0B] border-b border-[#1A1A1A]">
+    <nav 
+      className="relative z-50 bg-[#0B0B0B] border-b border-[#1A1A1A]"
+      suppressHydrationWarning
+    >
       {/* Bottom Shade Gradient */}
-      <div className="absolute top-full left-0 right-0 h-32 bg-gradient-to-b from-[#0B0B0B] to-transparent pointer-events-none z-10" />
+      <div 
+        className="absolute top-full left-0 right-0 h-32 bg-gradient-to-b from-[#0B0B0B] to-transparent pointer-events-none z-10" 
+        suppressHydrationWarning
+        aria-hidden="true"
+      />
       <div className="max-w-[1400px] mx-auto px-12 h-40 flex items-center justify-between">
         <div className="flex items-center">
           <Link
