@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/makabas/webstore-service/config"
+	"github.com/makabas/webstore-service/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -30,6 +31,10 @@ func NewDatabase(cfg *config.Config) (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	if err := db.AutoMigrate(&models.Product{}, &models.Order{}); err != nil {
+		log.Printf("Warning: failed to auto-migrate models: %v", err)
+	}
 
 	log.Printf("Successfully connected to database for %s", cfg.AppName)
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import Image from "next/image";
 import {
@@ -93,8 +93,16 @@ export default function AdminLayout({
               </div>
             )}
             {session && !isAdmin && (
-              <div className="font-mono text-[10px] text-[#F5A623] border border-[#F5A623]/40 bg-[#F5A623]/10 py-3 px-4 rounded-sm tracking-wider uppercase">
-                Access Denied: You do not have permission to view this page.
+              <div className="font-mono text-[10px] text-[#F5A623] border border-[#F5A623]/40 bg-[#F5A623]/10 py-3 px-4 rounded-sm tracking-wider uppercase flex flex-col gap-2">
+                <span>Access Denied: You do not have permission to view this page.</span>
+                <span className="text-white/50 text-[9px] normal-case">You are currently logged in with a standard account. NextAuth doesn't allow switching accounts without signing out first.</span>
+                <button 
+                  type="button" 
+                  onClick={() => signOut({ redirect: true, callbackUrl: '/admin/webstore' })}
+                  className="w-fit border-b border-[#F5A623]/50 text-[#F5A623] hover:text-white hover:border-white transition-colors"
+                >
+                  SIGN OUT CURRENT SESSION
+                </button>
               </div>
             )}
 
