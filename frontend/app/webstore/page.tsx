@@ -13,6 +13,7 @@ interface Product {
   category: string;
   price: number;
   stock: number;
+  imageUrl?: string;
 }
 
 export default function PublicWebstore() {
@@ -46,28 +47,11 @@ export default function PublicWebstore() {
     }
   };
 
-  const handleBuyNow = async (product: Product) => {
-    if (status === "unauthenticated") {
-      alert("Please Sign In or Register to purchase this item.");
-      return;
-    }
-    
-    try {
-      setLoading(true);
-      const res = await fetch(`${API_URL}/${product.id}/buy`, {
-        method: "POST",
-      });
-      if (!res.ok) {
-        const msg = await res.text();
-        throw new Error(msg || "Failed to process purchase");
-      }
-      alert(`Success! ${product.name} added to cart & purchased.`);
-      fetchProducts(searchQuery); // Refresh stock immediately
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  const handleInquire = (product: Product) => {
+    const phoneNumber = "94772215243";
+    const message = `Hello, I would like to inquire about the spare part: ${product.name}`;
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
   };
 
   return (
@@ -136,10 +120,17 @@ export default function PublicWebstore() {
                 key={product.id}
                 className="bg-[#121212] border border-[#1A1A1A] flex flex-col rounded-sm hover:border-[#F5A623]/50 transition-colors group relative overflow-hidden"
               >
-                {/* Image Placeholder */}
-                <div className="h-48 bg-[#1A1A1A] flex items-center justify-center border-b border-[#1A1A1A] relative">
-                  <div className="w-full h-full opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] mix-blend-overlay"></div>
-                  <ShoppingCartIcon className="w-12 h-12 text-[#2A2A2A] group-hover:scale-110 group-hover:text-[#F5A623]/20 transition-all duration-500" />
+                {/* Image Placeholder or Actual Image */}
+                <div className="h-48 bg-[#1A1A1A] flex items-center justify-center border-b border-[#1A1A1A] relative overflow-hidden">
+                  {product.imageUrl ? (
+                    <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  ) : (
+                    <>
+                      <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] mix-blend-overlay"></div>
+                      <ShoppingCartIcon className="w-12 h-12 text-[#2A2A2A] group-hover:scale-110 group-hover:text-[#F5A623]/20 transition-all duration-500" />
+                    </>
+                  )}
+                  
                   
                   {product.stock <= 0 && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-[2px]">
@@ -170,11 +161,10 @@ export default function PublicWebstore() {
                       Rs. {product.price.toFixed(2)}
                     </span>
                     <button
-                      onClick={() => handleBuyNow(product)}
-                      disabled={product.stock <= 0}
-                      className="px-6 py-2 border border-[#F5A623]/30 text-[#F5A623] font-mono text-xs uppercase tracking-widest hover:bg-[#F5A623] hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#F5A623]"
+                      onClick={() => handleInquire(product)}
+                      className="px-6 py-2 border border-[#F5A623]/30 text-[#F5A623] font-mono text-xs uppercase tracking-widest hover:bg-[#F5A623] hover:text-black transition-colors"
                     >
-                      Buy Now
+                      Inquire
                     </button>
                   </div>
                 </div>

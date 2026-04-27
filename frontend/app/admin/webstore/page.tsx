@@ -11,6 +11,7 @@ interface Product {
   category: string;
   price: number;
   stock: number;
+  imageUrl?: string;
 }
 
 export default function AdminWebstore() {
@@ -24,8 +25,10 @@ export default function AdminWebstore() {
     category: "",
     price: "",
     stock: "",
+    imageUrl: "",
   });
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const API_URL = "http://localhost:8087/api/v1/webstore/products"; // Fetching directly from webstore-service
 
@@ -60,6 +63,7 @@ export default function AdminWebstore() {
         category: formData.category,
         price: parseFloat(formData.price),
         stock: parseInt(formData.stock),
+        imageUrl: formData.imageUrl,
       };
 
       let res;
@@ -79,7 +83,7 @@ export default function AdminWebstore() {
 
       if (!res.ok) throw new Error("Failed to save product");
       
-      setFormData({ name: "", description: "", category: "", price: "", stock: "" });
+      setFormData({ name: "", description: "", category: "", price: "", stock: "", imageUrl: "" });
       setEditingId(null);
       fetchProducts();
     } catch (err: any) {
@@ -95,6 +99,7 @@ export default function AdminWebstore() {
       category: product.category,
       price: product.price.toString(),
       stock: product.stock.toString(),
+      imageUrl: product.imageUrl || "",
     });
   };
 
@@ -108,6 +113,34 @@ export default function AdminWebstore() {
       fetchProducts();
     } catch (err: any) {
       setError(err.message);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    setError("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "");
+
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Failed to upload image to Cloudinary");
+
+      const data = await res.json();
+      setFormData((prev) => ({ ...prev, imageUrl: data.secure_url }));
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -205,6 +238,35 @@ export default function AdminWebstore() {
             onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
             className="w-full h-12 bg-transparent border-b border-white/20 px-4 font-mono text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-[#F5A623] transition-all"
           />
+
+          <div className="md:col-span-2 flex items-end gap-4 mt-2">
+            <div className="flex-1">
+              <label className="block text-[#A1A1A1] font-mono text-xs uppercase tracking-widest mb-2">Product Image</label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="w-full h-10 file:mr-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:text-xs file:font-mono file:bg-[#1A1A1A] file:text-[#A1A1A1] hover:file:bg-[#2A2A2A] hover:file:text-white cursor-pointer file:cursor-pointer file:transition-colors text-white/50 text-xs font-mono"
+                  disabled={uploadingImage}
+                />
+                {uploadingImage && <span className="text-xs text-[#F5A623] animate-pulse whitespace-nowrap">Uploading...</span>}
+              </div>
+            </div>
+            {formData.imageUrl && (
+              <div className="h-16 w-16 border border-[#1A1A1A] rounded-sm overflow-hidden flex-shrink-0 relative group">
+                <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, imageUrl: "" })}
+                  className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Remove Image"
+                >
+                  <TrashIcon className="w-4 h-4 text-[#FF453A]" />
+                </button>
+              </div>
+            )}
+          </div>
           
           <div className="md:col-span-2 flex justify-end gap-4 mt-4">
             {editingId && (
@@ -212,7 +274,7 @@ export default function AdminWebstore() {
                 type="button"
                 onClick={() => {
                   setEditingId(null);
-                  setFormData({ name: "", description: "", category: "", price: "", stock: "" });
+                  setFormData({ name: "", description: "", category: "", price: "", stock: "", imageUrl: "" });
                 }}
                 className="h-10 px-6 border border-white/30 font-mono text-xs uppercase tracking-widest text-white hover:bg-white/10 transition-colors"
               >
@@ -236,6 +298,7 @@ export default function AdminWebstore() {
           <table className="w-full text-left font-mono text-xs">
             <thead className="bg-[#1A1A1A] text-[#A1A1A1] uppercase tracking-widest">
               <tr>
+                <th className="px-6 py-4 font-normal tracking-[0.2em] w-16">Img</th>
                 <th className="px-6 py-4 font-normal tracking-[0.2em]">ID</th>
                 <th className="px-6 py-4 font-normal tracking-[0.2em]">Name</th>
                 <th className="px-6 py-4 font-normal tracking-[0.2em]">Category</th>
@@ -253,13 +316,24 @@ export default function AdminWebstore() {
                 </tr>
               ) : products.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-white/50 uppercase tracking-widest">
+                  <td colSpan={7} className="px-6 py-8 text-center text-white/50 uppercase tracking-widest">
                     No Products Found
                   </td>
                 </tr>
               ) : (
                 products.map((product) => (
                   <tr key={product.id} className="hover:bg-[#1A1A1A]/30 transition-colors group">
+                    <td className="px-6 py-4">
+                      {product.imageUrl ? (
+                        <div className="w-8 h-8 rounded-sm overflow-hidden border border-[#1A1A1A]">
+                          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8 rounded-sm bg-[#1A1A1A] border border-white/5 flex items-center justify-center text-white/20 text-[10px]">
+                          N/A
+                        </div>
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-white/50">#{product.id}</td>
                     <td className="px-6 py-4">{product.name}</td>
                     <td className="px-6 py-4 text-[#F5A623]">{product.category}</td>
