@@ -1,4 +1,22 @@
 services:
+  # Postgres Database (Local)
+  postgres:
+    image: postgres:16-alpine
+    container_name: makabasla-postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - makabasla-network
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=neondb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d neondb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Service Discovery
   consul:
     image: hashicorp/consul:1.15
@@ -34,6 +52,8 @@ services:
     depends_on:
       consul:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   # Billing Service (Development)
   billing-service:
@@ -56,6 +76,8 @@ services:
       - APP_NAME=billing-service
     depends_on:
       consul:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
   # Task Management Service (Development)
@@ -80,6 +102,8 @@ services:
     depends_on:
       consul:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   # Appointment Service (Development)
   appointment-service:
@@ -102,6 +126,8 @@ services:
       - APP_NAME=appointment-service
     depends_on:
       consul:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
   # Webstore Service (Development)
@@ -126,6 +152,8 @@ services:
     depends_on:
       consul:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   # IAM Service (Development)
   iam-service:
@@ -148,6 +176,8 @@ services:
       - APP_NAME=iam-service
     depends_on:
       consul:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
 networks:

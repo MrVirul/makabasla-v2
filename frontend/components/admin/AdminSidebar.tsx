@@ -8,6 +8,7 @@ import {
   Cog6ToothIcon,
   ArrowRightStartOnRectangleIcon,
   UserIcon,
+  ShoppingBagIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -50,6 +51,12 @@ const adminItems = [
     url: "/admin/profile",
     icon: Cog6ToothIcon,
     permission: "super_admin",
+  },
+  {
+    title: "Webstore",
+    url: "/admin/webstore",
+    icon: ShoppingBagIcon,
+    permission: "admin:dashboard", // Make it generally accessible for now, or admin:webstore depending on logic
   },
 ];
 
