@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import logo from "@/public/home/common/logo.png";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import {
@@ -28,13 +29,13 @@ export default function NavBar() {
   ];
 
   return (
-    <nav 
+    <nav
       className="relative z-50 bg-[#0B0B0B] border-b border-[#1A1A1A]"
       suppressHydrationWarning
     >
       {/* Bottom Shade Gradient */}
-      <div 
-        className="absolute top-full left-0 right-0 h-32 bg-gradient-to-b from-[#0B0B0B] to-transparent pointer-events-none z-10" 
+      <div
+        className="absolute top-full left-0 right-0 h-32 bg-gradient-to-b from-[#0B0B0B] to-transparent pointer-events-none z-10"
         suppressHydrationWarning
         aria-hidden="true"
       />
@@ -45,7 +46,7 @@ export default function NavBar() {
             className="hover:brightness-110 transition-all duration-300"
           >
             <Image
-              src="/home/logo.png"
+              src={logo}
               alt="Makabasla Logo"
               width={400}
               height={100}

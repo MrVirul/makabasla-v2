@@ -381,7 +381,7 @@ export default function MakabaslaLetterhead({ billingData }: Readonly<Letterhead
                   }}
                 >
                   <Image
-                    src="/home/letterheadlogo.png"
+                    src="/home/common/letterheadlogo.png"
                     alt="Makabasla"
                     fill
                     style={{ objectFit: "contain" }}
