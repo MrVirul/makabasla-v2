@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import logo from "@/public/home/common/logo.png";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import {
@@ -22,13 +23,22 @@ export default function NavBar() {
   const services = [
     {
       name: "webstore",
-      icon: <ShoppingBagIcon className="w-4 h-4 stroke-[1.5]" />,
+      icon: <ShoppingBagIcon className="w-5 h-5 stroke-[1.5]" />,
       href: "/webstore",
     },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0B0B0B]/80 backdrop-blur-md border-b border-[#1A1A1A]">
+    <nav
+      className="relative z-50 bg-[#0B0B0B] border-b border-[#1A1A1A]"
+      suppressHydrationWarning
+    >
+      {/* Bottom Shade Gradient */}
+      <div
+        className="absolute top-full left-0 right-0 h-32 bg-gradient-to-b from-[#0B0B0B] to-transparent pointer-events-none z-10"
+        suppressHydrationWarning
+        aria-hidden="true"
+      />
       <div className="max-w-[1400px] mx-auto px-12 h-40 flex items-center justify-between">
         <div className="flex items-center">
           <Link
@@ -36,7 +46,7 @@ export default function NavBar() {
             className="hover:brightness-110 transition-all duration-300"
           >
             <Image
-              src="/home/logo.png"
+              src={logo}
               alt="Makabasla Logo"
               width={400}
               height={100}
@@ -46,7 +56,7 @@ export default function NavBar() {
           </Link>
         </div>
 
-        <div className="hidden md:flex items-center gap-10 font-mono text-[10px] tracking-widest uppercase">
+        <div className="hidden md:flex items-center gap-10 font-mono text-[12px] tracking-widest uppercase">
           {mounted ? (
             <>
               {services.map((service) => (
@@ -65,7 +75,7 @@ export default function NavBar() {
                   href="/admin"
                   className="text-[#F5A623] hover:text-[#D1D0C5] transition-colors duration-300 flex items-center gap-2.5"
                 >
-                  <ShieldCheckIcon className="w-3.5 h-3.5 stroke-[1.5]" />
+                  <ShieldCheckIcon className="w-5 h-5 stroke-[1.5]" />
                   admin panel
                 </Link>
               )}
@@ -79,19 +89,19 @@ export default function NavBar() {
                     className="flex items-center gap-4 text-[#A1A1A1] hover:text-[#D1D0C5] transition-colors group"
                   >
                     {session.user?.image ? (
-                      <div className="relative w-6 h-6 overflow-hidden rounded-sm ring-1 ring-[#1A1A1A] group-hover:ring-[#D1D0C5] transition-all">
+                      <div className="relative w-8 h-8 overflow-hidden rounded-sm ring-1 ring-[#1A1A1A] group-hover:ring-[#D1D0C5] transition-all">
                         <Image
                           src={session.user.image}
                           alt={session.user.name || "User Profile"}
                           fill
-                          sizes="24px"
+                          sizes="32px"
                           className="object-cover"
                         />
                       </div>
                     ) : (
-                      <UserIcon className="w-4 h-4 stroke-[1.5]" />
+                      <UserIcon className="w-5 h-5 stroke-[1.5]" />
                     )}
-                    <span className="max-w-[140px] truncate tracking-normal normal-case font-sans font-medium text-xs text-[#D1D0C5]">
+                    <span className="max-w-[160px] truncate tracking-normal normal-case font-sans font-medium text-sm text-[#D1D0C5]">
                       {session.user?.name}
                     </span>
                   </Link>
@@ -100,13 +110,13 @@ export default function NavBar() {
                     className="text-[#A1A1A1] hover:text-[#ca4754] transition-colors p-1"
                     title="Sign Out"
                   >
-                    <ArrowRightStartOnRectangleIcon className="w-4 h-4 stroke-[1.5]" />
+                    <ArrowRightStartOnRectangleIcon className="w-5 h-5 stroke-[1.5]" />
                   </button>
                 </div>
               ) : (
                 <Link
                   href="/auth/signin"
-                  className="px-6 py-2.5 bg-[#1A1A1A] text-[#D1D0C5] hover:bg-[#F5A623] hover:text-[#0B0B0B] transition-all duration-300 rounded-sm font-mono text-[10px] tracking-widest uppercase"
+                  className="px-8 py-3 bg-[#1A1A1A] text-[#D1D0C5] hover:bg-[#F5A623] hover:text-[#0B0B0B] transition-all duration-300 rounded-sm font-mono text-[12px] tracking-widest uppercase"
                 >
                   Log In / Sign Up
                 </Link>

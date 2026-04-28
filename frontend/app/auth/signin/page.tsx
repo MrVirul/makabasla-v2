@@ -57,7 +57,7 @@ function SignInForm() {
             className="hover:brightness-110 transition-all duration-300"
           >
             <Image
-              src="/home/logo1.png"
+              src="/home/common/logo1.png"
               alt="Makabasla Logo"
               width={320}
               height={80}
