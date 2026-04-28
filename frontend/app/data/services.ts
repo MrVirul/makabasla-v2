@@ -6,6 +6,12 @@ type Service = {
 
 export const services: Service[] = [
     {
+        title: "Full Vehicle Restoration",
+        description:
+            "Bring your vehicle back to life with complete end-to-end restoration from chassis and engine rebuilds to bodywork and finishing restoring performance, durability, and showroom-level presence.",
+        image: "/home/services/restoration.webp",
+    },
+    {
         title: "Extreme Suspension & Lift Kits",
         description:
             "Elevate your ride with professional lift installations for maximum ground clearance and off-road capability.",
@@ -20,7 +26,7 @@ export const services: Service[] = [
     {
         title: "Heavy-Duty Bumpers, Sliders & Skid Plates",
         description:
-            "Fortress-level protection for your undercarriage and body with military-grade armor solutions.",
+            "Fortress level protection for your undercarriage and body with military grade armor solutions.",
         image: "/home/services/bumper.jpg",
     },
     {
@@ -38,25 +44,20 @@ export const services: Service[] = [
     {
         title: "Snorkels, Exhausts & Off-Road Performance Tuning",
         description:
-            "Breathe deep and roar loud with performance exhaust systems and water-fording snorkel installs.",
+            "Breathe deep and roar loud with performance exhaust systems and water fording snorkel installs.",
         image: "/home/services/snokle.jpg",
     },
     {
         title: "Full Overland & Expedition Builds",
         description:
-            "Complete vehicle transformations for long-distance adventure and self-sufficient exploration.",
+            "Complete vehicle transformations for long-distance adventure and self sufficient exploration.",
         image: "/home/services/overland.jpeg",
     },
     {
         title: "Custom Fabrication & Hardcore Body Mods",
         description:
-            "One-of-a-kind metalwork and modifications. If you can dream it, we can build it.",
+            "One of a kind metalwork and modifications. If you can dream it, we can build it.",
         image: "/home/services/bodyKit.jpeg",
     },
-    {
-        title: "Pre-Trail Prep & Post-Trail Repairs",
-        description:
-            "Get trail-ready with thorough inspections or recover from battle damage with expert repairs.",
-        image: "/home/services/trailRepair.jpeg",
-    },
+
 ];
