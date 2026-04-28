@@ -82,7 +82,7 @@ export function AdminSidebar({ className }: Readonly<{ className?: string }>) {
       <SidebarHeader className="border-b border-[#1A1A1A] p-6 h-16 flex justify-center">
         <div className="flex items-center gap-4">
           <Image
-              src="/home/logo1.png"
+              src="/home/common/logo1.png"
               alt="Makabasla Logo"
               width={320}
               height={80}

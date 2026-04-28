@@ -5,7 +5,7 @@ import { services } from "@/app/data/services";
 
 export default function ServicesSection() {
   return (
-    <section className="relative bg-[#0B0B0B] py-32 px-6 md:px-12 overflow-hidden border-t border-[#1A1A1A]">
+    <section id="services" className="relative bg-[#0B0B0B] py-32 px-6 md:px-12 overflow-hidden border-t border-[#1A1A1A]">
       {/* Background Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-[#F5A623] blur-[150px] rounded-full" />
