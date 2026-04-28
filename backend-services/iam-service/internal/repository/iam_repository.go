@@ -24,6 +24,8 @@ type IamRepository interface {
 	CreateCustomer(customer *models.Customer) error
 	GetCustomerByEmail(email string) (*models.Customer, error)
 	GetCustomerByPhone(phone string) (*models.Customer, error)
+	UpdateVehicle(vehicle *models.Vehicle) error
+	DeleteVehicle(id uint) error
 }
 
 type iamRepository struct {
@@ -238,4 +240,12 @@ func (r *iamRepository) GetCustomerByPhone(phone string) (*models.Customer, erro
 		return nil, err
 	}
 	return &customer, nil
+}
+
+func (r *iamRepository) UpdateVehicle(v *models.Vehicle) error {
+	return r.db.Save(v).Error
+}
+
+func (r *iamRepository) DeleteVehicle(id uint) error {
+	return r.db.Delete(&models.Vehicle{}, id).Error
 }
