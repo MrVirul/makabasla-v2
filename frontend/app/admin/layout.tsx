@@ -33,7 +33,7 @@ export default function AdminLayout({
     password: "",
   });
 
-  const handleAdminLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAdminLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
@@ -49,6 +49,7 @@ export default function AdminLayout({
         setError("Invalid username or password.");
       }
     } catch (err) {
+      console.error("[AdminLayout] Login error:", err);
       setError("System error occurred.");
     } finally {
       setIsLoading(false);
@@ -63,7 +64,7 @@ export default function AdminLayout({
     );
   }
 
-  const isAdmin = !!(session as any)?.isAdmin;
+  const isAdmin = !!session?.isAdmin;
 
   if (!isAdmin) {
     return (
@@ -103,6 +104,9 @@ export default function AdminLayout({
                 >
                   SIGN OUT CURRENT SESSION
                 </button>
+            {session && (
+              <div className="font-mono text-[10px] text-[#F5A623] border border-[#F5A623]/40 bg-[#F5A623]/10 py-3 px-4 rounded-sm tracking-wider uppercase">
+                Access Denied: You do not have permission to view this page.
               </div>
             )}
 
@@ -166,9 +170,9 @@ export default function AdminLayout({
 
   return (
     <SidebarProvider>
-      <AdminSidebar />
+      <AdminSidebar className="no-print" />
       <SidebarInset className="bg-[#0B0B0B] flex flex-col min-h-screen text-[#D1D0C5]">
-        <header className="flex h-16 items-center justify-between gap-4 border-b border-[#1A1A1A] px-10 sticky top-0 bg-[#0B0B0B] z-40">
+        <header className="no-print flex h-16 items-center justify-between gap-4 border-b border-[#1A1A1A] px-10 sticky top-0 bg-[#0B0B0B] z-40">
           <div className="flex items-center gap-6">
             <SidebarTrigger className="text-[#A1A1A1] hover:text-[#D1D0C5] transition-colors" />
           </div>
