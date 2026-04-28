@@ -17,8 +17,8 @@ export default function ServicesSection() {
           <span className="text-[#F5A623] font-mono text-[10px] md:text-xs tracking-[0.4em] uppercase mb-6 opacity-80">
             Expert Engineering
           </span>
-          <h2 className="text-4xl md:text-6xl text-[#D1D0C5] font-medium tracking-tighter leading-tight max-w-2xl">
-            Specialist Off-Road <br /> Modifications
+          <h2 className="text-4xl md:text-6xl text-[#D1D0C5] font-medium tracking-tighter leading-tight max-w-none">
+            Specialist Off-Road Modifications
           </h2>
         </div>
 
