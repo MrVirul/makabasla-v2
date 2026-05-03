@@ -32,8 +32,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Bar,
-  BarChart,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -41,6 +41,7 @@ import {
   ResponsiveContainer,
   Pie,
   PieChart,
+  Legend,
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -49,7 +50,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { format, startOfMonth, subMonths } from "date-fns";
+import { format, startOfMonth, subMonths, subDays } from "date-fns";
 import { cn } from "@/lib/utils";
 
 // Types based on the system
@@ -220,27 +221,70 @@ export default function AdminDashboard() {
   }, [billings, vehicles]);
 
   // Chart data: Revenue over time
+  const [timeRange, setTimeRange] = useState<"weekly" | "monthly" | "yearly">("monthly");
+
   const chartData = useMemo(() => {
-    const months: Record<
-      string,
-      { name: string; revenue: number; expenses: number }
-    > = {};
+    const dataMap: Record<string, { name: string; income: number; expenses: number; date: Date }> = {};
+    const now = new Date();
+    
+    let startDate: Date;
+    let formatStr: string;
+    
+    if (timeRange === "weekly") {
+      startDate = subDays(now, 6);
+      formatStr = "EEE"; 
+    } else if (timeRange === "monthly") {
+      startDate = subDays(now, 29);
+      formatStr = "dd MMM";
+    } else {
+      startDate = subMonths(now, 11);
+      formatStr = "MMM";
+    }
+
+    // Initialize the range with 0s to avoid gaps
+    if (timeRange === "weekly" || timeRange === "monthly") {
+      const iterations = timeRange === "weekly" ? 7 : 30;
+      for (let i = iterations - 1; i >= 0; i--) {
+        const d = subDays(now, i);
+        const key = format(d, formatStr);
+        dataMap[key] = { name: key, income: 0, expenses: 0, date: d };
+      }
+    } else {
+      for (let i = 11; i >= 0; i--) {
+        const d = subMonths(now, i);
+        const key = format(d, formatStr);
+        dataMap[key] = { name: key, income: 0, expenses: 0, date: d };
+      }
+    }
 
     billings.forEach((b) => {
-      if (!b.created_at) return;
-      const date = new Date(b.created_at);
-      if (Number.isNaN(date.getTime())) return;
+      // 1. Process individual expenses
+      b.expenses?.forEach((exp) => {
+        if (!exp.date) return;
+        const eDate = new Date(exp.date);
+        if (Number.isNaN(eDate.getTime()) || eDate < startDate) return;
 
-      const monthKey = format(date, "MMM");
-      if (!months[monthKey]) {
-        months[monthKey] = { name: monthKey, revenue: 0, expenses: 0 };
-      }
-      months[monthKey].revenue += b.total_expenses || 0;
-      months[monthKey].expenses += (b.total_expenses || 0) * 0.35;
+        const key = format(eDate, formatStr);
+        if (dataMap[key]) {
+          dataMap[key].expenses += exp.amount || 0;
+        }
+      });
+
+      // 2. Process individual advances (income)
+      b.advances?.forEach((adv) => {
+        if (!adv.date) return;
+        const aDate = new Date(adv.date);
+        if (Number.isNaN(aDate.getTime()) || aDate < startDate) return;
+
+        const key = format(aDate, formatStr);
+        if (dataMap[key]) {
+          dataMap[key].income += adv.amount || 0;
+        }
+      });
     });
 
-    return Object.values(months);
-  }, [billings]);
+    return Object.values(dataMap).sort((a, b) => a.date.getTime() - b.date.getTime());
+  }, [billings, timeRange]);
 
   // Distribution data
   const distributionData = useMemo(() => {
@@ -443,38 +487,36 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Revenue Trend Chart */}
             <Card className="lg:col-span-2 bg-[#141414] border-none p-8">
-              <CardHeader className="px-0 pt-0 mb-8">
-                <CardTitle className="text-lg font-medium text-white/90">
-                  Revenue Trajectory
-                </CardTitle>
-                <CardDescription className="text-xs text-[#646669] font-mono uppercase tracking-wider">
-                  Gross performance over recent cycles
-                </CardDescription>
+              <CardHeader className="px-0 pt-0 mb-8 flex flex-row items-center justify-between space-y-0">
+                <div>
+                  <CardTitle className="text-lg font-medium text-white/90">
+                    Financial Trajectory
+                  </CardTitle>
+                  <CardDescription className="text-xs text-[#646669] font-mono uppercase tracking-wider">
+                    Income vs Expenses over {timeRange}
+                  </CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  {(["weekly", "monthly", "yearly"] as const).map((range) => (
+                    <button
+                      key={range}
+                      onClick={() => setTimeRange(range)}
+                      className={cn(
+                        "px-3 py-1 font-mono text-[9px] uppercase tracking-widest transition-all rounded-sm",
+                        timeRange === range
+                          ? "bg-[#F5A623] text-[#0B0B0B] font-bold"
+                          : "bg-white/5 text-[#646669] hover:text-white"
+                      )}
+                    >
+                      {range}
+                    </button>
+                  ))}
+                </div>
               </CardHeader>
               <CardContent className="px-0 pb-0">
                 <div className="h-[350px] w-full min-h-0 min-w-0">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <defs>
-                        <linearGradient
-                          id="barGradient"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="0%"
-                            stopColor="#F5A623"
-                            stopOpacity={1}
-                          />
-                          <stop
-                            offset="100%"
-                            stopColor="#F5A623"
-                            stopOpacity={0.4}
-                          />
-                        </linearGradient>
-                      </defs>
+                    <LineChart data={chartData}>
                       <CartesianGrid
                         strokeDasharray="3 3"
                         vertical={false}
@@ -482,7 +524,7 @@ export default function AdminDashboard() {
                       />
                       <XAxis
                         dataKey="name"
-                        stroke="#333"
+                        stroke="#FFFFFF"
                         fontSize={9}
                         tickLine={false}
                         axisLine={false}
@@ -490,7 +532,7 @@ export default function AdminDashboard() {
                         dy={10}
                       />
                       <YAxis
-                        stroke="#333"
+                        stroke="#FFFFFF"
                         fontSize={9}
                         tickLine={false}
                         axisLine={false}
@@ -498,21 +540,43 @@ export default function AdminDashboard() {
                         tickFormatter={(value) => `Rs ${value}`}
                       />
                       <RechartsTooltip
-                        cursor={{ fill: "rgba(255, 255, 255, 0.03)" }}
+                        cursor={{ stroke: '#F5A623', strokeWidth: 1 }}
                         contentStyle={{
                           backgroundColor: "#1A1A1A",
                           border: "1px solid #333",
                           fontSize: "10px",
                           borderRadius: "4px",
                         }}
-                        itemStyle={{ color: "#F5A623" }}
+                        itemStyle={{ padding: '2px 0' }}
                       />
-                      <Bar
-                        dataKey="revenue"
-                        fill="url(#barGradient)"
-                        radius={[2, 2, 0, 0]}
+                      <Legend 
+                        verticalAlign="top" 
+                        align="right"
+                        height={36}
+                        iconType="circle"
+                        formatter={(value) => <span className="text-[10px] font-mono uppercase tracking-widest text-[#646669] ml-2">{value}</span>}
                       />
-                    </BarChart>
+                      <Line
+                        type="monotone"
+                        dataKey="income"
+                        name="Income"
+                        stroke="#10b981"
+                        strokeWidth={2}
+                        dot={{ fill: '#10b981', r: 3, strokeWidth: 0 }}
+                        activeDot={{ r: 5, strokeWidth: 0 }}
+                        animationDuration={1500}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="expenses"
+                        name="Expenses"
+                        stroke="#ca4754"
+                        strokeWidth={2}
+                        dot={{ fill: '#ca4754', r: 3, strokeWidth: 0 }}
+                        activeDot={{ r: 5, strokeWidth: 0 }}
+                        animationDuration={1500}
+                      />
+                    </LineChart>
                   </ResponsiveContainer>
                 </div>
               </CardContent>
