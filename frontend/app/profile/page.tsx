@@ -787,7 +787,84 @@ export default function ProfilePage() {
 
         {/* Add Vehicle Dialog */}
         <Dialog open={isAddVehicleOpen} onOpenChange={setIsAddVehicleOpen}>
-          {/* ... (keep existing Add Vehicle dialog content) */}
+          <DialogContent className="max-w-xl bg-[#0B0B0B] border-[#1A1A1A] text-[#D1D0C5] p-0 overflow-hidden shadow-2xl">
+            <DialogHeader className="p-8 border-b border-[#1A1A1A] bg-[#0B0B0B]">
+              <DialogTitle className="text-2xl font-medium tracking-tight text-white mb-2">
+                Register New Vehicle
+              </DialogTitle>
+              <p className="font-mono text-[10px] text-[#A1A1A1] uppercase tracking-widest">
+                Add a new vehicle to your profile
+              </p>
+            </DialogHeader>
+
+            <div className="p-8 space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">Make</label>
+                  <input
+                    placeholder="e.g. Toyota"
+                    value={newVehicle.make}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, make: e.target.value })}
+                    className="w-full bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">Model</label>
+                  <input
+                    placeholder="e.g. Corolla"
+                    value={newVehicle.model}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, model: e.target.value })}
+                    className="w-full bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">Year</label>
+                  <input
+                    type="number"
+                    value={newVehicle.year}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, year: parseInt(e.target.value) })}
+                    className="w-full bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">Color</label>
+                  <input
+                    placeholder="e.g. Pearl White"
+                    value={newVehicle.color}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, color: e.target.value })}
+                    className="w-full bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all"
+                  />
+                </div>
+                <div className="col-span-2 space-y-2">
+                  <label className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">Plate Number</label>
+                  <input
+                    placeholder="ABC-1234"
+                    value={newVehicle.plate_number}
+                    onChange={(e) => setNewVehicle({ ...newVehicle, plate_number: e.target.value })}
+                    className="w-full bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all uppercase"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="p-8 border-t border-[#1A1A1A] flex justify-end gap-6">
+              <button
+                onClick={() => setIsAddVehicleOpen(false)}
+                className="font-mono text-[10px] text-[#A1A1A1] hover:text-[#D1D0C5] uppercase tracking-widest transition-colors"
+                disabled={adding}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddVehicle}
+                disabled={adding || !newVehicle.make || !newVehicle.model || !newVehicle.plate_number}
+                className="flex items-center gap-2 px-8 py-3 bg-[#F5A623] text-[#0B0B0B] font-mono text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#D1D0C5] transition-all disabled:opacity-50"
+              >
+                {adding ? <ArrowPathIcon className="w-3 h-3 animate-spin" /> : <PlusIcon className="w-3 h-3" />}
+                Add Vehicle
+              </button>
+            </div>
+          </DialogContent>
         </Dialog>
 
         {/* Edit Vehicle Dialog */}
@@ -834,6 +911,14 @@ export default function ProfilePage() {
                   <input
                     value={editingVehicle?.plate_number || ""}
                     onChange={(e) => editingVehicle && setEditingVehicle({ ...editingVehicle, plate_number: e.target.value })}
+                    className="w-full bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="font-mono text-[9px] text-[#A1A1A1] uppercase tracking-widest">Color</label>
+                  <input
+                    value={editingVehicle?.color || ""}
+                    onChange={(e) => editingVehicle && setEditingVehicle({ ...editingVehicle, color: e.target.value })}
                     className="w-full bg-[#1A1A1A] border border-transparent focus:border-[#F5A623]/30 px-4 py-3 rounded-sm font-mono text-xs outline-none transition-all"
                   />
                 </div>
