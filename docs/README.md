@@ -17,6 +17,9 @@ Common commands for starting, stopping, and developing the microservices.
 #### [Architecture Diagram](ARCHITECTURE_DIAGRAM.md)
 Visual system architecture detailing the API Gateway, Consul service discovery, and the individual microservices.
 
+#### [Backend Functionalities Guide](BACKEND_FUNCTIONALITIES.md)
+Comprehensive reference detailing backend service routes, business logic patterns, logical database tables, and core shared packages (retry policies, error mapping, and token propagation) for onboarding new developers.
+
 #### [Consul Health Checks](CONSUL_HEALTH_CHECKS.md)
 Detailed documentation on service discovery health check endpoints and configuration.
 
