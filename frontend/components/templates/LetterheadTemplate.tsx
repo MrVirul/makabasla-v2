@@ -237,13 +237,27 @@ export default function MakabaslaLetterhead({ billingData }: Readonly<Letterhead
           .letterhead-page {
             box-shadow: none !important;
             margin: 0 !important;
-            width: 210mm !important;
-            height: 297mm !important;
+            width: 100% !important;
+            min-height: 297mm !important;
+            height: auto !important;
             border: none !important;
             transform: none !important;
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
+            position: relative !important;
+            left: auto !important;
+            top: auto !important;
+          }
+
+          tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          thead {
+            display: table-header-group !important;
+          }
+
+          tfoot {
+            display: table-footer-group !important;
           }
         }
 

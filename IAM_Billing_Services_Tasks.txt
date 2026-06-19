@@ -1,0 +1,21 @@
+Repository: https://github.com/MrVirul/makabasla-v2.git
+
+Tasks performed under IAM & Billing Services:
+
+- Wired the IAM service to the database.
+- Added support for vehicle registration and customer profile synchronization.
+- Added vehicle update and delete endpoints.
+- Implemented GetAllVehicles for the registry.
+- Migrated billing transport to gRPC.
+- Added billing delete service and repository logic.
+- Added admin dashboard metrics for billing.
+- Fixed billing chart dimension issues, browser warnings, and billing add failures.
+- Added billing invoice generation in the frontend.
+- Improved profile phone number sync and validation.
+- Implemented role-based automatic profile synchronization.
+
+API Gateway and related infrastructure work:
+
+- Added PostgreSQL database setup automation.
+- Implemented shared infrastructure libraries for gRPC, HTTP, discovery, and logging.
+- Updated Docker orchestration for the microservices stack.
