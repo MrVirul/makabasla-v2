@@ -1,6 +1,6 @@
-# Makabasla v2
+# Makabasla GMS
 
-Modern healthcare management system built with Go microservices and a Next.js frontend.
+Modern Garage management system built with Go microservices and a Next.js frontend.
 
 ## 🏗️ Project Structure
 
