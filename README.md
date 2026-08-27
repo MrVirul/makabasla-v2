@@ -1,155 +1,188 @@
+<div align="center">
+
 # Makabasla GMS
 
-Modern Garage management system built with Go microservices and a Next.js frontend.
+**Garage management system built with Go microservices and a Next.js frontend.**
 
-## 🏗️ Project Structure
+[![CI](https://github.com/MrVirul/makabasla-v2/actions/workflows/ci.yml/badge.svg)](https://github.com/MrVirul/makabasla-v2/actions/workflows/ci.yml)
+[![Go](https://img.shields.io/badge/Go-1.26.1-00ADD8?logo=go&logoColor=white)](https://go.dev/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-087ea4?logo=react&logoColor=white)](https://react.dev/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169e1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Consul](https://img.shields.io/badge/Consul-1.15-8f46d8?logo=consul&logoColor=white)](https://www.consul.io/)
+
+</div>
+
+---
+
+## Table of Contents
+
+- [About](#about)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Services & Ports](#services--ports)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [Testing](#testing)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## About
+
+Makabasla GMS is a garage management platform composed of independently deployable Go
+microservices behind an API gateway, with a Next.js App Router frontend. Services register
+themselves with HashiCorp Consul for discovery, the gateway validates JWTs before proxying
+requests, and each service owns its own PostgreSQL database.
+
+## Features
+
+- **Microservices architecture** — six independently deployable services with a shared Go workspace (`go.work`)
+- **Service discovery** — automatic registration and health checks via HashiCorp Consul
+- **API gateway** — centralized routing, JWT validation, and CORS handling
+- **Identity & access management** — Google OAuth 2.0 sign-in with just-in-time user profile sync
+- **Vehicle management** — customer vehicle registration and profile editing
+- **Billing** — per-vehicle bills with advance payments and expense tracking
+- **Service management** — task tracking, appointments, and webstore inventory
+- **Modern dashboard** — glassmorphic UI built with Tailwind CSS 4 and Radix primitives
+- **CI enforced** — GitHub Actions runs semantic PR title linting plus Go and Next.js builds
+
+## Tech Stack
+
+### Backend
+
+| Technology | Role |
+| --- | --- |
+| Go 1.26.1 | Service runtime (workspace-managed via `go.work`) |
+| Echo | HTTP server and router |
+| gRPC + Protobuf | Inter-service communication |
+| PostgreSQL 16 | Primary datastore (one database per service) |
+| HashiCorp Consul 1.15 | Service discovery and health checking |
+| Resty | Internal HTTP client with retries |
+| JWT | Token validation at the gateway |
+
+### Frontend
+
+| Technology | Role |
+| --- | --- |
+| Next.js 16 | React framework (App Router) |
+| React 19 | UI runtime |
+| TypeScript 6 | Type safety |
+| Tailwind CSS 4 | Styling |
+| Radix UI | Accessible component primitives |
+| NextAuth.js | Session and OAuth handling |
+| Recharts | Dashboard charts |
+| Lucide React | Iconography |
+
+## Architecture
+
+```text
+                        ┌──────────────────┐
+   Browser  ──────────▶  │   Next.js App    │  :3000
+                        └────────┬─────────┘
+                                 │ REST + Bearer JWT
+                                 ▼
+                        ┌──────────────────┐
+                        │   API Gateway    │  :8080
+                        │  auth · CORS ·   │
+                        │    routing       │
+                        └────────┬─────────┘
+                                 │ service lookup via Consul :8500
+        ┌────────────┬───────────┼───────────┬────────────┬────────────┐
+        ▼            ▼           ▼           ▼            ▼            ▼
+   iam-service  billing-svc  task-mgt-svc  appt-svc   webstore-svc   proto
+     :8084        :8083        :8086        :8085       :8087        (gRPC)
+        │            │           │           │            │
+        ▼            ▼           ▼           ▼            ▼
+   ┌─────────┐  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐
+   │Postgres │  │Postgres │ │Postgres │ │Postgres │ │Postgres │
+   └─────────┘  └─────────┘ └─────────┘ └─────────┘ └─────────┘
+                     database per service  :5432
+```
+
+## Services & Ports
+
+| Service | Port | Responsibility |
+| --- | --- | --- |
+| `api-gateway` | 8080 | Routing, JWT validation, CORS |
+| `iam-service` | 8084 | Users, profiles, vehicles |
+| `billing-service` | 8083 | Bills, advances, expenses |
+| `appointment-service` | 8085 | Booking and scheduling |
+| `task-mgt-service` | 8086 | Work task tracking |
+| `webstore-service` | 8087 | Parts and inventory |
+| `postgres` | 5432 | Relational datastore |
+| `consul` | 8500 | Service registry and UI |
+| `frontend` | 3000 | Next.js dev server |
+
+## Project Structure
 
 ```text
 makabasla-v2/
-├── compose.yaml                                 # Local orchestration (development)
-├── go.work                                      # Go workspace for all backend modules
-├── README.md
+├── compose.yaml                     # Orchestrates all services + infrastructure
+├── go.work                          # Go workspace spanning backend modules
+├── Makefile                         # Root task runner (make test)
+├── CONTRIBUTING.md                  # Commit and PR conventions
 ├── backend-services/
-│   ├── Dockerfile.dev                           # Shared dev image for backend workflows
-│   ├── README.md
-│   ├── api-gateway/
-│   │   ├── Dockerfile                           # API Gateway container image
-│   │   ├── go.mod
-│   │   ├── cmd/main.go
-│   │   ├── config/config.go
-│   │   └── internal/
-│   │       ├── handler/
-│   │       └── middleware/
-│   ├── appointment-service/
-│   │   ├── Dockerfile                           # Appointment service container image
-│   │   ├── go.mod
-│   │   ├── cmd/main.go
-│   │   ├── config/config.go
-│   │   └── internal/
-│   │       ├── database/
-│   │       ├── discovery/
-│   │       ├── handler/
-│   │       ├── models/
-│   │       ├── repository/
-│   │       └── service/
-│   ├── billing-service/
-│   │   ├── Dockerfile                           # Billing service container image
-│   │   ├── go.mod
-│   │   ├── cmd/main.go
-│   │   ├── config/config.go
-│   │   └── internal/
-│   │       ├── database/
-│   │       ├── discovery/
-│   │       ├── handler/
-│   │       ├── models/
-│   │       ├── repository/
-│   │       └── service/
-│   ├── iam-service/
-│   │   ├── Dockerfile                           # IAM service container image
-│   │   ├── go.mod
-│   │   ├── cmd/main.go
-│   │   ├── config/config.go
-│   │   └── internal/
-│   │       ├── database/
-│   │       ├── discovery/
-│   │       ├── handler/
-│   │       ├── models/
-│   │       ├── repository/
-│   │       └── service/
-│   ├── task-mgt-service/
-│   │   ├── Dockerfile                           # Task management service container image
-│   │   ├── go.mod
-│   │   ├── cmd/main.go
-│   │   ├── config/config.go
-│   │   └── internal/
-│   │       ├── database/
-│   │       ├── discovery/
-│   │       ├── handler/
-│   │       ├── repository/
-│   │       └── service/
-│   ├── webstore-service/
-│   │   ├── Dockerfile                           # Webstore service container image
-│   │   ├── go.mod
-│   │   ├── cmd/main.go
-│   │   ├── config/config.go
-│   │   └── internal/
-│   │       ├── database/
-│   │       ├── discovery/
-│   │       ├── handler/
-│   │       ├── repository/
-│   │       └── service/
-│   └── shared/
-│       ├── go.mod
-│       ├── Makefile
-│       ├── pkg/                                 # Shared config, discovery, grpc, httpclient, logger
-│       └── proto/                               # Shared protobuf contracts
-├── frontend/
-│   ├── package.json
-│   ├── next.config.ts
-│   ├── app/
-│   ├── components/
-│   ├── hooks/
-│   ├── lib/
-│   └── public/
+│   ├── Dockerfile.dev               # Shared dev image for backend workflows
+│   ├── api-gateway/                 # Edge routing and auth
+│   ├── iam-service/                 # Identity, access, vehicles
+│   ├── billing-service/             # Invoicing and payments
+│   ├── appointment-service/         # Scheduling
+│   ├── task-mgt-service/            # Task tracking
+│   ├── webstore-service/            # Parts inventory
+│   └── shared/                      # Config, discovery, gRPC, HTTP client, logger
+│       ├── proto/                   # Protobuf contracts (common, billing)
+│       └── pkg/                     # Shared Go packages
+├── frontend/                        # Next.js App Router application
 ├── billing-api/
-│   └── opencollection.yml
-├── docs/
-│   ├── ARCHITECTURE_DIAGRAM.md
-│   ├── CHECKLIST.md
-│   ├── CONSUL_HEALTH_CHECKS.md
-│   ├── IMPLEMENTATION_SUMMARY.md
-│   ├── QUICK_REFERENCE.md
-│   ├── REORGANIZATION_SUMMARY.md
-│   └── SETUP_GUIDE.md
-└── memory-bank/
-   ├── activeContext.md
-   ├── productContext.md
-   ├── progress.md
-   ├── projectbrief.md
-   ├── systemPatterns.md
-   └── techContext.md
-
-Dockerfile locations (quick reference):
-- backend-services/Dockerfile.dev
-- backend-services/api-gateway/Dockerfile
-- backend-services/appointment-service/Dockerfile
-- backend-services/billing-service/Dockerfile
-- backend-services/iam-service/Dockerfile
-- backend-services/task-mgt-service/Dockerfile
-- backend-services/webstore-service/Dockerfile
+│   └── opencollection.yml           # Billing API specification
+├── tests/                           # Centralized service test runner
+└── docs/                            # Architecture, setup, and reference guides
 ```
 
-## 🚀 Quick Start
+## Prerequisites
 
-### Backend Services (Standard)
+- **Go 1.26.1** — backend services
+- **Node.js 20+** — frontend (Next.js 16 requires Node 18.18+)
+- **Docker & Docker Compose** — infrastructure and service orchestration
+- **Google Cloud OAuth credentials** — required for Google sign-in
+
+## Quick Start
+
+### 1. Clone the repository
 
 ```bash
-cd backend-services
-
-# 1. Setup databases
-./setup-databases.sh
-
-# 2. Start all services
-./start-all.sh
-
-# 3. Test services
-./test-services.sh
+git clone https://github.com/MrVirul/makabasla-v2.git
+cd makabasla-v2
 ```
 
-### Backend Services (Docker)
+### 2. Configure environment
+
+`.env` is git-ignored and must be created manually in the project root. Copy the variable
+names from [Configuration](#configuration) and fill in real values — Compose and every
+service read from this single file.
+
+### 3. Start the backend
 
 ```bash
-# Start all microservices and infrastructure with one command
-docker compose up --build
+docker compose up --build -d
 ```
 
-**Access Points:**
+This starts PostgreSQL, Consul, the API gateway, and all five microservices. Follow the
+logs to confirm each service registers with Consul:
 
-- API Gateway: http://localhost:8080
-- Consul UI: http://localhost:8500
-- Google Cloud Console (OAuth setup)
+```bash
+docker compose logs -f
+```
 
-### Frontend
+Consul UI at http://localhost:8500 should list every healthy service.
+
+### 4. Start the frontend
 
 ```bash
 cd frontend
@@ -157,92 +190,106 @@ npm install
 npm run dev
 ```
 
-## 📚 Documentation
+### 5. Verify
 
-Complete documentation is available in the [`docs/`](docs/) directory:
+| Endpoint | URL |
+| --- | --- |
+| Frontend | http://localhost:3000 |
+| API gateway | http://localhost:8080 |
+| Consul UI | http://localhost:8500 |
+| Profile | http://localhost:3000/profile |
 
-- **[Setup Guide](docs/SETUP_GUIDE.md)** - Comprehensive implementation guide
-- **[Quick Reference](docs/QUICK_REFERENCE.md)** - Command reference and examples
-- **[Architecture Diagram](docs/ARCHITECTURE_DIAGRAM.md)** - System architecture and design
-- **[Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md)** - What's implemented and how to use it
-- **[Checklist](docs/CHECKLIST.md)** - Testing and deployment checklist
+## Configuration
 
-## 🛠️ Technology Stack
+All services read from environment variables defined in a root `.env` file.
 
-### Backend
+### Infrastructure
 
-- **Go**: 1.26 (Monorepo with `go.work`)
-- **Echo**: HTTP server/router
-- **gRPC**: Inter-service communication
-- **PostgreSQL**: Database
-- **Consul**: Service discovery
-- **Google OAuth**: Identity provider via NextAuth
-- **JWT**: Authentication (gateway)
-- **Resty**: Internal HTTP client with retries
+| Variable | Purpose |
+| --- | --- |
+| `POSTGRES_USER` | Postgres superuser used by every service |
+| `POSTGRES_PASSWORD` | Postgres password |
+| `CONSUL_HOST` | Consul address used for service discovery |
 
-### Frontend
+### Databases
 
-- **Next.js 15+**: React framework (App Router)
-- **NextAuth.js**: Authentication handling
-- **TailwindCSS 4**: Modern styling
-- **Shadcn UI**: Premium component library
-- **Lucide React**: Icon system
+Each service owns a separate database and reads its own connection string.
 
-## ⚡ Features
+| Variable | Service |
+| --- | --- |
+| `IAM_DB_URL` | `iam-service` |
+| `BILLING_DB_URL` | `billing-service` |
+| `APPOINTMENT_DB_URL` | `appointment-service` |
+| `TSKMGT_DB_URL` | `task-mgt-service` |
+| `WEBSTORE_DB_URL` | `webstore-service` |
 
-- ✅ **Microservices Architecture** - Independent, scalable services
-- ✅ **Service Discovery** - Automatic service registration via Consul
-- ✅ **API Gateway** - Centralized routing, JWT validation & CORS
-- ✅ **User Profile Sync** - Just-in-Time provisioning for customer data
-- ✅ **Vehicle Management** - Customer vehicle registration system
-- ✅ **Modern Dashboard** - Premium glassmorphic UI with Shadcn components
-- ✅ **Google Authentication** - OAuth 2.0 integration with NextAuth.js
+### Authentication
 
-## 📖 Getting Started
+| Variable | Purpose |
+| --- | --- |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `GOOGLE_REDIRECT_URI` | Registered OAuth callback URL |
+| `NEXTAUTH_SECRET` | NextAuth session signing secret |
+| `NEXTAUTH_URL` | Public frontend base URL |
 
-### Prerequisites
+Generate a secret with:
 
-- **Go 1.23+** - For backend services
-- **Node.js 18+** - For frontend
-- **Docker & Docker Compose** - Infrastructure
+```bash
+openssl rand -base64 32
+```
 
-### Installation
+## Testing
 
-1. **Clone the repository**
+Run the system service unit tests from the repository root:
 
-   ```bash
-   git clone https://github.com/MrVirul/makabasla-v2.git
-   cd makabasla-v2
-   ```
+```bash
+make test
+```
 
-2. **Start backend services (Docker recommended)**
+Run tests for a single module:
 
-   ```bash
-   docker compose up -d
-   ```
+```bash
+go test ./backend-services/iam-service/...
+```
 
-3. **Start frontend**
+Build the frontend:
 
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
+```bash
+cd frontend && npm run build
+```
 
-4. **Verify installation**
-   - Frontend: http://localhost:3000
-   - API Gateway: http://localhost:8080
-   - Profile Sync: http://localhost:3000/profile
+Regenerate Go code from the Protobuf contracts:
 
-## 📝 Project Status
+```bash
+cd backend-services/shared && make protos
+```
 
-- ✅ **API Gateway** - Complete with auth + CORS + routing
-- ✅ **IAM Service** - User Profile & Vehicle Management functional
-- ✅ **Frontend** - Next.js + Tailwind 4 + Shadcn UI integration complete
-- ✅ **Infrastructure** - Consul, Google OAuth, and PostgreSQL integrated
+Both backends and frontend builds run automatically in CI on every push and pull request
+against `main` and `dev`.
 
----
+## Documentation
 
-**Version**: 1.1.0  
-**Last Updated**: 2026-03-21  
-**Status**: ✅ Active Development
+Extended documentation lives in [`docs/`](docs/) — start with the
+[backend documentation index](docs/README.md).
+
+| Document | Description |
+| --- | --- |
+| [Setup Guide](docs/SETUP_GUIDE.md) | Full backend setup walkthrough |
+| [Quick Reference](docs/QUICK_REFERENCE.md) | Command and port reference |
+| [Architecture Diagram](docs/ARCHITECTURE_DIAGRAM.md) | Service topology and request flows |
+| [Backend Functionalities](docs/BACKEND_FUNCTIONALITIES.md) | Endpoint-level feature catalogue |
+| [Consul Health Checks](docs/CONSUL_HEALTH_CHECKS.md) | Health check configuration |
+| [Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md) | Current implementation state |
+| [Checklist](docs/CHECKLIST.md) | Testing and deployment checklist |
+
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming,
+commit message conventions, and the pull request workflow. PR titles are linted for semantic
+formatting in CI.
+
+## License
+
+No `LICENSE` file has been added to this repository yet. Until one is committed, all rights
+are reserved — add a license before distributing or publishing the project.
