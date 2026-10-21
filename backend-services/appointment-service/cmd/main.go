@@ -13,6 +13,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/makabas/appointment-service/config"
 	"github.com/makabas/appointment-service/internal/database"
+	"github.com/makabas/appointment-service/internal/discovery"
 	"github.com/makabas/appointment-service/internal/handler"
 	"github.com/makabas/appointment-service/internal/repository"
 	"github.com/makabas/appointment-service/internal/service"
@@ -27,8 +28,6 @@ func main() {
 		log.Fatalf("Warning: failed to initialize database: %v", err)
 	}
 
-
-
 	repo := repository.NewAppointmentRepository(db)
 	svc := service.NewAppointmentService(repo)
 	h := handler.NewAppointmentHandler(svc)
@@ -37,6 +36,20 @@ func main() {
 	e.Use(middleware.Recover())
 
 	h.RegisterRoutes(e)
+
+	// Register with Consul for service discovery
+	consulClient, err := discovery.NewConsulClient(cfg)
+	if err != nil {
+		log.Fatalf("Failed to create Consul client: %v", err)
+	}
+	if err := consulClient.Register(cfg); err != nil {
+		log.Fatalf("Failed to register with Consul: %v", err)
+	}
+	defer func() {
+		if err := consulClient.Deregister(); err != nil {
+			log.Printf("Failed to deregister from Consul: %v", err)
+		}
+	}()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)

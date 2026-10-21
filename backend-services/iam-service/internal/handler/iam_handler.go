@@ -191,6 +191,7 @@ func containsEmail(s string) bool {
 }
 
 func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
+	e.GET("/health", h.Health)
 	e.GET("/api/v1/user", h.GetUser)
 	e.POST("/api/v1/profile", h.SyncProfile)
 	e.GET("/api/v1/profile/:id", h.GetProfile)
@@ -201,4 +202,9 @@ func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
 	e.GET("/api/v1/customers", h.GetAllCustomers)
 	e.POST("/api/v1/auth/login", h.Login)
 	e.POST("/api/v1/register", h.Register)
+}
+
+// Health is used by the Consul health check configured in internal/discovery.
+func (h *IamHandler) Health(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]string{"status": "ok"})
 }

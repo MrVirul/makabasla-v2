@@ -106,6 +106,7 @@ func (h *WebstoreHandler) GetAnalytics(c echo.Context) error {
 }
 
 func (h *WebstoreHandler) RegisterRoutes(e *echo.Echo) {
+	e.GET("/health", h.Health)
 	group := e.Group("/api/v1/webstore/products")
 	group.GET("", h.GetAllProducts)
 	group.POST("", h.CreateProduct)
@@ -115,4 +116,9 @@ func (h *WebstoreHandler) RegisterRoutes(e *echo.Echo) {
 
 	analyticsGroup := e.Group("/api/v1/webstore/analytics")
 	analyticsGroup.GET("", h.GetAnalytics)
+}
+
+// Health is used by the Consul health check configured in internal/discovery.
+func (h *WebstoreHandler) Health(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]string{"status": "ok"})
 }

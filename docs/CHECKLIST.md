@@ -16,7 +16,7 @@ Always review this checklist before deploying updates to the Makabasla Go Micros
 - [ ] Service-to-service communication paths succeed
 
 ### 3. Database Readiness
-- [ ] `setup-databases.sql` effectively runs when PostgreSQL volume is wiped
+- [ ] `scripts/init-databases.sh` effectively runs when PostgreSQL volume is wiped
 - [ ] The `billingdb`, `appointmentdb`, `taskdb`, and `webstoredb` instances initialize properly
 - [ ] Go struct schemas mapped to logical PostgreSQL domains migrate/sync properly
 

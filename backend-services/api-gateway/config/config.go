@@ -8,15 +8,19 @@ import (
 )
 
 type Config struct {
-	ServerPort     string `mapstructure:"SERVER_PORT"`
-	AppName        string `mapstructure:"APP_NAME"`
-	JwtSecret      string `mapstructure:"JWT_SECRET"`
-	IAMServiceURL  string `mapstructure:"IAM_SERVICE_URL"`
+	ServerPort    string `mapstructure:"SERVER_PORT"`
+	AppName       string `mapstructure:"APP_NAME"`
+	ConsulHost    string `mapstructure:"CONSUL_HOST"`
+	ConsulPort    string `mapstructure:"CONSUL_PORT"`
+	JwtSecret     string `mapstructure:"JWT_SECRET"`
+	IAMServiceURL string `mapstructure:"IAM_SERVICE_URL"`
 }
 
 func LoadConfig() *Config {
 	viper.SetDefault("SERVER_PORT", "8080")
 	viper.SetDefault("APP_NAME", "api-gateway")
+	viper.SetDefault("CONSUL_HOST", "consul")
+	viper.SetDefault("CONSUL_PORT", "8500")
 	viper.SetDefault("JWT_SECRET", "your-256-bit-secret-key-here-change-in-production-make-it-at-least-32-characters-long")
 	viper.SetDefault("IAM_SERVICE_URL", "http://iam-service:8084")
 

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/makabas/appointment-service/config"
+	"github.com/makabas/appointment-service/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -28,6 +29,10 @@ func NewDatabase(cfg *config.Config) (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	if err := db.AutoMigrate(&models.Appointment{}); err != nil {
+		return nil, err
+	}
 
 	log.Printf("Successfully connected to database for %s", cfg.AppName)
 

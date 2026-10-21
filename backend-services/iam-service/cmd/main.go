@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	// "strings" // Unused in dev mode (Basic Auth skipped)
 	"syscall"
 	"time"
 
@@ -14,6 +13,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/makabas/iam-service/config"
 	"github.com/makabas/iam-service/internal/database"
+	"github.com/makabas/iam-service/internal/discovery"
 	"github.com/makabas/iam-service/internal/handler"
 	"github.com/makabas/iam-service/internal/repository"
 	"github.com/makabas/iam-service/internal/service"
@@ -27,8 +27,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
-
-
 
 	repo := repository.NewIamRepository(db)
 	svc := service.NewIamService(repo)
@@ -52,6 +50,20 @@ func main() {
 	// }))
 
 	h.RegisterRoutes(e)
+
+	// Register with Consul for service discovery
+	consulClient, err := discovery.NewConsulClient(cfg)
+	if err != nil {
+		log.Fatalf("Failed to create Consul client: %v", err)
+	}
+	if err := consulClient.Register(cfg); err != nil {
+		log.Fatalf("Failed to register with Consul: %v", err)
+	}
+	defer func() {
+		if err := consulClient.Deregister(); err != nil {
+			log.Printf("Failed to deregister from Consul: %v", err)
+		}
+	}()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)

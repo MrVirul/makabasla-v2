@@ -82,9 +82,15 @@ func (h *TaskHandler) UpdateTaskStatus(c echo.Context) error {
 }
 
 func (h *TaskHandler) RegisterRoutes(e *echo.Echo) {
+	e.GET("/health", h.Health)
 	api := e.Group("/api/v1")
 	api.POST("/vehicles/:vehicle_id/tasks", h.CreateTask)
 	api.GET("/vehicles/:vehicle_id/tasks", h.GetTasks)
 	api.PATCH("/tasks/:task_id/status", h.UpdateTaskStatus)
+}
+
+// Health is used by the Consul health check configured in internal/discovery.
+func (h *TaskHandler) Health(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]string{"status": "ok"})
 }
 

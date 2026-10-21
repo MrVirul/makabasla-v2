@@ -187,12 +187,13 @@ go run cmd/main.go
 
 ## 3. Database Initializer
 
-The `postgres` service is pre-configured to automatically run `backend-services/setup-databases.sql` on the very first startup to provision the databases:
+The `postgres` service is pre-configured to automatically run `scripts/init-databases.sh` on the very first startup to provision the databases:
 
 - `billingdb`
 - `appointmentdb`
 - `taskdb`
 - `webstoredb`
+- `iamdb`
 
 If you need to completely reset the databases, remove the docker volume and restart:
 

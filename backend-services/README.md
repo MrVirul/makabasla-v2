@@ -130,7 +130,7 @@ When using `compose.yaml`, PostgreSQL defaults to:
 - `POSTGRES_PASSWORD=postgres`
 - Port `5432`
 
-Databases are initialized from `backend-services/setup-databases.sql`.
+Databases are initialized from `scripts/init-databases.sh`.
 
 ### Common Environment Variables
 

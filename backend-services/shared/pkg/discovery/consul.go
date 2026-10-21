@@ -15,6 +15,11 @@ type RegistryConfig struct {
 	AppPort    string
 	ConsulHost string
 	ConsulPort string
+	// CheckPort overrides the port used for the HTTP health check. It defaults
+	// to AppPort, which is correct for HTTP services. Services that expose a
+	// non-HTTP port (e.g. billing on gRPC) set this to their HTTP port so the
+	// Consul check hits a real HTTP endpoint.
+	CheckPort string
 }
 
 // Registry defines the interface for service discovery systems.
@@ -50,6 +55,15 @@ func (r *consulRegistry) Register(cfg RegistryConfig) error {
 		return fmt.Errorf("invalid app port: %v", err)
 	}
 
+	checkPort := cfg.CheckPort
+	if checkPort == "" {
+		checkPort = cfg.AppPort
+	}
+	checkPortNum, err := strconv.Atoi(checkPort)
+	if err != nil {
+		return fmt.Errorf("invalid check port: %v", err)
+	}
+
 	r.serviceID = fmt.Sprintf("%s-%s", cfg.AppName, cfg.AppPort)
 
 	registration := &api.AgentServiceRegistration{
@@ -58,7 +72,7 @@ func (r *consulRegistry) Register(cfg RegistryConfig) error {
 		Port:    port,
 		Address: cfg.AppAddress,
 		Check: &api.AgentServiceCheck{
-			HTTP:     fmt.Sprintf("http://%s:%d/health", cfg.AppAddress, port),
+			HTTP:     fmt.Sprintf("http://%s:%d/health", cfg.AppAddress, checkPortNum),
 			Interval: "10s",
 			Timeout:  "5s",
 		},

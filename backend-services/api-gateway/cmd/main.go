@@ -16,6 +16,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/makabas/api-gateway/config"
 	gatehandler "github.com/makabas/api-gateway/internal/handler"
+	"github.com/makabas/shared/pkg/discovery"
 )
 
 func NewProxy(targetHost, prefixToRemove string) echo.HandlerFunc {
@@ -70,6 +71,11 @@ func main() {
 		MaxAge:           3600,
 	}))
 
+	// Health endpoint (also used by the Consul health check)
+	e.GET("/health", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{"status": "ok"})
+	})
+
 	// Initialize internal handlers
 	billH := gatehandler.NewBillingHandler("billing-service:8083", "http://billing-service:8089")
 
@@ -90,6 +96,26 @@ func main() {
 	e.Any("/api/appointment/*", NewProxy("http://appointment-service:8085", "/api/appointment"))
 	e.Any("/api/task/*", NewProxy("http://task-mgt-service:8086", "/api/task"))
 	e.Any("/api/webstore/*", NewProxy("http://webstore-service:8087", "/api/webstore"))
+
+	// Register with Consul for service discovery
+	registry, err := discovery.NewConsulRegistry(cfg.ConsulHost, cfg.ConsulPort)
+	if err != nil {
+		log.Fatalf("Failed to create Consul registry: %v", err)
+	}
+	if err := registry.Register(discovery.RegistryConfig{
+		AppName:    cfg.AppName,
+		AppAddress: cfg.AppName,
+		AppPort:    cfg.ServerPort,
+		ConsulHost: cfg.ConsulHost,
+		ConsulPort: cfg.ConsulPort,
+	}); err != nil {
+		log.Fatalf("Failed to register with Consul: %v", err)
+	}
+	defer func() {
+		if err := registry.Deregister(); err != nil {
+			log.Printf("Failed to deregister from Consul: %v", err)
+		}
+	}()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)

@@ -17,6 +17,7 @@ import (
 	"github.com/makabas/billing-service/internal/handler"
 	"github.com/makabas/billing-service/internal/repository"
 	"github.com/makabas/billing-service/internal/service"
+	sharediscovery "github.com/makabas/shared/pkg/discovery"
 	billingpb "github.com/makabas/shared/pkg/pb/billing"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -42,6 +43,9 @@ func main() {
 	// Initialize internal REST server for monitoring/diagnostics
 	e := echo.New()
 	e.Use(middleware.CORS())
+	e.GET("/health", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{"status": "ok"})
+	})
 	e.GET("/api/v1/internal/billings", func(c echo.Context) error {
 		billings, err := svc.GetAllBillings()
 		if err != nil {
@@ -49,6 +53,28 @@ func main() {
 		}
 		return c.JSON(http.StatusOK, billings)
 	})
+
+	// Register with Consul. Billing exposes gRPC on ServerPort and HTTP health on RestPort,
+	// so the registration is built explicitly rather than reusing the HTTP-oriented helper.
+	billingRegistry, err := sharediscovery.NewConsulRegistry(cfg.ConsulHost, cfg.ConsulPort)
+	if err != nil {
+		log.Fatalf("failed to create consul registry: %v", err)
+	}
+	if err := billingRegistry.Register(sharediscovery.RegistryConfig{
+		AppName:    cfg.AppName,
+		AppAddress: cfg.AppName,
+		AppPort:    cfg.ServerPort,
+		CheckPort:  cfg.RestPort,
+		ConsulHost: cfg.ConsulHost,
+		ConsulPort: cfg.ConsulPort,
+	}); err != nil {
+		log.Fatalf("failed to register billing-service with consul: %v", err)
+	}
+	defer func() {
+		if err := billingRegistry.Deregister(); err != nil {
+			log.Printf("Failed to deregister from Consul: %v", err)
+		}
+	}()
 
 	grpcServer := grpc.NewServer()
 	billingpb.RegisterBillingServiceServer(grpcServer, h)
@@ -65,8 +91,8 @@ func main() {
 	}()
 
 	go func() {
-		log.Printf("Billing REST monitoring is starting on port 8089")
-		if err := e.Start(":8089"); err != nil {
+		log.Printf("Billing REST monitoring is starting on port %s", cfg.RestPort)
+		if err := e.Start(":" + cfg.RestPort); err != nil && err != http.ErrServerClosed {
 			log.Printf("REST monitoring server error: %v", err)
 		}
 	}()

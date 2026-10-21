@@ -9,6 +9,7 @@ import (
 
 type Config struct {
 	ServerPort string `mapstructure:"SERVER_PORT"`
+	RestPort   string `mapstructure:"REST_PORT"`
 	AppName    string `mapstructure:"APP_NAME"`
 	ConsulHost string `mapstructure:"CONSUL_HOST"`
 	ConsulPort string `mapstructure:"CONSUL_PORT"`
@@ -19,6 +20,7 @@ type Config struct {
 
 func LoadConfig() *Config {
 	viper.SetDefault("SERVER_PORT", "8083")
+	viper.SetDefault("REST_PORT", "8089")
 	viper.SetDefault("APP_NAME", "BILLING-SERVICE")
 	viper.SetDefault("CONSUL_HOST", "consul")
 	viper.SetDefault("CONSUL_PORT", "8500")
