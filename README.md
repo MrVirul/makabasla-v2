@@ -182,6 +182,21 @@ docker compose logs -f
 
 Consul UI at http://localhost:8500 should list every healthy service.
 
+### 3.1 Seed sample data (optional)
+
+```bash
+./scripts/seed-data.sh
+```
+
+This fills every service database with a small, consistent data set and creates the
+sample users. Credentials are listed in the
+[Setup Guide](docs/SETUP_GUIDE.md#5-sample-user-credentials).
+
+> [!WARNING]
+> The IAM service stores and compares passwords in plaintext, and the sample
+> accounts are for local development only. See the
+> [credentials section](docs/SETUP_GUIDE.md#5-sample-user-credentials) for details.
+
 ### 4. Start the frontend
 
 ```bash
