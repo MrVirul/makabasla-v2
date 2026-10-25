@@ -201,6 +201,9 @@ func (h *IamHandler) RegisterRoutes(e *echo.Echo) {
 	e.GET("/api/v1/vehicles", h.GetAllVehicles)
 	e.GET("/api/v1/customers", h.GetAllCustomers)
 	e.POST("/api/v1/auth/login", h.Login)
+	// Alias so the gateway's short form (/api/auth/login) maps onto a route
+	// that sits alongside the rest of the IAM resources.
+	e.POST("/api/v1/login", h.Login)
 	e.POST("/api/v1/register", h.Register)
 }
 

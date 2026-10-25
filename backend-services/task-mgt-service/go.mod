@@ -1,14 +1,16 @@
 module github.com/makabas/task-mgt-service
 
-go 1.26
+go 1.26.1
 
 require (
-	github.com/hashicorp/consul/api v1.33.4
 	github.com/labstack/echo/v4 v4.15.1
+	github.com/makabas/shared v0.0.0-00010101000000-000000000000
 	github.com/spf13/viper v1.21.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
 )
+
+require github.com/hashicorp/consul/api v1.33.4 // indirect
 
 require (
 	github.com/armon/go-metrics v0.4.1 // indirect
@@ -51,3 +53,5 @@ require (
 	golang.org/x/text v0.32.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 )
+
+replace github.com/makabas/shared => ../shared

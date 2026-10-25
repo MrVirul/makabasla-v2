@@ -20,6 +20,10 @@ type RegistryConfig struct {
 	// non-HTTP port (e.g. billing on gRPC) set this to their HTTP port so the
 	// Consul check hits a real HTTP endpoint.
 	CheckPort string
+	// Meta carries arbitrary key/value pairs alongside the registration. It is
+	// used to publish ports that are not the service's main port, such as the
+	// billing service's REST monitoring port.
+	Meta map[string]string
 }
 
 // Registry defines the interface for service discovery systems.
@@ -71,6 +75,7 @@ func (r *consulRegistry) Register(cfg RegistryConfig) error {
 		Name:    cfg.AppName,
 		Port:    port,
 		Address: cfg.AppAddress,
+		Meta:    cfg.Meta,
 		Check: &api.AgentServiceCheck{
 			HTTP:     fmt.Sprintf("http://%s:%d/health", cfg.AppAddress, checkPortNum),
 			Interval: "10s",

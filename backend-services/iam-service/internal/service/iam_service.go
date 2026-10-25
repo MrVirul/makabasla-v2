@@ -2,11 +2,12 @@ package service
 
 import (
 	"fmt"
+	"log"
 	"time"
 
+	"github.com/makabas/iam-service/internal/auth"
 	"github.com/makabas/iam-service/internal/models"
 	"github.com/makabas/iam-service/internal/repository"
-	// "golang.org/x/crypto/bcrypt"
 )
 
 type IamService interface {
@@ -83,13 +84,20 @@ func (s *iamService) LoginAdmin(username, password string) (interface{}, error) 
 		return nil, fmt.Errorf("invalid credentials")
 	}
 
-	// For dev phase, if password matches or is 'admin' bypass
-	if admin.Password != "" && admin.Password != password {
-		if password != "admin" { // Dev bypass
-			return nil, fmt.Errorf("invalid credentials")
+	matched, needsRehash := auth.VerifyPassword(admin.Password, password)
+	if !matched {
+		return nil, fmt.Errorf("invalid credentials")
+	}
+
+	if needsRehash {
+		// Upgrade a legacy plaintext credential to a bcrypt hash on first use.
+		if hashed, hashErr := auth.HashPassword(password); hashErr == nil {
+			if updateErr := s.repo.UpdateAdminPassword(admin.ID, hashed); updateErr != nil {
+				log.Printf("[Service] Failed to upgrade password hash for admin %s: %v", admin.ID, updateErr)
+			}
 		}
 	}
-	
+
 	return map[string]interface{}{
 		"id":    admin.ID,
 		"name":  admin.Name,
@@ -105,10 +113,18 @@ func (s *iamService) LoginCustomer(email, password string) (interface{}, error) 
 		return nil, fmt.Errorf("invalid credentials")
 	}
 
-	// For now, if customer has a password, we verify it.
-	// If they don't have a password (e.g. Google-only), we might need to handle that.
-	if customer.Password != "" && customer.Password != password {
+	matched, needsRehash := auth.VerifyPassword(customer.Password, password)
+	if !matched {
 		return nil, fmt.Errorf("invalid credentials")
+	}
+
+	if needsRehash {
+		// Upgrade a legacy plaintext credential to a bcrypt hash on first use.
+		if hashed, hashErr := auth.HashPassword(password); hashErr == nil {
+			if updateErr := s.repo.UpdateCustomerPassword(customer.ID, hashed); updateErr != nil {
+				log.Printf("[Service] Failed to upgrade password hash for customer %s: %v", customer.ID, updateErr)
+			}
+		}
 	}
 
 	return map[string]interface{}{
@@ -148,10 +164,15 @@ func (s *iamService) RegisterCustomer(email, password, name, phone string) (inte
 	// Simple ID generation for dev
 	id := fmt.Sprintf("cust_%d", time.Now().UnixNano())
 
+	hashed, err := auth.HashPassword(password)
+	if err != nil {
+		return nil, fmt.Errorf("password must contain at least one character")
+	}
+
 	customer := &models.Customer{
 		ID:       id,
 		Email:    email,
-		Password: password,
+		Password: hashed,
 		Name:     name,
 		Phone:    &phone,
 	}

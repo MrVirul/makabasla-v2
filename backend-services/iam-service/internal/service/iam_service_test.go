@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/makabas/iam-service/internal/auth"
 	"github.com/makabas/iam-service/internal/models"
 )
 
@@ -21,6 +22,8 @@ type mockIamRepo struct {
 	getAllCustomersFunc    func() ([]models.Customer, error)
 	loginAdminFunc         func(username, password string) (*models.Admin, error)
 	loginCustomerFunc      func(email, password string) (*models.Customer, error)
+	updateAdminPasswordFunc    func(id, password string) error
+	updateCustomerPasswordFunc func(id, password string) error
 	createCustomerFunc     func(customer *models.Customer) error
 	getCustomerByEmailFunc func(email string) (*models.Customer, error)
 	getCustomerByPhoneFunc func(phone string) (*models.Customer, error)
@@ -49,6 +52,18 @@ func (m *mockIamRepo) GetAllCustomers() ([]models.Customer, error) { return m.ge
 func (m *mockIamRepo) LoginAdmin(u, p string) (*models.Admin, error) { return m.loginAdminFunc(u, p) }
 func (m *mockIamRepo) LoginCustomer(e, p string) (*models.Customer, error) {
 	return m.loginCustomerFunc(e, p)
+}
+func (m *mockIamRepo) UpdateAdminPassword(id, p string) error {
+	if m.updateAdminPasswordFunc == nil {
+		return nil
+	}
+	return m.updateAdminPasswordFunc(id, p)
+}
+func (m *mockIamRepo) UpdateCustomerPassword(id, p string) error {
+	if m.updateCustomerPasswordFunc == nil {
+		return nil
+	}
+	return m.updateCustomerPasswordFunc(id, p)
 }
 func (m *mockIamRepo) CreateCustomer(c *models.Customer) error { return m.createCustomerFunc(c) }
 func (m *mockIamRepo) GetCustomerByEmail(e string) (*models.Customer, error) {
@@ -179,5 +194,184 @@ func TestIamService_SyncProfile(t *testing.T) {
 			}
 		})
 	})
+}
+
+func TestIamService_LoginAdmin(t *testing.T) {
+	hashed, err := auth.HashPassword("admin123")
+	if err != nil {
+		t.Fatalf("failed to hash password: %v", err)
+	}
+
+	t.Run("Success: correct password", func(t *testing.T) {
+		mockRepo := &mockIamRepo{
+			loginAdminFunc: func(u, p string) (*models.Admin, error) {
+				return &models.Admin{ID: "ad-1", Username: u, Password: hashed}, nil
+			},
+		}
+		svc := NewIamService(mockRepo)
+
+		res, err := svc.LoginAdmin("admin", "admin123")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if res == nil {
+			t.Error("expected a non-nil result on success")
+		}
+	})
+
+	t.Run("Failure: wrong password", func(t *testing.T) {
+		mockRepo := &mockIamRepo{
+			loginAdminFunc: func(u, p string) (*models.Admin, error) {
+				return &models.Admin{ID: "ad-1", Username: u, Password: hashed}, nil
+			},
+		}
+		svc := NewIamService(mockRepo)
+
+		if _, err := svc.LoginAdmin("admin", "wrongpass"); err == nil {
+			t.Error("expected an error for a wrong password")
+		}
+	})
+
+	t.Run("Failure: dev bypass password is rejected", func(t *testing.T) {
+		mockRepo := &mockIamRepo{
+			loginAdminFunc: func(u, p string) (*models.Admin, error) {
+				return &models.Admin{ID: "ad-1", Username: u, Password: hashed}, nil
+			},
+		}
+		svc := NewIamService(mockRepo)
+
+		if _, err := svc.LoginAdmin("admin", "admin"); err == nil {
+			t.Error("expected the removed 'admin' bypass to be rejected")
+		}
+	})
+
+	t.Run("Failure: empty stored password is rejected", func(t *testing.T) {
+		mockRepo := &mockIamRepo{
+			loginAdminFunc: func(u, p string) (*models.Admin, error) {
+				return &models.Admin{ID: "ad-1", Username: u, Password: ""}, nil
+			},
+		}
+		svc := NewIamService(mockRepo)
+
+		if _, err := svc.LoginAdmin("admin", ""); err == nil {
+			t.Error("expected an empty stored password to be rejected")
+		}
+		if _, err := svc.LoginAdmin("admin", "anything"); err == nil {
+			t.Error("expected an empty stored password to reject any password")
+		}
+	})
+
+	t.Run("Success: legacy plaintext password is upgraded", func(t *testing.T) {
+		var stored string
+		mockRepo := &mockIamRepo{
+			loginAdminFunc: func(u, p string) (*models.Admin, error) {
+				return &models.Admin{ID: "ad-1", Username: u, Password: stored}, nil
+			},
+			updateAdminPasswordFunc: func(id, p string) error {
+				stored = p
+				return nil
+			},
+		}
+		stored = "legacy-plaintext"
+		svc := NewIamService(mockRepo)
+
+		if _, err := svc.LoginAdmin("admin", "legacy-plaintext"); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !auth.IsBcryptHash(stored) {
+			t.Error("expected the legacy credential to be upgraded to a bcrypt hash")
+		}
+	})
+}
+
+func TestIamService_LoginCustomer(t *testing.T) {
+	hashed, err := auth.HashPassword("customer123")
+	if err != nil {
+		t.Fatalf("failed to hash password: %v", err)
+	}
+
+	t.Run("Success: correct password", func(t *testing.T) {
+		mockRepo := &mockIamRepo{
+			loginCustomerFunc: func(e, p string) (*models.Customer, error) {
+				return &models.Customer{ID: "cu-1", Email: e, Password: hashed}, nil
+			},
+		}
+		svc := NewIamService(mockRepo)
+
+		res, err := svc.LoginCustomer("kasun@example.test", "customer123")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if res == nil {
+			t.Error("expected a non-nil result on success")
+		}
+	})
+
+	t.Run("Failure: wrong password", func(t *testing.T) {
+		mockRepo := &mockIamRepo{
+			loginCustomerFunc: func(e, p string) (*models.Customer, error) {
+				return &models.Customer{ID: "cu-1", Email: e, Password: hashed}, nil
+			},
+		}
+		svc := NewIamService(mockRepo)
+
+		if _, err := svc.LoginCustomer("kasun@example.test", "wrongpass"); err == nil {
+			t.Error("expected an error for a wrong password")
+		}
+	})
+
+	t.Run("Failure: google-only account with no password is rejected", func(t *testing.T) {
+		mockRepo := &mockIamRepo{
+			loginCustomerFunc: func(e, p string) (*models.Customer, error) {
+				return &models.Customer{ID: "cu-1", Email: e, Password: ""}, nil
+			},
+		}
+		svc := NewIamService(mockRepo)
+
+		if _, err := svc.LoginCustomer("google@example.test", ""); err == nil {
+			t.Error("expected an empty stored password to be rejected")
+		}
+		if _, err := svc.LoginCustomer("google@example.test", "anything"); err == nil {
+			t.Error("expected an empty stored password to reject any password")
+		}
+	})
+}
+
+func TestIamService_RegisterCustomerHashesPassword(t *testing.T) {
+	var created *models.Customer
+	mockRepo := &mockIamRepo{
+		getCustomerByEmailFunc: func(e string) (*models.Customer, error) {
+			return nil, errors.New("not found")
+		},
+		getCustomerByPhoneFunc: func(p string) (*models.Customer, error) {
+			return nil, errors.New("not found")
+		},
+		createCustomerFunc: func(c *models.Customer) error {
+			created = c
+			return nil
+		},
+	}
+	svc := NewIamService(mockRepo)
+
+	if _, err := svc.RegisterCustomer("new@test.com", "plaintext-secret", "New User", "0123456789"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if created == nil {
+		t.Fatal("expected a customer to be created")
+	}
+	if created.Password == "plaintext-secret" {
+		t.Error("password was stored in plaintext")
+	}
+	if !auth.IsBcryptHash(created.Password) {
+		t.Errorf("expected a bcrypt hash, got %q", created.Password)
+	}
+
+	matched, needsRehash := auth.VerifyPassword(created.Password, "plaintext-secret")
+	if !matched {
+		t.Error("expected the hashed password to verify")
+	}
+	if needsRehash {
+		t.Error("expected a freshly generated hash to be up to date")
+	}
 }
 

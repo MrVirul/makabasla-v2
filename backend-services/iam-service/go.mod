@@ -1,11 +1,12 @@
 module github.com/makabas/iam-service
 
-go 1.26
+go 1.26.1
 
 require (
-	github.com/hashicorp/consul/api v1.33.4
 	github.com/labstack/echo/v4 v4.15.1
+	github.com/makabas/shared v0.0.0-00010101000000-000000000000
 	github.com/spf13/viper v1.21.0
+	golang.org/x/crypto v0.46.0
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
 )
@@ -15,6 +16,7 @@ require (
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
+	github.com/hashicorp/consul/api v1.33.4 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
@@ -43,7 +45,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.46.0 // indirect
 	golang.org/x/exp v0.0.0-20250808145144-a408d31f581a // indirect
 	golang.org/x/net v0.48.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect

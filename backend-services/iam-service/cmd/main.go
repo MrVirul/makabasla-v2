@@ -13,7 +13,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/makabas/iam-service/config"
 	"github.com/makabas/iam-service/internal/database"
-	"github.com/makabas/iam-service/internal/discovery"
+	"github.com/makabas/shared/pkg/discovery"
 	"github.com/makabas/iam-service/internal/handler"
 	"github.com/makabas/iam-service/internal/repository"
 	"github.com/makabas/iam-service/internal/service"
@@ -52,15 +52,21 @@ func main() {
 	h.RegisterRoutes(e)
 
 	// Register with Consul for service discovery
-	consulClient, err := discovery.NewConsulClient(cfg)
+	registry, err := discovery.NewConsulRegistry(cfg.ConsulHost, cfg.ConsulPort)
 	if err != nil {
-		log.Fatalf("Failed to create Consul client: %v", err)
+		log.Fatalf("Failed to create Consul registry: %v", err)
 	}
-	if err := consulClient.Register(cfg); err != nil {
+	if err := registry.Register(discovery.RegistryConfig{
+		AppName:    cfg.AppName,
+		AppAddress: cfg.AppName,
+		AppPort:    cfg.ServerPort,
+		ConsulHost: cfg.ConsulHost,
+		ConsulPort: cfg.ConsulPort,
+	}); err != nil {
 		log.Fatalf("Failed to register with Consul: %v", err)
 	}
 	defer func() {
-		if err := consulClient.Deregister(); err != nil {
+		if err := registry.Deregister(); err != nil {
 			log.Printf("Failed to deregister from Consul: %v", err)
 		}
 	}()

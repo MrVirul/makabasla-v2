@@ -21,6 +21,8 @@ type IamRepository interface {
 	GetAllCustomers() ([]models.Customer, error)
 	LoginAdmin(username string, password string) (*models.Admin, error)
 	LoginCustomer(email string, password string) (*models.Customer, error)
+	UpdateAdminPassword(id string, password string) error
+	UpdateCustomerPassword(id string, password string) error
 	CreateCustomer(customer *models.Customer) error
 	GetCustomerByEmail(email string) (*models.Customer, error)
 	GetCustomerByPhone(phone string) (*models.Customer, error)
@@ -218,6 +220,19 @@ func (r *iamRepository) LoginCustomer(email string, password string) (*models.Cu
 		return nil, err
 	}
 	return &customer, nil
+}
+
+// UpdateAdminPassword replaces an administrator's stored credential. It is used
+// to upgrade legacy plaintext passwords to a bcrypt hash after a successful
+// login.
+func (r *iamRepository) UpdateAdminPassword(id string, password string) error {
+	return r.db.Model(&models.Admin{}).Where("id = ?", id).Update("password", password).Error
+}
+
+// UpdateCustomerPassword replaces a customer's stored credential. It is used to
+// upgrade legacy plaintext passwords to a bcrypt hash after a successful login.
+func (r *iamRepository) UpdateCustomerPassword(id string, password string) error {
+	return r.db.Model(&models.Customer{}).Where("id = ?", id).Update("password", password).Error
 }
 
 func (r *iamRepository) CreateCustomer(customer *models.Customer) error {

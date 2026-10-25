@@ -16,6 +16,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/makabas/api-gateway/config"
 	gatehandler "github.com/makabas/api-gateway/internal/handler"
+	"github.com/makabas/api-gateway/internal/proxy"
 	"github.com/makabas/shared/pkg/discovery"
 )
 
@@ -59,6 +60,21 @@ func NewProxy(targetHost, prefixToRemove string) echo.HandlerFunc {
 func main() {
 	cfg := config.LoadConfig()
 
+	// Build a Consul-backed resolver with Docker hostnames as fallbacks so the
+	// gateway still routes correctly if Consul is temporarily unavailable.
+	registry, err := discovery.NewConsulRegistry(cfg.ConsulHost, cfg.ConsulPort)
+	if err != nil {
+		log.Fatalf("Failed to create Consul registry: %v", err)
+	}
+
+	resolver := discovery.NewResolver(registry, map[string]string{
+		"iam-service":         "iam-service:8084",
+		"appointment-service": "appointment-service:8085",
+		"task-mgt-service":    "task-mgt-service:8086",
+		"webstore-service":    "webstore-service:8087",
+		"billing-service":     "billing-service:8089",
+	})
+
 	e := echo.New()
 	e.Use(middleware.Recover())
 	
@@ -92,16 +108,15 @@ func main() {
 	e.DELETE("/api/billing/:vehicleId", billH.DeleteBilling)
 
 	// Direct Proxy Routes
-	e.Any("/api/auth/*", NewProxy("http://iam-service:8084", "/api/auth"))            // IAM maps to auth here
-	e.Any("/api/appointment/*", NewProxy("http://appointment-service:8085", "/api/appointment"))
-	e.Any("/api/task/*", NewProxy("http://task-mgt-service:8086", "/api/task"))
-	e.Any("/api/webstore/*", NewProxy("http://webstore-service:8087", "/api/webstore"))
+	// The routes accept both the short form (/api/<service>/...) and the
+	// frontend's double form (/api/<service>/api/v1/...). They resolve backend
+	// instances via Consul with hard-coded Docker hostnames as a fallback.
+	e.Any("/api/auth/*", proxy.Handler(resolver, proxy.Route{Service: "iam-service", Prefix: "/api/auth", APIBase: "/api/v1", RootPath: "/api/v1"}))
+	e.Any("/api/appointment/*", proxy.Handler(resolver, proxy.Route{Service: "appointment-service", Prefix: "/api/appointment", APIBase: "/api/v1/appointment", RootPath: "/api/v1/appointment"}))
+	e.Any("/api/task/*", proxy.Handler(resolver, proxy.Route{Service: "task-mgt-service", Prefix: "/api/task", APIBase: "/api/v1"}))
+	e.Any("/api/webstore/*", proxy.Handler(resolver, proxy.Route{Service: "webstore-service", Prefix: "/api/webstore", APIBase: "/api/v1/webstore"}))
 
 	// Register with Consul for service discovery
-	registry, err := discovery.NewConsulRegistry(cfg.ConsulHost, cfg.ConsulPort)
-	if err != nil {
-		log.Fatalf("Failed to create Consul registry: %v", err)
-	}
 	if err := registry.Register(discovery.RegistryConfig{
 		AppName:    cfg.AppName,
 		AppAddress: cfg.AppName,
